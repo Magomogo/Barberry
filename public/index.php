@@ -2,8 +2,8 @@
 
 include __DIR__ . '/../bootstrap.php';
 
-$r = new Dispatcher();
+$r = new Dispatcher(new Controller(new Storage_File()));
 
-$controller = $r->dispatch($_SERVER['REQUEST_URI'], $_REQUEST);
+$controller = $r->dispatchRequest($_SERVER['REQUEST_URI'], $_FILES);
 $response = $controller->{$_SERVER['REQUEST_METHOD']}();
 $response->send();

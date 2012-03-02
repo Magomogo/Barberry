@@ -5,19 +5,25 @@ class Dispatcher {
     /**
      * @var Storage_Interface
      */
-    private $storage;
+    private $controller;
 
+    /**
+     * @var FileLoader
+     */
+    private $fileLoader;
 
-    public function __construct(Storage_Interface $storage) {
-        $this->storage = $storage;
+    public function __construct(Controller_Interface $controller, $fileLoader) {
+        $this->controller = $controller;
+        $this->fileLoader = $fileLoader;
     }
 
-    public function dispatch($uri, $requestArray) {
-        return new Controller(
-            $this->storage,
+    public function dispatchRequest($uri, array $phpFiles = array()) {
+        $this->controller->requestDispatched(
             self::extractId($uri),
-            self::extractOutputContentType($uri)
+            self::extractOutputContentType($uri),
+            $this->fileLoader->process($phpFiles)
         );
+        return $this->controller;
     }
 
 //--------------------------------------------------------------------------------------------------

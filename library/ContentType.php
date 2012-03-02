@@ -11,6 +11,18 @@ class ContentType {
 
     private $contentTypeString;
 
+    public static function jpeg() {
+        return new self(self::$extensionMap['jpg'][0]);
+    }
+
+    public static function gif() {
+        return new self(self::$extensionMap['gif'][0]);
+    }
+
+    public static function json() {
+        return new self(self::$extensionMap['json'][0]);
+    }
+
     public static function createByExtention($ext) {
         if(isset(self::$extensionMap[$ext])) {
             return new self(self::$extensionMap[$ext][0]);

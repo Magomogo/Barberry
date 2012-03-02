@@ -4,32 +4,43 @@ class DispatcherTest extends PHPUnit_Framework_TestCase {
 
     public function testInstantiatesAController() {
         $this->assertInstanceOf(
-            'Controller',
-            $this->d()->dispatch('/12345zx.jpg', array())
+            'Controller_Interface',
+            $this->d()->dispatchRequest('/12345zx.jpg')
         );
     }
 
     public function testIdentifiesIdAtTheRequestUri() {
-        $d = $this->d();
-        $controller = $d->dispatch('/12345zx.jpg', array());
-        $this->assertAttributeEquals('12345zx', 'entityId', $controller);
+        $controller = $this->getMock('Controller_Interface');
+        $controller->expects($this->once())->method('requestProcessed')->with('12345zx');
+
+        $this->d($controller)->dispatchRequest('/12345zx.jpg');
     }
 
     public function testUnderstandsOutputContentTypeByExtensionGiven() {
-        $d = $this->d();
-        $controller = $d->dispatch('/12345zx.jpg', array());
-        $this->assertAttributeEquals(
-            ContentType::createByExtention('jpeg'),
-            'outputContentType',
-            $controller
-        );
+        $controller = $this->getMock('Controller_Interface');
+        $controller
+                ->expects($this->once())
+                ->method('requestProcessed')
+                ->with(
+                    $this->anything(), ContentType::jpeg()
+                );
+
+        $this->d($controller)->dispatchRequest('/12345zx.jpg');
+    }
+
+    public function testDelegatesFileLoading() {
+        $loader = $this->getMock('FileLoader');
+        $loader->expects($this->once())->method('process')->with(array('_FILES'));
+
+        $this->d(null, $loader)->dispatchRequest('foo', array('_FILES'));
     }
 
 //--------------------------------------------------------------------------------------------------
 
-    private function d(Storage_Interface $storageMock = null) {
+    private function d(Controller_Interface $controller = null, $loader = null) {
         return new Dispatcher(
-            $storageMock ?: $this->getMock('Storage_Interface')
+            $controller ?: $this->getMock('Controller_Interface'),
+            $loader ?: $this->getMock('FileLoader')
         );
     }
 }

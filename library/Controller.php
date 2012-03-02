@@ -1,11 +1,11 @@
 <?php
 
-class Controller {
+class Controller implements Controller_Interface {
 
     /**
      * @var null|string
      */
-    private $entityId;
+    private $docId;
 
     /**
      * @var null|ContentType
@@ -17,17 +17,18 @@ class Controller {
      */
     private $storage;
 
-    public function __construct(Storage_Interface $storage,
-                                $entityId = null,
-                                ContentType $outputContentType = null) {
-        $this->entityId = $entityId;
+    public function __construct(Storage_Interface $storage) {
         $this->storage = $storage;
+    }
+
+    public function requestDispatched($docId, ContentType $outputContentType = null, $bin = null) {
+        $this->docId = $docId;
         $this->outputContentType = $outputContentType;
     }
 
     public function POST() {
         return self::response(
-            ContentType::createByExtention('json'),
+            ContentType::json(),
             json_encode(
                 array(
                     'id' => $this->storage->save('')
@@ -37,7 +38,7 @@ class Controller {
     }
 
     public function GET() {
-        $bin = $this->storage->getById($this->entityId);
+        $bin = $this->storage->getById($this->docId);
         $direction = new ConvertDirection($bin, $this->outputContentType);
 
         return self::response(
@@ -46,11 +47,12 @@ class Controller {
         );
     }
 
+    /**
+     * @TODO implement
+     * @return Response
+     */
     public function DELETE() {
-        return self::response(
-            ContentType::createByExtention('json'),
-            '{}'
-        );
+        return self::response(ContentType::json(), '{}');
     }
 
 //--------------------------------------------------------------------------------------------------
@@ -58,4 +60,5 @@ class Controller {
     private static function response($contentType, $body) {
         return new Response($contentType, $body);
     }
+
 }
