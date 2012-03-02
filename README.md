@@ -23,7 +23,7 @@ We desided to use REST interface. Here are the commands.
 Submitting data to the service.
 
     Url: /
-    Data: Document and (optionally) variables to parse of Document is a template
+    Data: Document and (optionally) variables to parse if Document is a template
     Return: {id : "_auto_generated_id_string_"}
 
 
