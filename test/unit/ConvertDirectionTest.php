@@ -6,7 +6,7 @@ class ConvertDirectionTest extends PHPUnit_Framework_TestCase {
         $this->assertAttributeEquals(
             'phpToJpg',
             'factoryMethod',
-            self::phpToImageDirection()
+            self::phpToSomethingDirection()
         );
     }
 
@@ -14,27 +14,36 @@ class ConvertDirectionTest extends PHPUnit_Framework_TestCase {
         $factory = $this->getMock('Test_FakeConverterFactory');
         $factory->expects($this->once())->method(('phpToJpg'));
 
-        self::phpToImageDirection()->initConverter($factory);
+        self::phpToSomethingDirection()->initConverter($factory);
     }
 
     public function testThrowExceptionWhenDirectionIsNotAvailable() {
         $this->setExpectedException('Converter_NotAvailableException');
 
-        self::phpToImageDirection('gif')->initConverter(
+        self::phpToSomethingDirection('gif')->initConverter(
             $this->getMock('Test_FakeConverterFactory')
         );
     }
 
-    private static function phpToImageDirection($imageExt='jpg') {
+    public function testSameSourceAndDestinationActivatesNullConverter() {
+        $factory = $this->getMock('Test_FakeConverterFactory');
+        $factory->expects($this->once())->method(('nullConverter'));
+
+        self::phpToSomethingDirection('php')->initConverter($factory);
+    }
+
+//--------------------------------------------------------------------------------------------------
+
+    private static function phpToSomethingDirection($ext='jpg') {
         return new ConvertDirection(
             file_get_contents(__FILE__),
-            ContentType::createByExtention($imageExt)
+            ContentType::createByExtention($ext)
         );
     }
 
 }
 
-
 interface Test_FakeConverterFactory {
     public function phpToJpg();
+    public function nullConverter();
 }

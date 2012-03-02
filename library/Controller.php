@@ -22,11 +22,12 @@ class Controller {
                                 ContentType $outputContentType = null) {
         $this->entityId = $entityId;
         $this->storage = $storage;
-        $this->outputContentType = $outputContentType ?: ContentType::createByExtention('json');
+        $this->outputContentType = $outputContentType;
     }
 
     public function POST() {
-        return $this->response(
+        return self::response(
+            ContentType::createByExtention('json'),
             json_encode(
                 array(
                     'id' => $this->storage->save('')
@@ -37,20 +38,24 @@ class Controller {
 
     public function GET() {
         $bin = $this->storage->getById($this->entityId);
-/*        $detector = new ConvertDirection(new ConverterFactory(), $bin, $this->outputContentType);
-        $converter = $detector->createConverter();*/
+        $direction = new ConvertDirection($bin, $this->outputContentType);
 
-        return $this->response(''/*$converter->convert($bin)*/);
+        return self::response(
+            $this->outputContentType,
+            $direction->initConverter(new Converter_Factory())->convert($bin)
+        );
     }
 
     public function DELETE() {
-
-        return $this->response('{}');
+        return self::response(
+            ContentType::createByExtention('json'),
+            '{}'
+        );
     }
 
 //--------------------------------------------------------------------------------------------------
 
-    private function response($body = '') {
-        return new Response($this->outputContentType, $body);
+    private static function response($contentType, $body) {
+        return new Response($contentType, $body);
     }
 }

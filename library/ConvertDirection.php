@@ -6,14 +6,25 @@ class ConvertDirection {
 
     public function __construct($sourceBinary, ContentType $destinationContentType) {
         $finfo = new finfo(FILEINFO_MIME);
-        $this->factoryMethod =
-            ContentType::createByContentTypeString($finfo->buffer($sourceBinary))->standartExtention().
-            "To".
-            ucfirst($destinationContentType->standartExtention());
+        $sourceExt = ContentType::createByContentTypeString($finfo->buffer($sourceBinary))
+                ->standartExtention();
+        $destinationExt = $destinationContentType->standartExtention();
+
+        if ($sourceExt != $destinationExt) {
+            $this->factoryMethod = $sourceExt . 'To' . ucfirst($destinationExt);
+        } else {
+            $this->factoryMethod = 'nullConverter';
+        }
 
     }
 
+    /**
+     * @param $factory
+     * @return Converter_Interface
+     * @throws Converter_NotAvailableException
+     */
     public function initConverter($factory) {
+
         if(method_exists($factory, $this->factoryMethod)) {
             return $factory->{$this->factoryMethod}();
         }
