@@ -22,6 +22,9 @@ class Controller implements Controller_Interface {
      */
     private $storage;
 
+    /**
+     * @param Storage_Interface $storage
+     */
     public function __construct(Storage_Interface $storage) {
         $this->storage = $storage;
     }
@@ -39,6 +42,10 @@ class Controller implements Controller_Interface {
         return $this;
     }
 
+    /**
+     * @return Response
+     * @throws Controller_NullPostException
+     */
     public function POST() {
         if (!strlen($this->postedFile)) {
             throw new Controller_NullPostException;
@@ -54,8 +61,17 @@ class Controller implements Controller_Interface {
         );
     }
 
+    /**
+     * @return Response
+     * @throws Controller_NotFoundException
+     */
     public function GET() {
         $bin = $this->storage->getById($this->docId);
+
+        if (!strlen($bin)) {
+            throw new Controller_NotFoundException;
+        }
+
         $direction = new ConvertDirection($bin, $this->outputContentType);
 
         return self::response(
@@ -67,9 +83,14 @@ class Controller implements Controller_Interface {
     /**
      * @TODO implement
      * @return Response
+     * @throws Controller_NotFoundException
      */
     public function DELETE() {
         return self::response(ContentType::json(), '{}');
+    }
+
+    public function __call($name, $args) {
+        throw new Controller_NotFoundException;
     }
 
 //--------------------------------------------------------------------------------------------------

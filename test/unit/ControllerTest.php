@@ -57,6 +57,16 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
         self::c()->POST();
     }
 
+    public function testThrowsNotFoundExceptionWhenUnknownMethodIsCalled() {
+        $this->setExpectedException('Controller_NotFoundException');
+        self::c()->PUT();
+    }
+
+    public function testThrowsNotFoundExceptionWhenStorageHasNoContentForRequestedId() {
+        $this->setExpectedException('Controller_NotFoundException');
+        self::c(Test_Stub::create('Storage_Interface', 'getById', null))->GET();
+    }
+
 //--------------------------------------------------------------------------------------------------
 
     private static function c(Storage_Interface $storage = null, $entityId = null, $outputContentType = null) {
