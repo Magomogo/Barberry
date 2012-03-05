@@ -13,6 +13,11 @@ class Controller implements Controller_Interface {
     private $outputContentType;
 
     /**
+     * @var string
+     */
+    private $postedFile;
+
+    /**
      * @var Storage_Interface
      */
     private $storage;
@@ -21,17 +26,29 @@ class Controller implements Controller_Interface {
         $this->storage = $storage;
     }
 
+    /**
+     * @param $docId
+     * @param ContentType|null $outputContentType
+     * @param null|string $bin
+     * @return Controller
+     */
     public function requestDispatched($docId, ContentType $outputContentType = null, $bin = null) {
         $this->docId = $docId;
         $this->outputContentType = $outputContentType;
+        $this->postedFile = $bin;
+        return $this;
     }
 
     public function POST() {
+        if (!strlen($this->postedFile)) {
+            throw new Controller_NullPostException;
+        }
+
         return self::response(
             ContentType::json(),
             json_encode(
                 array(
-                    'id' => $this->storage->save('')
+                    'id' => $this->storage->save($this->postedFile)
                 )
             )
         );

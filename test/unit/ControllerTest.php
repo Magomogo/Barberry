@@ -3,17 +3,20 @@
 class ControllerTest extends PHPUnit_Framework_TestCase {
 
     public function testDataType() {
-        $this->assertInstanceOf('Controller_Interface', $this->c());
+        $this->assertInstanceOf('Controller_Interface', self::c());
     }
 
     public function testGETReadsStorage() {
-        $storage = $this->aGifStorageStub();
-        $storage->expects($this->once())->method('getById')->with('123asd');
+        $storage = $this->getMock('Storage_Interface');
+        $storage->expects($this->once())
+                ->method('getById')
+                ->will($this->returnValue(Test_Data::gif1x1()))
+                ->with('123asd');
         $this->c($storage, '123asd', ContentType::createByExtention('gif'))->GET();
     }
 
     public function testGETReturnsAResponseObject() {
-        $this->assertInstanceOf('Response', $this->c()->GET());
+        $this->assertInstanceOf('Response', self::c()->GET());
     }
 
     public function testGETResponseContainsCorrectContentType() {
@@ -22,38 +25,47 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testPOSTResponseIsJson() {
-        $response = $this->c()->POST();
+        $response = self::c()->requestDispatched(null, null, '123')->POST();
         $this->assertEquals(ContentType::json(), $response->contentType);
     }
 
     public function testDELETEResponseIsJson() {
-        $response = $this->c()->DELETE();
+        $response = self::c()->DELETE();
         $this->assertEquals(ContentType::json(), $response->contentType);
     }
 
-    public function testPOSTReturnEntityIdAtSaveToStorage() {
+    public function testPOSTReturnsEntityIdAtSaveToStorage() {
         $storage = $this->getMock('Storage_Interface');
         $storage->expects($this->once())->method('save')->will($this->returnValue('12345xz'));
 
         $this->assertEquals(
             new Response(ContentType::json(), json_encode(array('id'=>'12345xz'))),
-            $this->c($storage)->POST()
+            $this->c($storage)->requestDispatched(null, null, '123')->POST()
         );
+    }
+
+    public function testSavesPostedContentToTheStorage() {
+        $storage = $this->getMock('Storage_Interface');
+        $storage->expects($this->once())->method('save')->with('0101010111');
+        $controller = $this->c($storage);
+        $controller->requestDispatched(null, null, '0101010111');
+        $controller->POST();
+    }
+
+    public function testThrowsNullPostValueWhenNoContentPosted() {
+        $this->setExpectedException('Controller_NullPostException');
+        self::c()->POST();
     }
 
 //--------------------------------------------------------------------------------------------------
 
-    private function c(Storage_Interface $storage = null, $entityId = null, $outputContentType = null) {
-        $c = new Controller($storage ?: $this->aGifStorageStub());
+    private static function c(Storage_Interface $storage = null, $entityId = null, $outputContentType = null) {
+        $c = new Controller($storage ?: self::aGifStorageStub());
         $c->requestDispatched($entityId, $outputContentType ?: ContentType::gif());
         return $c;
     }
 
-    private function aGifStorageStub() {
-        $stub = $this->getMock('Storage_Interface');
-        $stub->expects($this->any())->method('getById')->will($this->returnValue(
-            Test_Data::gif1x1()
-        ));
-        return $stub;
+    private static function aGifStorageStub() {
+        return Test_Stub::create('Storage_Interface', 'getById', Test_Data::gif1x1());
     }
 }
