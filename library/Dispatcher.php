@@ -8,20 +8,21 @@ class Dispatcher {
     private $controller;
 
     /**
-     * @var FileLoader
+     * @var PostedDataProcessor
      */
-    private $fileLoader;
+    private $dataProcessor;
 
-    public function __construct(Controller_Interface $controller, $fileLoader) {
+    public function __construct(Controller_Interface $controller,
+                                PostedDataProcessor $dataProcessor) {
         $this->controller = $controller;
-        $this->fileLoader = $fileLoader;
+        $this->dataProcessor = $dataProcessor;
     }
 
-    public function dispatchRequest($uri, array $phpFiles = array()) {
+    public function dispatchRequest($uri, array $phpFiles = array(), array $request = array()) {
         $this->controller->requestDispatched(
             self::extractId($uri),
             self::extractOutputContentType($uri),
-            $this->fileLoader->process($phpFiles)
+            $this->dataProcessor->process($phpFiles, $request)
         );
         return $this->controller;
     }

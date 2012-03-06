@@ -28,11 +28,11 @@ class DispatcherTest extends PHPUnit_Framework_TestCase {
         self::d($controller)->dispatchRequest('/12345zx.jpg');
     }
 
-    public function testDelegatesFileLoading() {
-        $loader = $this->getMock('FileLoader');
-        $loader->expects($this->once())->method('process')->with(array('_FILES'));
+    public function testDelegatesPostedFileProcessing() {
+        $loader = $this->getMockBuilder('PostedDataProcessor')->disableOriginalConstructor()->getMock();
+        $loader->expects($this->once())->method('process')->with(array('_FILES'), array('_REQUEST'));
 
-        self::d(null, $loader)->dispatchRequest('foo', array('_FILES'));
+        self::d(null, $loader)->dispatchRequest('foo', array('_FILES'), array('_REQUEST'));
     }
 
 //--------------------------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ class DispatcherTest extends PHPUnit_Framework_TestCase {
     private static function d(Controller_Interface $controller = null, $loader = null) {
         return new Dispatcher(
             $controller ?: Test_Stub::create('Controller_Interface'),
-            $loader ?: Test_Stub::create('FileLoader')
+            $loader ?: Test_Stub::create('PostedDataProcessor')
         );
     }
 }
