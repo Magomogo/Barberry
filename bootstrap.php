@@ -1,4 +1,6 @@
 <?php
+define('APPLICATION_PATH', __DIR__);
+
 # convert errors into exceptions
 set_error_handler(
     create_function(

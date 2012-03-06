@@ -74,10 +74,14 @@ class Controller implements Controller_Interface {
 
         $direction = new ConvertDirection($bin, $this->outputContentType);
 
-        return self::response(
-            $this->outputContentType,
-            $direction->initConverter(new Converter_Factory())->convert($bin)
-        );
+        try {
+            return self::response(
+                $this->outputContentType,
+                $direction->initConverter(new Converter_Factory())->convert($bin)
+            );
+        } catch (Converter_NotAvailableException $e) {
+            throw new Controller_NotFoundException;
+        }
     }
 
     /**

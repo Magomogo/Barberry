@@ -8,5 +8,13 @@ $r = new Dispatcher(
 );
 
 $controller = $r->dispatchRequest($_SERVER['REQUEST_URI'], $_FILES, $_POST);
-$response = $controller->{$_SERVER['REQUEST_METHOD']}();
+
+try {
+    $response = $controller->{$_SERVER['REQUEST_METHOD']}();
+} catch (Controller_NotFoundException $e) {
+    $response = Response::notFound();
+} catch (Exception $e) {
+    $response = Response::serverError();
+    error_log(strval($e));
+}
 $response->send();

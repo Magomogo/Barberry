@@ -53,4 +53,8 @@ class ContentType {
         }
         throw new ContentType_Exception($this->contentTypeString);
     }
+
+    public function __toString() {
+        return $this->contentTypeString;
+    }
 }
