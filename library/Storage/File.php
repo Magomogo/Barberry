@@ -43,23 +43,10 @@ class Storage_File implements Storage_Interface {
 //--------------------------------------------------------------------------------------------------
 
     private function generateUniqueId() {
-        $randomString = $this->randomString();
-
-        if(false === $this->isIdUnique($randomString)) {
-            return $this->generateUniqueId();
-        }
-        return $randomString;
-    }
-
-    private function isIdUnique($id) {
-        return file_exists($this->filePathById($id))?false:true;
+        return basename(tempnam($this->path, ''));
     }
 
     private function filePathById($id) {
         return $this->path.$id;
-    }
-
-    private function randomString() {
-        return Random::generate(5);
     }
 }
