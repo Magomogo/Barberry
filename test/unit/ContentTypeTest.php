@@ -19,4 +19,8 @@ class ContentTypeTest extends PHPUnit_Framework_TestCase {
             ContentType::createByContentTypeString('text/x-php; charset=us-ascii')->standartExtention()
         );
     }
+
+    public function testMagicallyBecomesAString() {
+        $this->assertEquals('image/jpeg', strval(ContentType::jpeg()));
+    }
 }
