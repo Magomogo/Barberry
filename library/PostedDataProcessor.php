@@ -40,7 +40,7 @@ class PostedDataProcessor {
         return method_exists($this->parserFactory, self::parserFactoryMethod($spec));
     }
 
-    private function originalFileExtension($spec) {
+    private static function originalFileExtension($spec) {
         return strpos($spec['name'], '.') !== false ?
                 substr($spec['name'], strrpos($spec['name'], '.') + 1) : '';
     }
