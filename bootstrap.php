@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL | E_STRICT);
 define('APPLICATION_PATH', __DIR__);
 
 # convert errors into exceptions
