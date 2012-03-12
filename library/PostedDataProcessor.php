@@ -29,9 +29,11 @@ class PostedDataProcessor {
     private function goodUploadedFile($spec, array $request) {
         $file = $this->readTempFile($spec['tmp_name']);
 
-        $parserFactoryMethod = self::parserFactoryMethod($file);
-        if (count($request) && method_exists($this->parserFactory, $parserFactoryMethod)) {
-            $file = $this->parserFactory->$parserFactoryMethod()->parse($file, $request);
+        if (count($request)) {
+            $parserFactoryMethod = self::parserFactoryMethod($file);
+            if (method_exists($this->parserFactory, $parserFactoryMethod)) {
+                $file = $this->parserFactory->$parserFactoryMethod()->parse($file, $request);
+            }
         }
 
         return $file;
