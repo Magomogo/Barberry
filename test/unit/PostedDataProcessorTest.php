@@ -4,22 +4,26 @@ class PostedDataProcessorTest extends PHPUnit_Framework_TestCase {
 
     public function testReadsFirstCorrectlyUploadedFileFromTemporaryDirectory() {
         $partialMock = $this->partiallyMockedProcessor();
-        $partialMock->expects($this->once())->method('readTempFile')->with('/tmp/1254432ks3');
+        $partialMock->expects($this->once())
+                ->method('readTempFile')
+                ->with('/tmp/1254432ks3');
 
-        $partialMock->process(array('myfile' => self::gifFileInPhpFilesArray()));
+        $partialMock->process(array('myfile' => self::goodFileInPhpFilesArray()));
     }
 
     public function testSkipsIncorrectlyUploadedFile() {
         $partialMock = $this->partiallyMockedProcessor();
-        $partialMock->expects($this->once())->method('readTempFile')->with('/tmp/goodFileHere');
+        $partialMock->expects($this->once())
+                ->method('readTempFile')
+                ->with('/tmp/1254432ks3');
 
         $partialMock->process(
             array(
                 'badfile' => array_merge(
-                    self::gifFileInPhpFilesArray(), array('error' => UPLOAD_ERR_PARTIAL)
+                    self::badFileInPhpFilesArray()
                 ),
                 'goodfile' => array_merge(
-                    self::gifFileInPhpFilesArray(), array('tmp_name' => '/tmp/goodFileHere')
+                    self::goodFileInPhpFilesArray()
                 )
             )
         );
@@ -28,13 +32,13 @@ class PostedDataProcessorTest extends PHPUnit_Framework_TestCase {
     public function testUtilizesFactoryToCreateAParserForPostedTemplate() {
         $parserFactory = $this->getMock('Parser_Factory');
         $parserFactory->expects($this->once())
-                ->method('odtParser')
+                ->method('ottParser')
                 ->will($this->returnValue(Test_Stub::create('Parser_Interface')));
 
-        $processor = $this->partiallyMockedProcessor($parserFactory);
+        $processor = $this->partiallyMockedProcessor($parserFactory, Test_Data::ottTemplate());
         $processor->process(
             array(
-                'file' => self::odtFileInPhpFilesArray()
+                'file' => self::goodFileInPhpFilesArray()
             ),
             array('vars')
         );
@@ -44,18 +48,22 @@ class PostedDataProcessorTest extends PHPUnit_Framework_TestCase {
         $parser = $this->getMock('Parser_Interface');
         $parser->expects($this->once())
                 ->method('parse')
-                ->with('10011', array('vars'))
+                ->with(Test_Data::ottTemplate(), array('vars'))
                 ->will($this->returnValue('Parse result'));
 
         $processor = $this->partiallyMockedProcessor(
-            Test_Stub::create('Parser_Factory', 'odtParser', $parser)
+            Test_Stub::create('Parser_Factory', 'ottParser', $parser),
+            Test_Data::ottTemplate()
         );
+        $processor->expects($this->any())->method('readTempFile')->will($this->returnValue(
+            Test_Data::ottTemplate()
+        ));
 
         $this->assertEquals(
             'Parse result',
             $processor->process(
                 array(
-                    'file' => self::odtFileInPhpFilesArray()
+                    'file' => self::goodFileInPhpFilesArray()
                 ),
                 array('vars')
             )
@@ -64,34 +72,29 @@ class PostedDataProcessorTest extends PHPUnit_Framework_TestCase {
 
 //--------------------------------------------------------------------------------------------------
 
-    private function partiallyMockedProcessor($parserFactory = null) {
+    private function partiallyMockedProcessor($parserFactory = null, $readFile = null) {
         $partialMock = $this->getMock(
             'PostedDataProcessor',
             array('readTempFile'),
             array($parserFactory ?: new Parser_Factory)
         );
         $partialMock->expects($this->any())->method('readTempFile')
-                ->will($this->returnValue('10011'));
+                ->will($this->returnValue($readFile ?: Test_Data::gif1x1()));
         return $partialMock;
     }
 
-    private static function gifFileInPhpFilesArray() {
+    private static function goodFileInPhpFilesArray() {
         return array(
-            'name' => 'facepalm.gif',
-            'type' => 'image/gif',
             'size' => 1234,
             'tmp_name' => '/tmp/1254432ks3',
             'error' => UPLOAD_ERR_OK
         );
     }
 
-    private static function odtFileInPhpFilesArray() {
+    private static function badFileInPhpFilesArray() {
         return array(
-            'name' => 'template.odt',
-            'type' => 'application/vnd.oasis.opendocument.spreadsheet-template',
-            'size' => 443,
-            'tmp_name' => '/tmp/wer2342',
-            'error' => UPLOAD_ERR_OK
+            'size' => 0,
+            'error' => UPLOAD_ERR_CANT_WRITE
         );
     }
 }

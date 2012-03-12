@@ -7,6 +7,7 @@ class ContentType {
         'gif' => array('image/gif'),
         'json' => array('application/json'),
         'php' => array('text/x-php', 'text/php'),
+        'ott' => array('application/vnd.oasis.opendocument.text-template'),
     );
 
     private $contentTypeString;
@@ -23,18 +24,24 @@ class ContentType {
         return new self(self::$extensionMap['json'][0]);
     }
 
-    public static function createByExtention($ext) {
+    public static function ott() {
+        return new self(self::$extensionMap['ott'][0]);
+    }
+
+    public static function byExtention($ext) {
         if(isset(self::$extensionMap[$ext])) {
             return new self(self::$extensionMap[$ext][0]);
         }
         throw new ContentType_Exception($ext);
     }
 
-    public static function createByContentTypeString($contentTypeString) {
+    public static function byString($content) {
+        $contentTypeString = self::contentTypeString($content);
+
         foreach(self::$extensionMap as $ext=>$contentTypeStringArray) {
             foreach($contentTypeStringArray as $str) {
                 if(false !== strpos($contentTypeString, $str)) {
-                    return self::createByExtention($ext);
+                    return self::byExtention($ext);
                 }
             }
         }
@@ -56,5 +63,12 @@ class ContentType {
 
     public function __toString() {
         return $this->contentTypeString;
+    }
+
+//--------------------------------------------------------------------------------------------------
+
+    private static function contentTypeString($content) {
+        $finfo = new finfo(FILEINFO_MIME, APPLICATION_PATH . '/scripts/magic.mgc');
+        return $finfo->buffer($content);
     }
 }

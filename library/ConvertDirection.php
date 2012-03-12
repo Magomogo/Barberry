@@ -5,9 +5,7 @@ class ConvertDirection {
     private $factoryMethod;
 
     public function __construct($sourceBinary, ContentType $destinationContentType) {
-        $finfo = new finfo(FILEINFO_MIME);
-        $sourceExt = ContentType::createByContentTypeString($finfo->buffer($sourceBinary))
-                ->standartExtention();
+        $sourceExt = ContentType::byString($sourceBinary)->standartExtention();
         $destinationExt = $destinationContentType->standartExtention();
 
         if ($sourceExt != $destinationExt) {

@@ -37,7 +37,7 @@ class ConvertDirectionTest extends PHPUnit_Framework_TestCase {
     private static function phpToSomethingDirection($ext='jpg') {
         return new ConvertDirection(
             file_get_contents(__FILE__),
-            ContentType::createByExtention($ext)
+            ContentType::byExtention($ext)
         );
     }
 

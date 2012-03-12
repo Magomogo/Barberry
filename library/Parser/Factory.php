@@ -2,7 +2,7 @@
 
 class Parser_Factory {
 
-    public function odtParser() {
+    public function ottParser() {
 
     }
 }

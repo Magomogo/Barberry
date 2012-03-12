@@ -39,7 +39,7 @@ class Dispatcher {
     private static function extractOutputContentType($uri) {
         if (preg_match('/\.([a-z]+)$/i', $uri, $regs)) {
             try {
-                return ContentType::createByExtention($regs[1]);
+                return ContentType::byExtention($regs[1]);
             } catch (ContentType_Exception $e) {}
         }
         return null;

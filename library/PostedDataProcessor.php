@@ -28,24 +28,16 @@ class PostedDataProcessor {
 
     private function goodUploadedFile($spec, array $request) {
         $file = $this->readTempFile($spec['tmp_name']);
-        if (count($request) && $this->canBeParsed($spec)) {
-            $file = $this->parserFactory->{self::parserFactoryMethod($spec)}()
-                    ->parse($file, $request);
+
+        $parserFactoryMethod = self::parserFactoryMethod($file);
+        if (count($request) && method_exists($this->parserFactory, $parserFactoryMethod)) {
+            $file = $this->parserFactory->$parserFactoryMethod()->parse($file, $request);
         }
 
         return $file;
     }
 
-    private function canBeParsed($spec) {
-        return method_exists($this->parserFactory, self::parserFactoryMethod($spec));
-    }
-
-    private static function originalFileExtension($spec) {
-        return strpos($spec['name'], '.') !== false ?
-                substr($spec['name'], strrpos($spec['name'], '.') + 1) : '';
-    }
-
-    private static function parserFactoryMethod($spec) {
-        return strtolower(self::originalFileExtension($spec)) . 'Parser';
+    private static function parserFactoryMethod($file) {
+        return ContentType::byString($file)->standartExtention() . 'Parser';
     }
 }

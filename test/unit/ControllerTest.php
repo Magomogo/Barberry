@@ -12,7 +12,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
                 ->method('getById')
                 ->will($this->returnValue(Test_Data::gif1x1()))
                 ->with('123asd');
-        $this->c($storage, '123asd', ContentType::createByExtention('gif'))->GET();
+        $this->c($storage, '123asd', ContentType::byExtention('gif'))->GET();
     }
 
     public function testGETReturnsAResponseObject() {
