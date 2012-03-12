@@ -31,10 +31,25 @@ class Storage_FileTest extends PHPUnit_Framework_TestCase {
         $this->assertFalse(file_exists($expectedPath));
     }
 
+    public function testNotFoundException() {
+        $this->setExpectedException('Storage_NotFoundException');
+        $this->storage()->getById('not-existing-id');
+    }
+
+    public function testGetByIdTestsForFileExistance() {
+        $this->setExpectedException('Storage_NotFoundException');
+        $this->storage()->getById('/');
+    }
+
+    public function testFailedWriteCausesException() {
+        $this->setExpectedException('Storage_WriteException');
+        $this->storage('unexisting/path')->save('/');
+    }
+
 //--------------------------------------------------------------------------------------------------
 
-    private function storage() {
-        return new Storage_File($this->storage_path);
+    private function storage($path = null) {
+        return new Storage_File($path ?: $this->storage_path);
     }
 
     private static function rmDirRecursive($dir) {

@@ -62,9 +62,13 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
         self::c()->PUT();
     }
 
-    public function testThrowsNotFoundExceptionWhenStorageHasNoContentForRequestedId() {
+    public function testThrowsNotFoundExceptionWhenStorageHasNoRequestedDocument() {
+        $storage = $this->getMock('Storage_Interface');
+        $storage->expects($this->any())->method('getById')
+                ->will($this->throwException(new Storage_NotFoundException('123')));
+
         $this->setExpectedException('Controller_NotFoundException');
-        self::c(Test_Stub::create('Storage_Interface', 'getById', null))->GET();
+        self::c($storage)->GET();
     }
 
 //--------------------------------------------------------------------------------------------------

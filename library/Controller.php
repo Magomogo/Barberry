@@ -66,9 +66,9 @@ class Controller implements Controller_Interface {
      * @throws Controller_NotFoundException
      */
     public function GET() {
-        $bin = $this->storage->getById($this->docId);
-
-        if (!strlen($bin)) {
+        try {
+            $bin = $this->storage->getById($this->docId);
+        } catch (Storage_NotFoundException $e) {
             throw new Controller_NotFoundException;
         }
 
