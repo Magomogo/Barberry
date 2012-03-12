@@ -9,6 +9,7 @@ class ContentType {
         'php' => array('text/x-php', 'text/php'),
         'ott' => array('application/vnd.oasis.opendocument.text-template'),
         'ots' => array('application/vnd.oasis.opendocument.spreadsheet-template'),
+        'txt' => array('text/plain')
     );
 
     private $contentTypeString;
