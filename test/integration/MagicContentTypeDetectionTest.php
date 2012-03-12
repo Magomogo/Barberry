@@ -15,4 +15,11 @@ class MagicContentTypeDetectionTest extends PHPUnit_Framework_TestCase {
             ContentType::byString(Test_Data::ottTemplate())
         );
     }
+
+    public function testOpenDocumentSpreadsheetTempate() {
+        $this->assertEquals(
+            ContentType::ots(),
+            ContentType::byString(Test_Data::otsTemplate())
+        );
+    }
 }

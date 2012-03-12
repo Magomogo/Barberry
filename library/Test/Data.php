@@ -9,4 +9,8 @@ class Test_Data {
     public static function ottTemplate() {
         return file_get_contents(dirname(dirname(__DIR__)) . '/test/data/document1.ott');
     }
+
+    public static function otsTemplate() {
+        return file_get_contents(dirname(dirname(__DIR__)) . '/test/data/spreadsheet1.ots');
+    }
 }

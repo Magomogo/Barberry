@@ -8,6 +8,7 @@ class ContentType {
         'json' => array('application/json'),
         'php' => array('text/x-php', 'text/php'),
         'ott' => array('application/vnd.oasis.opendocument.text-template'),
+        'ots' => array('application/vnd.oasis.opendocument.spreadsheet-template'),
     );
 
     private $contentTypeString;
@@ -26,6 +27,10 @@ class ContentType {
 
     public static function ott() {
         return new self(self::$extensionMap['ott'][0]);
+    }
+
+    public static function ots() {
+        return new self(self::$extensionMap['ots'][0]);
     }
 
     public static function byExtention($ext) {
