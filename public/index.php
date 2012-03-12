@@ -3,7 +3,7 @@
 include __DIR__ . '/../bootstrap.php';
 
 $r = new Dispatcher(
-    new Controller(new Storage_File()),
+    new Controller(new Storage_File('')),
     new PostedDataProcessor(new Parser_Factory)
 );
 

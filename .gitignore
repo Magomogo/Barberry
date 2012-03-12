@@ -1,2 +1,4 @@
 .idea
 etc/config.php
+!var/DIR_INFO.TXT
+var/*
