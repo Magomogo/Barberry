@@ -26,6 +26,8 @@ class Config {
     }
 
     public function __construct($optionsToOverride = array()) {
+        $this->setDefaultValues();
+
         foreach ($optionsToOverride as $key => $value) {
             if (property_exists($this, $key)) {
                 $this->$key = $value;
@@ -33,4 +35,11 @@ class Config {
         }
     }
 
+//--------------------------------------------------------------------------------------------------
+
+    private function setDefaultValues() {
+        $this->directoryCache = APPLICATION_PATH . '/var/cache/';
+        $this->directoryTemp = APPLICATION_PATH . '/var/';
+        $this->directoryStorage = APPLICATION_PATH . '/usr/storage/';
+    }
 }
