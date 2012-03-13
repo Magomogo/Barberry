@@ -22,4 +22,11 @@ class MagicContentTypeDetectionTest extends PHPUnit_Framework_TestCase {
             ContentType::byString(Test_Data::otsTemplate())
         );
     }
+
+    public function testMicrosoftOfficeSpreadsheet() {
+        $this->assertEquals(
+            ContentType::xls(),
+            ContentType::byString(Test_Data::xlsSpreadsheet())
+        );
+    }
 }

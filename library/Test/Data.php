@@ -13,4 +13,8 @@ class Test_Data {
     public static function otsTemplate() {
         return file_get_contents(dirname(dirname(__DIR__)) . '/test/data/spreadsheet1.ots');
     }
+
+    public static function xlsSpreadsheet() {
+        return file_get_contents(dirname(dirname(__DIR__)) . '/test/data/spreadsheet1.xls');
+    }
 }
