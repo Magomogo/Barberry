@@ -14,7 +14,7 @@ try {
 
     if('GET' == strtoupper($_SERVER['REQUEST_METHOD'])) {
         $cache = new Cache(Config::get()->directoryCache);
-        $cache->save($response, $_SERVER['REQUEST_URI']);
+        $cache->save($response->body, $_SERVER['REQUEST_URI']);
     }
 
 } catch (Controller_NotFoundException $e) {
