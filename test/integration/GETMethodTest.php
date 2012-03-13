@@ -58,7 +58,6 @@ class GETMethodTest extends PHPUnit_Framework_TestCase {
         return new Storage_File(Config::get()->directoryStorage);
     }
 
-
     /**
      * @return Cache
      */
