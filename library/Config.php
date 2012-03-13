@@ -3,7 +3,10 @@
 class Config {
 
     public $httpHost = 'bin.hostname.domain';
+
     public $directoryTemp;
+    public $directoryStorage;
+    public $directoryCache;
 
 //--------------------------------------------------------------------------------------------------
 
