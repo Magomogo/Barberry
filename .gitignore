@@ -1,4 +1,8 @@
 .idea
 etc/config.php
 !var/DIR_INFO.TXT
+!var/cache/DIR_INFO.TXT
+!usr/DIR_INFO.TXT
+!usr/storage/DIR_INFO.TXT
 var/*
+usr/*
