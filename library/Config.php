@@ -38,7 +38,7 @@ class Config {
 //--------------------------------------------------------------------------------------------------
 
     private function setDefaultValues() {
-        $this->directoryCache = APPLICATION_PATH . '/var/cache/';
+        $this->directoryCache = APPLICATION_PATH . '/public/cache/';
         $this->directoryTemp = APPLICATION_PATH . '/var/';
         $this->directoryStorage = APPLICATION_PATH . '/usr/storage/';
     }
