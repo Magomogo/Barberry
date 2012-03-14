@@ -1,4 +1,7 @@
 RewriteEngine On
+RewriteCond %{DOCUMENT_ROOT}/cache%{REQUEST_URI} -f
+RewriteRule ^(.+)$ %{DOCUMENT_ROOT}/cache/$1 [L]
+
 RewriteCond %{REQUEST_FILENAME} -s [OR]
 RewriteCond %{REQUEST_FILENAME} -l [OR]
 RewriteCond %{REQUEST_FILENAME} -d
