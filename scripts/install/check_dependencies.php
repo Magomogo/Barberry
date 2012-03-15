@@ -80,7 +80,7 @@ function checkOpenOfficeService() {
     if ($fp) {
         echo "LISTENING\n";
     } else {
-        echo "MISSING - Run soffice --accept=\"socket,port=2002;urp;\"\n\n";
+        echo "MISSING - Run soffice --accept=\"socket,port=2002;urp;\" --headless\n\n";
         exit;
     }
     fclose($fp);
