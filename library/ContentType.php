@@ -2,41 +2,46 @@
 
 class ContentType {
     private static $extensionMap = array(
-        'jpg' => array('image/jpeg'),
-        'jpeg' => array('image/jpeg'),
-        'gif' => array('image/gif'),
-        'json' => array('application/json'),
-        'php' => array('text/x-php', 'text/php'),
-        'ott' => array('application/vnd.oasis.opendocument.text-template'),
-        'ots' => array('application/vnd.oasis.opendocument.spreadsheet-template'),
-        'txt' => array('text/plain')
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'gif' => 'image/gif',
+        'json' => 'application/json',
+        'php' => 'text/x-php',
+        'ott' => 'application/vnd.oasis.opendocument.text-template',
+        'ots' => 'application/vnd.oasis.opendocument.spreadsheet-template',
+        'txt' => 'text/plain',
+        'xls' => 'application/vnd.ms-office'
     );
 
     private $contentTypeString;
 
     public static function jpeg() {
-        return new self(self::$extensionMap['jpg'][0]);
+        return new self(self::$extensionMap['jpg']);
     }
 
     public static function gif() {
-        return new self(self::$extensionMap['gif'][0]);
+        return new self(self::$extensionMap['gif']);
     }
 
     public static function json() {
-        return new self(self::$extensionMap['json'][0]);
+        return new self(self::$extensionMap['json']);
     }
 
     public static function ott() {
-        return new self(self::$extensionMap['ott'][0]);
+        return new self(self::$extensionMap['ott']);
     }
 
     public static function ots() {
-        return new self(self::$extensionMap['ots'][0]);
+        return new self(self::$extensionMap['ots']);
+    }
+
+    public static function xls() {
+        return new self(self::$extensionMap['xls']);
     }
 
     public static function byExtention($ext) {
         if(isset(self::$extensionMap[$ext])) {
-            return new self(self::$extensionMap[$ext][0]);
+            return new self(self::$extensionMap[$ext]);
         }
         throw new ContentType_Exception($ext);
     }
@@ -44,12 +49,10 @@ class ContentType {
     public static function byString($content) {
         $contentTypeString = self::contentTypeString($content);
 
-        foreach(self::$extensionMap as $ext=>$contentTypeStringArray) {
-            foreach($contentTypeStringArray as $str) {
-                if(false !== strpos($contentTypeString, $str)) {
-                    return self::byExtention($ext);
-                }
-            }
+        $ext = array_search($contentTypeString, self::$extensionMap);
+
+        if(false !== $ext) {
+            return self::byExtention($ext);
         }
         throw new ContentType_Exception($contentTypeString);
     }
@@ -60,7 +63,7 @@ class ContentType {
 
     public function standartExtention() {
         foreach(self::$extensionMap as $ext=>$contentTypeStringArray) {
-            if($this->contentTypeString === $contentTypeStringArray[0]) {
+            if($this->contentTypeString === $contentTypeStringArray) {
                 return $ext;
             }
         }
@@ -74,7 +77,10 @@ class ContentType {
 //--------------------------------------------------------------------------------------------------
 
     private static function contentTypeString($content) {
-        $finfo = new finfo(FILEINFO_MIME, APPLICATION_PATH . '/scripts/magic.mgc');
+        $finfo = new finfo(
+            FILEINFO_MIME ^ FILEINFO_MIME_ENCODING,
+            APPLICATION_PATH . '/scripts/magic.mime.mgc'
+        );
         return $finfo->buffer($content);
     }
 }

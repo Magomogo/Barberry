@@ -1,0 +1,9 @@
+## MS Office
+0	string	\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1\0\0\0\0\0\0\0\0	MS Office
+!:mime application/vnd.ms-office
+
+>16     search Microsoft\ Excel	        Excel
+!:mime application/vnd.ms-excel
+
+>512    string  \xEC\xA5\xC1\x00        Word
+!:mime application/vnd.ms-word

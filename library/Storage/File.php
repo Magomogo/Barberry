@@ -59,7 +59,9 @@ class Storage_File implements Storage_Interface {
 //--------------------------------------------------------------------------------------------------
 
     private function generateUniqueId() {
-        return basename(tempnam($this->permanentStoragePath, ''));
+        $tempFile = tempnam($this->permanentStoragePath, '');
+        chmod($tempFile, 0664);
+        return basename($tempFile);
     }
 
     private function filePathById($id) {
