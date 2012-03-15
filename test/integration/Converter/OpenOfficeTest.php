@@ -2,6 +2,10 @@
 
 class Integration_Converter_OpenOfficeTest extends PHPUnit_Framework_TestCase {
 
+    public static function setUpBeforeClass() {
+        Test_Util::assertOpenOfficeServiceIsAvailable();
+    }
+
     public function testConvertsOtsToXls() {
         $this->assertEquals(
             ContentType::xls(),

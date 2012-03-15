@@ -19,6 +19,7 @@ class Converter_OpenOffice implements Converter_Interface {
 
     public function convert($bin) {
         $source = tempnam($this->tempPath, "ooconverter_");
+        chmod($source, 0664);
         $destination = $source . '.' . $this->targetContentType->standartExtention();
         file_put_contents($source, $bin);
         exec(

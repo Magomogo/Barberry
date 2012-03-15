@@ -8,9 +8,12 @@ class ContentType {
         'json' => 'application/json',
         'php' => 'text/x-php',
         'ott' => 'application/vnd.oasis.opendocument.text-template',
+        'odt' => 'application/vnd.oasis.opendocument.text',
         'ots' => 'application/vnd.oasis.opendocument.spreadsheet-template',
+        'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
         'txt' => 'text/plain',
-        'xls' => 'application/vnd.ms-office'
+        'xls' => 'application/vnd.ms-excel',
+        'doc' => 'application/vnd.ms-word'
     );
 
     private $contentTypeString;
@@ -37,6 +40,18 @@ class ContentType {
 
     public static function xls() {
         return new self(self::$extensionMap['xls']);
+    }
+
+    public static function doc() {
+        return new self(self::$extensionMap['doc']);
+    }
+
+    public static function odt() {
+        return new self(self::$extensionMap['odt']);
+    }
+
+    public static function ods() {
+        return new self(self::$extensionMap['ods']);
     }
 
     public static function byExtention($ext) {

@@ -19,6 +19,10 @@ if (!$can_proceed) {
     exit;
 }
 
+reportUnixCommand('soffice', 'Please install openoffice.org-headless');
+reportUnixCommand('python', 'Please install python');
+checkOpenOfficeService();
+
 echo "\nAll critical checks passed SUCCESSFULLY\n\n";
 
 //==================================================================================================
@@ -51,4 +55,33 @@ function reportPhpExtension($name) {
          echo "MISSING\n";
          return false;
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+
+function reportUnixCommand($command, $messageIfMissing) {
+    echo "$command command - ";
+
+    if (preg_match('/^\/\w+/', exec("which $command"))) {
+        echo "FOUND\n";
+    }
+    else {
+        echo "MISSING - $messageIfMissing\n\n";
+        exit;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+
+function checkOpenOfficeService() {
+    echo "Open office service - ";
+
+    $fp = @fsockopen('127.0.0.1', '2002');
+    if ($fp) {
+        echo "LISTENING\n";
+    } else {
+        echo "MISSING - Run soffice --accept=\"socket,port=2002;urp;\"\n\n";
+        exit;
+    }
+    fclose($fp);
 }
