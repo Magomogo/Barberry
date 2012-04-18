@@ -4,7 +4,7 @@ class DirectionFactoryTest extends PHPUnit_Framework_TestCase {
 
     public function testDetectsDirectionClassName() {
         $this->assertAttributeEquals(
-            'EnabledDirection_PhpToJpg',
+            'PhpToJpgDirection',
             'directionClassName',
             self::phpToSomethingDirection()
         );
@@ -31,7 +31,7 @@ class DirectionFactoryTest extends PHPUnit_Framework_TestCase {
 //--------------------------------------------------------------------------------------------------
 
     private static function phpToSomethingDirection($ext='jpg') {
-        return new DirectionFactory(
+        return new Direction_Factory(
             file_get_contents(__FILE__),
             ContentType::byExtention($ext)
         );

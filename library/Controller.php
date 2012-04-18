@@ -72,12 +72,12 @@ class Controller implements Controller_Interface {
             throw new Controller_NotFoundException;
         }
 
-        $direction = new DirectionFactory($bin, $this->outputContentType);
+        $directionFactory = new Direction_Factory($bin, $this->outputContentType);
 
         try {
             return self::response(
                 $this->outputContentType,
-                $direction->direction()->convert($bin)
+                $directionFactory->direction()->convert($bin)
             );
         } catch (Plugin_NotAvailableException $e) {
             throw new Controller_NotFoundException;

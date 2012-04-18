@@ -6,6 +6,10 @@ class EnvironmentTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue(class_exists('Dispatcher'));
     }
 
+    public function testAutoloaderLoadsDirections() {
+        $this->assertTrue(class_exists('TestClassDirection'));
+    }
+
     /**
      * @dataProvider requiredWritableDirectories
      */

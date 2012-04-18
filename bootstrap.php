@@ -13,7 +13,11 @@ set_error_handler(
 
 #autoloader
 spl_autoload_register(function($className) {
-    $filename = __DIR__ . '/library/' . str_replace('_', '/', $className) . '.php';
+    if (preg_match('/Direction$/', $className)) {
+        $filename = Config::get()->directoryEnabledDirection . substr($className, 0, -9) . '.php';
+    } else {
+        $filename = __DIR__ . '/library/' . str_replace('_', '/', $className) . '.php';
+    }
 
     if (file_exists($filename)) {
         include_once($filename);

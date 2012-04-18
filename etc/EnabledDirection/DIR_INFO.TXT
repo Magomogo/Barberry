@@ -1,1 +1,1 @@
-enabled convert directions
+Enabled convert directions classes to autoload

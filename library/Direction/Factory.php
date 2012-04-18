@@ -1,6 +1,6 @@
 <?php
 
-class DirectionFactory {
+class Direction_Factory {
 
     /**
      * @var string
@@ -21,10 +21,10 @@ class DirectionFactory {
         $sourceContentType = ContentType::byString($sourceBinary);;
 
         $this->directionClassName =
-            'EnabledDirection_'
-                    . ucfirst($sourceContentType->standartExtention())
+                    ucfirst($sourceContentType->standartExtention())
                     . 'To'
-                    . ucfirst($destinationContentType->standartExtention());
+                    . ucfirst($destinationContentType->standartExtention())
+                    . 'Direction';
 
         $this->directionDescription = $sourceContentType . ' to '. $destinationContentType;
         $this->sameContentTypes = ($sourceContentType == $destinationContentType);
@@ -40,7 +40,7 @@ class DirectionFactory {
             return new Plugin_Null;
         }
         if(class_exists($this->directionClassName, true)) {
-            return new $this->directionClassName;
+            return new $this->directionClassName($command);
         }
         throw new Plugin_NotAvailableException($this->directionDescription);
     }

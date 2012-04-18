@@ -7,6 +7,7 @@ class Config {
     public $directoryTemp;
     public $directoryStorage;
     public $directoryCache;
+    public $directoryEnabledDirection;
 
 //--------------------------------------------------------------------------------------------------
 
@@ -41,5 +42,6 @@ class Config {
         $this->directoryCache = APPLICATION_PATH . '/public/cache/';
         $this->directoryTemp = APPLICATION_PATH . '/var/';
         $this->directoryStorage = APPLICATION_PATH . '/usr/storage/';
+        $this->directoryEnabledDirection = APPLICATION_PATH . '/etc/EnabledDirection/';
     }
 }

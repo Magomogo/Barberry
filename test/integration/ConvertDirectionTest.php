@@ -41,7 +41,7 @@ class Integration_ConvertDirectionTest extends PHPUnit_Framework_TestCase {
 //--------------------------------------------------------------------------------------------------
 
     private static function convert($dataToConvert, ContentType $targetContentType) {
-        $dir = new DirectionFactory($dataToConvert, $targetContentType);
+        $dir = new Direction_Factory($dataToConvert, $targetContentType);
         return $dir->direction()->convert($dataToConvert);
     }
 
