@@ -3,7 +3,7 @@
 class EnvironmentTest extends PHPUnit_Framework_TestCase {
 
     public function testAutoloaderWorks() {
-        $this->assertTrue(class_exists('Dispatcher'));
+        $this->assertTrue(class_exists('Controller'));
     }
 
     public function testAutoloaderLoadsDirections() {
@@ -27,6 +27,7 @@ class EnvironmentTest extends PHPUnit_Framework_TestCase {
             array(Config::get()->directoryTemp),
             array(Config::get()->directoryCache),
             array(Config::get()->directoryStorage),
+            array(Config::get()->directoryEnabledDirection),
         );
     }
 }

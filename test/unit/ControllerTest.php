@@ -12,7 +12,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
                 ->method('getById')
                 ->will($this->returnValue(Test_Data::gif1x1()))
                 ->with('123asd');
-        $this->c($storage, '123asd', ContentType::byExtention('gif'))->GET();
+        $this->c(new Request('/123asd.gif'), $storage)->GET();
     }
 
     public function testGETReturnsAResponseObject() {
@@ -25,8 +25,10 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testPOSTResponseIsJson() {
-        $response = self::c()->requestDispatched(null, null, '123')->POST();
-        $this->assertEquals(ContentType::json(), $response->contentType);
+        $this->assertEquals(
+            ContentType::json(),
+            self::c(self::binaryRequest())->POST()->contentType
+        );
     }
 
     public function testDELETEResponseIsJson() {
@@ -40,15 +42,14 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals(
             new Response(ContentType::json(), json_encode(array('id'=>'12345xz'))),
-            $this->c($storage)->requestDispatched(null, null, '123')->POST()
+            $this->c(self::binaryRequest(), $storage)->POST()
         );
     }
 
     public function testSavesPostedContentToTheStorage() {
         $storage = $this->getMock('Storage_Interface');
         $storage->expects($this->once())->method('save')->with('0101010111');
-        $controller = $this->c($storage);
-        $controller->requestDispatched(null, null, '0101010111');
+        $controller = $this->c(self::binaryRequest(), $storage);
         $controller->POST();
     }
 
@@ -68,18 +69,23 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
                 ->will($this->throwException(new Storage_NotFoundException('123')));
 
         $this->setExpectedException('Controller_NotFoundException');
-        self::c($storage)->GET();
+        self::c(null, $storage)->GET();
     }
 
 //--------------------------------------------------------------------------------------------------
 
-    private static function c(Storage_Interface $storage = null, $entityId = null, $outputContentType = null) {
-        $c = new Controller($storage ?: self::aGifStorageStub());
-        $c->requestDispatched($entityId, $outputContentType ?: ContentType::gif());
-        return $c;
+    private static function c(Request $request = null, Storage_Interface $storage = null) {
+        return new Controller(
+            $request ?: new Request('/1.gif', null),
+            $storage ?: self::aGifStorageStub()
+        );
     }
 
     private static function aGifStorageStub() {
         return Test_Stub::create('Storage_Interface', 'getById', Test_Data::gif1x1());
+    }
+
+    private static function binaryRequest() {
+        return new Request('/', '0101010111');
     }
 }

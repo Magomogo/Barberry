@@ -18,7 +18,7 @@ class Direction_Factory {
     private $sameContentTypes;
 
     public function __construct($sourceBinary, ContentType $destinationContentType) {
-        $sourceContentType = ContentType::byString($sourceBinary);;
+        $sourceContentType = ContentType::byString($sourceBinary);
 
         $this->directionClassName =
                     ucfirst($sourceContentType->standartExtention())

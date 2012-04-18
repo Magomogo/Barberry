@@ -2,12 +2,10 @@
 
 include __DIR__ . '/../bootstrap.php';
 
-$r = new Dispatcher(
-    new Controller(new Storage_File(Config::get()->directoryStorage)),
-    new PostedDataProcessor(new Parser_Factory)
+$controller = new Controller(
+    new Request($_SERVER['REQUEST_URI'], postedDataProcessor()->process($_FILES, $_POST)),
+    new Storage_File(Config::get()->directoryStorage)
 );
-
-$controller = $r->dispatchRequest($_SERVER['REQUEST_URI'], $_FILES, $_POST);
 
 try {
     $response = $controller->{$_SERVER['REQUEST_METHOD']}();
@@ -24,3 +22,9 @@ try {
     error_log(strval($e));
 }
 $response->send();
+
+//--------------------------------------------------------------------------------------------------
+
+function postedDataProcessor() {
+    return new PostedDataProcessor(new Parser_Factory);
+}
