@@ -1,6 +1,6 @@
 <?php
 
-class Converter_OpenOffice implements Converter_Interface {
+class Plugin_OpenOffice_Converter implements Plugin_Interface_Converter {
 
     /**
      * @var string

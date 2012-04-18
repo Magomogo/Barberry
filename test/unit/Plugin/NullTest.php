@@ -1,13 +1,13 @@
 <?php
 
-class Converter_NullTest extends PHPUnit_Framework_TestCase {
+class Plugin_NullTest extends PHPUnit_Framework_TestCase {
 
     public function testDataType() {
-        $this->assertInstanceOf('Converter_Interface', new Converter_Null());
+        $this->assertInstanceOf('Plugin_Interface_Converter', new Plugin_Null());
     }
 
     public function testReturnsTheArgument() {
-        $c = new Converter_Null();
+        $c = new Plugin_Null();
         $this->assertEquals(
             Test_Data::gif1x1(),
             $c->convert(Test_Data::gif1x1())

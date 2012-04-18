@@ -1,5 +1,6 @@
 .idea
 etc/config.php
+etc/EnabledDirection/*.php
 !var/DIR_INFO.TXT
 !public/cache/DIR_INFO.TXT
 !usr/DIR_INFO.TXT

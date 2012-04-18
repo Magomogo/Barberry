@@ -1,5 +1,6 @@
 <?php
 
-interface Converter_Interface {
+interface Plugin_Interface_Converter {
+
     public function convert($bin);
 }

@@ -17,7 +17,5 @@ spl_autoload_register(function($className) {
 
     if (file_exists($filename)) {
         include_once($filename);
-    } else {
-        trigger_error("Can't autoload: " . $className, E_USER_ERROR);
     }
 });

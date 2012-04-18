@@ -1,6 +1,6 @@
 <?php
 
-class Converter_Null implements Converter_Interface {
+class Plugin_Null implements Plugin_Interface_Converter {
 
     public function convert($bin) {
         return $bin;
