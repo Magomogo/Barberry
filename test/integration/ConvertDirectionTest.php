@@ -2,9 +2,11 @@
 
 class Integration_ConvertDirectionTest extends PHPUnit_Framework_TestCase {
 
-    public function testOts2Xls() {
+    public static function setUpBeforeClass() {
         Test_Util::assertOpenOfficeServiceIsAvailable();
+    }
 
+    public function testOts2Xls() {
         $this->assertEquals(
             ContentType::xls(),
             ContentType::byString(self::convert(Test_Data::otsTemplate(), ContentType::xls()))
@@ -12,8 +14,6 @@ class Integration_ConvertDirectionTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testOds2Xls() {
-        Test_Util::assertOpenOfficeServiceIsAvailable();
-
         $this->assertEquals(
             ContentType::xls(),
             ContentType::byString(self::convert(Test_Data::odsSpreadsheet(), ContentType::xls()))
@@ -21,8 +21,6 @@ class Integration_ConvertDirectionTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testOtt2Doc() {
-        Test_Util::assertOpenOfficeServiceIsAvailable();
-
         $this->assertEquals(
             ContentType::doc(),
             ContentType::byString(self::convert(Test_Data::ottTemplate(), ContentType::doc()))
@@ -30,8 +28,6 @@ class Integration_ConvertDirectionTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testOdt2Doc() {
-        Test_Util::assertOpenOfficeServiceIsAvailable();
-
         $this->assertEquals(
             ContentType::doc(),
             ContentType::byString(self::convert(Test_Data::odtDocument(), ContentType::doc()))

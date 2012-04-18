@@ -28,6 +28,8 @@ PHP
         return array(
             array(ContentType::odt(), 'ContentType::doc()'),
             array(ContentType::ots(), 'ContentType::xls()'),
+            array(ContentType::ods(), 'ContentType::xls()'),
+            array(ContentType::ott(), 'ContentType::doc()'),
         );
     }
 }
