@@ -5,12 +5,12 @@ class ContentTypeTest extends PHPUnit_Framework_TestCase {
     public function testIsJpegCreatedByExtention() {
         $this->assertEquals(
             'jpg',
-            ContentType::byExtention('jpeg')->standartExtention()
+            ContentType::byExtention('jpg')->standartExtention()
         );
     }
 
     public function testContentTypeHasStandartExtension() {
-        ContentType::byExtention('jpeg')->standartExtention();
+        ContentType::byExtention('jpg')->standartExtention();
     }
 
     public function testIsPhpCreatedByContentTypeString() {

@@ -1,6 +1,6 @@
 <?php
 
-class CacheTest extends PHPUnit_Framework_TestCase {
+class Integration_CacheTest extends PHPUnit_Framework_TestCase {
 
     private $cache_path;
 
@@ -14,27 +14,23 @@ class CacheTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testIsContentSavedInFileSystem() {
-        $requested_uri = '/7yU98sd/1x1.gif';
-
         $this->cache()->save(
             Test_Data::gif1x1(),
-            $requested_uri
+            new Request('/7yU98sd_1x1.gif')
         );
 
-        $expectedPath = $this->cache_path.ltrim($requested_uri, '/');
+        $expectedPath = $this->cache_path . '/7yU98sd/7yU98sd_1x1.gif';
 
         $this->assertEquals(file_get_contents($expectedPath), Test_Data::gif1x1());
     }
 
     public function testIsContentSavedInFileSystemInGroupDirectory() {
-        $requested_uri = '/admin/7yU98sd/1x1.gif';
-
         $this->cache()->save(
             Test_Data::gif1x1(),
-            $requested_uri
+            new Request('/adm/7yU98sd_1x1.gif')
         );
 
-        $expectedPath = $this->cache_path.ltrim($requested_uri, '/');
+        $expectedPath = $this->cache_path.ltrim('/adm/7yU98sd/7yU98sd_1x1.gif');
 
         $this->assertEquals(file_get_contents($expectedPath), Test_Data::gif1x1());
     }

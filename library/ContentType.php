@@ -3,7 +3,6 @@
 class ContentType {
     private static $extensionMap = array(
         'jpg' => 'image/jpeg',
-        'jpeg' => 'image/jpeg',
         'gif' => 'image/gif',
         'json' => 'application/json',
         'php' => 'text/x-php',

@@ -5,6 +5,11 @@ class Request {
     /**
      * @var string
      */
+    public $group;
+
+    /**
+     * @var string
+     */
     public $id;
 
     /**
@@ -23,38 +28,40 @@ class Request {
     public $commandString;
 
     public function __construct($uri, $bin = null) {
-        $this->id = self::extractId($uri);
-        $this->commandString = self::extractCommandString($uri);
-        $this->contentType = self::extractOutputContentType($uri);
+        $parts = array_values(array_filter(explode('/', $uri)));
+        switch (1) {
+            case (count($parts) == 2) && preg_match('@^[a-z]{3}$@i', $parts[0]):
+                $this->group = array_shift($parts);
+            case count($parts) == 1:
+                $this->id = self::extractId($parts[0]);
+                $this->commandString = self::extractCommandString($parts[0]);
+                $this->contentType = self::extractOutputContentType($parts[0]);
+        }
         $this->bin = $bin;
     }
 
 //--------------------------------------------------------------------------------------------------
 
-    private static function extractId($uri) {
-        if (preg_match('/' . self::idRegExp() . '[\/\.]/i', $uri, $regs)) {
+    private static function extractId($part) {
+        if (preg_match('@^([0-9a-z]+)[_\.]@i', $part, $regs)) {
             return $regs[1];
         }
         return null;
     }
 
     private static function extractCommandString($uri) {
-        if (preg_match('/' . self::idRegExp() . '[\/](.*)\.[a-z]+/i', $uri, $regs)) {
-            return $regs[2];
+        if (preg_match('@^[^_]+_(.*)\.[a-z]+@i', $uri, $regs)) {
+            return $regs[1];
         }
         return null;
     }
 
     private static function extractOutputContentType($uri) {
-        if (preg_match('/\.([a-z]+)$/i', $uri, $regs)) {
+        if (preg_match('@\.([a-z]+)$@i', $uri, $regs)) {
             try {
                 return ContentType::byExtention($regs[1]);
             } catch (ContentType_Exception $e) {}
         }
         return null;
-    }
-
-    private static function idRegExp() {
-        return '^\/?([0-9a-z]+)';
     }
 }

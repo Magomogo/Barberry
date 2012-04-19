@@ -27,9 +27,7 @@ class GETMethodTest extends PHPUnit_Framework_TestCase {
 
         # clean
         self::storage()->delete($id);
-        if(file_exists(self::cache()->filePath('/' . $id . '.gif'))) {
-            unlink(self::cache()->filePath('/' . $id . '.gif'));
-        }
+        self::cache()->invalidate(new Request('/' . $id . '.gif'));
 
         $this->assertEquals(200, $httpCode, $error);
         $this->assertEquals(Test_Data::gif1x1(), $body);
@@ -43,12 +41,12 @@ class GETMethodTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals(
             Test_Data::gif1x1(),
-            file_get_contents(self::cache()->filePath('/' . $id . '.gif'))
+            file_get_contents(Config::get()->directoryCache. "$id/$id.gif")
         );
 
         # clean
         self::storage()->delete($id);
-        unlink(self::cache()->filePath('/' . $id . '.gif'));
+        self::cache()->invalidate(new Request('/' . $id . '.gif'));
     }
 
     /**

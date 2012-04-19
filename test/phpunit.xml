@@ -20,4 +20,9 @@
     <listeners>
         <listener class="\Mockery\Adapter\Phpunit\TestListener" file="Mockery/Adapter/Phpunit/TestListener.php"> </listener>
     </listeners>
+
+    <php>
+        <env name="APPLICATION_ENV" value="testing"/>
+    </php>
+
 </phpunit>
