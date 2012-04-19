@@ -1,9 +1,9 @@
 RewriteEngine On
 RewriteCond %{DOCUMENT_ROOT}/cache/$1/$2/$2$3 -f
-RewriteRule ^([a-z]{3})/([^_\.]+)([_\.].*)$ %{DOCUMENT_ROOT}/cache/$1/$2/$2$3 [L]
+RewriteRule ^([a-z]{3})/([^_\.]+)([_\.].*)$ %{DOCUMENT_ROOT}/cache/$1/$2/$2$3 [L,E=ACCESS_ALLOWED]
 
 RewriteCond %{DOCUMENT_ROOT}/cache/$1/$1$2 -f
-RewriteRule ^([^_\.]+)([_\.].*)$ %{DOCUMENT_ROOT}/cache/$1/$1$2 [L]
+RewriteRule ^([^_\.]+)([_\.].*)$ %{DOCUMENT_ROOT}/cache/$1/$1$2 [L,E=ACCESS_ALLOWED]
 
 RewriteCond %{REQUEST_FILENAME} -s [OR]
 RewriteCond %{REQUEST_FILENAME} -l [OR]
