@@ -36,12 +36,20 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(ContentType::json(), $response->contentType);
     }
 
-    public function testPOSTReturnsEntityIdAtSaveToStorage() {
+    public function testPOSTReturnsDocumentInformationAtSavingToStorage() {
         $storage = $this->getMock('Storage_Interface');
         $storage->expects($this->once())->method('save')->will($this->returnValue('12345xz'));
 
         $this->assertEquals(
-            new Response(ContentType::json(), json_encode(array('id'=>'12345xz'))),
+            new Response(
+                ContentType::json(), json_encode(
+                    array(
+                        'id'=>'12345xz',
+                        'contentType' => 'text/plain',
+                        'ext' => 'txt',
+                        'length' => 10
+                    )
+            )),
             $this->c(self::binaryRequest(), $storage)->POST()
         );
     }

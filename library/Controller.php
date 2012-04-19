@@ -29,11 +29,16 @@ class Controller implements Controller_Interface {
             throw new Controller_NullPostException;
         }
 
+        $contentType = ContentType::byString($this->request->bin);
+
         return self::response(
             ContentType::json(),
             json_encode(
                 array(
-                    'id' => $this->storage->save($this->request->bin)
+                    'id' => $this->storage->save($this->request->bin),
+                    'contentType' => strval($contentType),
+                    'ext' => $contentType->standartExtention(),
+                    'length' => strlen($this->request->bin),
                 )
             )
         );
