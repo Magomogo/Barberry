@@ -23,9 +23,7 @@ class DirectionFactoryTest extends PHPUnit_Framework_TestCase {
     public function testSameSourceAndDestinationWitCommandRequiresPlugin() {
         $this->setExpectedException('Plugin_NotAvailableException');
 
-        $this->assertInstanceOf('Plugin_Null', self::phpToSomethingDirection('php')->direction(
-            Test_Stub::create('Plugin_Interface_Command')
-        ));
+        $this->assertInstanceOf('Plugin_Null', self::phpToSomethingDirection('php')->direction('12'));
     }
 
 //--------------------------------------------------------------------------------------------------
