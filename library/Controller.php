@@ -29,7 +29,11 @@ class Controller implements Controller_Interface {
             throw new Controller_NullPostException;
         }
 
-        $contentType = ContentType::byString($this->request->bin);
+        try {
+            $contentType = ContentType::byString($this->request->bin);
+        } catch (ContentType_Exception $e) {
+            throw new Controller_NotImplementedException($e->getMessage());
+        }
 
         return self::response(
             ContentType::json(),
@@ -41,7 +45,8 @@ class Controller implements Controller_Interface {
                     'length' => strlen($this->request->bin),
                     'filename' => $this->request->postedFilename
                 )
-            )
+            ),
+            201
         );
     }
 
@@ -83,8 +88,8 @@ class Controller implements Controller_Interface {
 
 //--------------------------------------------------------------------------------------------------
 
-    private static function response($contentType, $body) {
-        return new Response($contentType, $body);
+    private static function response($contentType, $body, $code = 200) {
+        return new Response($contentType, $body, $code);
     }
 
 }

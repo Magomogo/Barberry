@@ -50,7 +50,9 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
                         'length' => 10,
                         'filename' => 'File.txt',
                     )
-            )),
+                ),
+                201
+            ),
             $this->c(self::binaryRequest(), $storage)->POST()
         );
     }
@@ -79,6 +81,15 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
 
         $this->setExpectedException('Controller_NotFoundException');
         self::c(null, $storage)->GET();
+    }
+
+    public function testSuccessfullPOSTReturns201CreatedCode() {
+        $this->assertEquals(201, self::c(self::binaryRequest())->POST()->code);
+    }
+
+    public function testPOSTOfUnknownContentTypeReturns501NotImplemented() {
+        $this->setExpectedException('Controller_NotImplementedException');
+        self::c(new Request('/', array('content' => dechex(0))))->POST();
     }
 
 //--------------------------------------------------------------------------------------------------

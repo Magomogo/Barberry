@@ -14,7 +14,7 @@ class POSTMethodTest extends PHPUnit_Framework_TestCase {
         $error = curl_error($handle);
         curl_close($handle);
 
-        $this->assertEquals(200, $httpCode, $error);
+        $this->assertEquals(201, $httpCode, $error);
         $this->assertRegExp('{"id":"\w+"}', $response);
         $this->assertEquals(Test_Data::gif1x1(), self::storage()->getById(json_decode($response)->id));
 

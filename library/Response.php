@@ -13,6 +13,14 @@ class Response {
         return new self(ContentType::json(), '{}', 404);
     }
 
+    public static function notImplemented($msg) {
+        return new self(
+            ContentType::json(),
+            json_encode(array('msg' => $msg)),
+            501
+        );
+    }
+
     public static function serverError() {
         return new self(ContentType::json(), '{}', 500);
     }

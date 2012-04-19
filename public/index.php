@@ -17,6 +17,8 @@ try {
 
 } catch (Controller_NotFoundException $e) {
     $response = Response::notFound();
+} catch (Controller_NotImplementedException $e) {
+    $response = Response::notImplemented($e->getMessage());
 } catch (Exception $e) {
     $response = Response::serverError();
     error_log(strval($e));
