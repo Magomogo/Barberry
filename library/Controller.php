@@ -74,7 +74,6 @@ class Controller implements Controller_Interface {
     }
 
     /**
-     * @TODO implement
      * @return Response
      * @throws Controller_NotFoundException
      */
