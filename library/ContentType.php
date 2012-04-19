@@ -12,7 +12,8 @@ class ContentType {
         'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
         'txt' => 'text/plain',
         'xls' => 'application/vnd.ms-excel',
-        'doc' => 'application/vnd.ms-word'
+        'doc' => 'application/vnd.ms-word',
+        'pdf' => 'application/pdf',
     );
 
     private $contentTypeString;
@@ -51,6 +52,10 @@ class ContentType {
 
     public static function ods() {
         return new self(self::$extensionMap['ods']);
+    }
+
+    public static function pdf() {
+        return new self(self::$extensionMap['pdf']);
     }
 
     public static function byExtention($ext) {

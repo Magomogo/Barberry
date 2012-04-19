@@ -50,4 +50,11 @@ class MagicContentTypeDetectionTest extends PHPUnit_Framework_TestCase {
             ContentType::byString(Test_Data::odtDocument())
         );
     }
+
+    public function testPortableDocumentFormat() {
+        $this->assertEquals(
+            ContentType::pdf(),
+            ContentType::byString(Test_Data::pdfDocument())
+        );
+    }
 }

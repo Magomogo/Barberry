@@ -29,4 +29,8 @@ class Test_Data {
     public static function odsSpreadsheet() {
         return file_get_contents(dirname(dirname(__DIR__)) . '/test/data/spreadsheet1.ods');
     }
+
+    public static function pdfDocument() {
+        return file_get_contents(dirname(dirname(__DIR__)) . '/test/data/sample.pdf');
+    }
 }
