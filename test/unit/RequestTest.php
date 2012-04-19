@@ -36,9 +36,15 @@ class RequestTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(ContentType::jpeg(), $r->contentType);
     }
 
+    public function testProvidesAccessToPostedFile() {
+        $request = new Request('', array('content' => '123', 'filename' => 'Text.txt'));
+        $this->assertEquals('123', $request->bin);
+        $this->assertEquals('Text.txt', $request->postedFilename);
+    }
+
 //--------------------------------------------------------------------------------------------------
 
     private static function request($uri) {
-        return new Request($uri, null);
+        return new Request($uri);
     }
 }

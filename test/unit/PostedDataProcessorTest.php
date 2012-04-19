@@ -60,7 +60,7 @@ class PostedDataProcessorTest extends PHPUnit_Framework_TestCase {
         ));
 
         $this->assertEquals(
-            'Parse result',
+            array('content' => 'Parse result', 'filename' => 'Name of a file.txt'),
             $processor->process(
                 array(
                     'file' => self::goodFileInPhpFilesArray()
@@ -68,6 +68,21 @@ class PostedDataProcessorTest extends PHPUnit_Framework_TestCase {
                 array('vars')
             )
         );
+    }
+
+    public function testReturnsPostedFileAndItsFilename() {
+        $this->assertEquals(
+            array(
+                'content' => Test_Data::gif1x1(),
+                'filename' => 'Name of a file.txt',
+            ),
+            $this->partiallyMockedProcessor()->process(
+                array(
+                    'file' => self::goodFileInPhpFilesArray()
+                )
+            )
+        );
+
     }
 
 //--------------------------------------------------------------------------------------------------
@@ -87,7 +102,8 @@ class PostedDataProcessorTest extends PHPUnit_Framework_TestCase {
         return array(
             'size' => 1234,
             'tmp_name' => '/tmp/1254432ks3',
-            'error' => UPLOAD_ERR_OK
+            'error' => UPLOAD_ERR_OK,
+            'name' => 'Name of a file.txt'
         );
     }
 

@@ -11,7 +11,7 @@ class PostedDataProcessor {
     public function process(array $phpFiles, array $request = array()) {
         foreach ($phpFiles  as $spec) {
             if (($spec['error'] == UPLOAD_ERR_OK) && ($spec['size'] > 0)) {
-                return $this->goodUploadedFile($spec, $request);
+                return $this->goodUploadedFile($spec, $request, $spec['name']);
             }
         }
         return null;
@@ -26,7 +26,7 @@ class PostedDataProcessor {
         return null;
     }
 
-    private function goodUploadedFile($spec, array $request) {
+    private function goodUploadedFile($spec, array $request, $filename) {
         $file = $this->readTempFile($spec['tmp_name']);
 
         if (count($request)) {
@@ -36,7 +36,7 @@ class PostedDataProcessor {
             }
         }
 
-        return $file;
+        return array('content' => $file, 'filename' => $filename);
     }
 
     private static function parserFactoryMethod($file) {

@@ -4,6 +4,7 @@ class ContentType {
     private static $extensionMap = array(
         'jpg' => 'image/jpeg',
         'gif' => 'image/gif',
+        'png' => 'image/png',
         'json' => 'application/json',
         'php' => 'text/x-php',
         'ott' => 'application/vnd.oasis.opendocument.text-template',
@@ -56,6 +57,10 @@ class ContentType {
 
     public static function pdf() {
         return new self(self::$extensionMap['pdf']);
+    }
+
+    public static function png() {
+        return new self(self::$extensionMap['png']);
     }
 
     public static function byExtention($ext) {

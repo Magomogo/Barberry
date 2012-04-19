@@ -18,16 +18,21 @@ class Request {
     public $contentType;
 
     /**
-     * @var null, string
+     * @var null|string
      */
     public $bin;
+
+    /**
+     * @var null|string
+     */
+    public $postedFilename;
 
     /**
      * @var string
      */
     public $commandString;
 
-    public function __construct($uri, $bin = null) {
+    public function __construct($uri, $postInfo = null) {
         $parts = array_values(array_filter(explode('/', $uri)));
         switch (1) {
             case (count($parts) == 2) && preg_match('@^[a-z]{3}$@i', $parts[0]):
@@ -37,7 +42,11 @@ class Request {
                 $this->commandString = self::extractCommandString($parts[0]);
                 $this->contentType = self::extractOutputContentType($parts[0]);
         }
-        $this->bin = $bin;
+        if (is_array($postInfo)) {
+            $this->bin = array_key_exists('content', $postInfo) ? $postInfo['content'] : null;
+            $this->postedFilename = array_key_exists('filename', $postInfo) ?
+                $postInfo['filename'] : null;
+        }
     }
 
 //--------------------------------------------------------------------------------------------------

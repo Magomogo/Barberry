@@ -47,7 +47,8 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
                         'id'=>'12345xz',
                         'contentType' => 'text/plain',
                         'ext' => 'txt',
-                        'length' => 10
+                        'length' => 10,
+                        'filename' => 'File.txt',
                     )
             )),
             $this->c(self::binaryRequest(), $storage)->POST()
@@ -84,7 +85,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
 
     private static function c(Request $request = null, Storage_Interface $storage = null) {
         return new Controller(
-            $request ?: new Request('/1.gif', null),
+            $request ?: new Request('/1.gif'),
             $storage ?: self::aGifStorageStub()
         );
     }
@@ -94,6 +95,6 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
     }
 
     private static function binaryRequest() {
-        return new Request('/', '0101010111');
+        return new Request('/', array('content' => '0101010111', 'filename' => 'File.txt'));
     }
 }

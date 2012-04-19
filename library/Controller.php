@@ -39,6 +39,7 @@ class Controller implements Controller_Interface {
                     'contentType' => strval($contentType),
                     'ext' => $contentType->standartExtention(),
                     'length' => strlen($this->request->bin),
+                    'filename' => $this->request->postedFilename
                 )
             )
         );
