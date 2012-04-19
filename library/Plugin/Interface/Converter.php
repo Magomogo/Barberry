@@ -2,5 +2,5 @@
 
 interface Plugin_Interface_Converter {
 
-    public function convert($bin);
+    public function convert($bin, $commandString = null);
 }

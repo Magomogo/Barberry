@@ -26,7 +26,7 @@ class Direction_Composer {
         return <<<PHP
 <?php
 class {$className}Direction extends Direction_Abstract {
-    public function __construct(Plugin_Interface_Command \$command = null) {
+    public function init() {
         \$this->converter = $converterInstantiatingPhp
     }
 }

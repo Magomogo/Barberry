@@ -14,7 +14,7 @@ class CacheTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testIsContentSavedInFileSystem() {
-        $requested_uri = '/7yU98sd_1x1.gif';
+        $requested_uri = '/7yU98sd/1x1.gif';
 
         $this->cache()->save(
             Test_Data::gif1x1(),
@@ -27,7 +27,7 @@ class CacheTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testIsContentSavedInFileSystemInGroupDirectory() {
-        $requested_uri = '/admin/7yU98sd_1x1.gif';
+        $requested_uri = '/admin/7yU98sd/1x1.gif';
 
         $this->cache()->save(
             Test_Data::gif1x1(),

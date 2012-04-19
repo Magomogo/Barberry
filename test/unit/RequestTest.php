@@ -16,6 +16,13 @@ class RequestTest extends PHPUnit_Framework_TestCase {
         );
     }
 
+    public function testExtractsCommandStringFromUri() {
+        $r = self::request('/123erwe34/175x75_bgFFF_bw.jpg');
+        $this->assertEquals('123erwe34', $r->id);
+        $this->assertEquals('175x75_bgFFF_bw', $r->commandString);
+        $this->assertEquals(ContentType::jpeg(), $r->contentType);
+    }
+
 //--------------------------------------------------------------------------------------------------
 
     private static function request($uri) {

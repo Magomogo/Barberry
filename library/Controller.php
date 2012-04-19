@@ -55,7 +55,7 @@ class Controller implements Controller_Interface {
         try {
             return self::response(
                 $this->request->contentType,
-                $directionFactory->direction()->convert($bin)
+                $directionFactory->direction($this->request->commandString)->convert($bin)
             );
         } catch (Plugin_NotAvailableException $e) {
             throw new Controller_NotFoundException;

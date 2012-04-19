@@ -31,16 +31,16 @@ class Direction_Factory {
     }
 
     /**
-     * @param null|Plugin_Interface_Command $command
+     * @param null|string $commandPart
      * @return Plugin_Interface_Converter
      * @throws Plugin_NotAvailableException
      */
-    public function direction(Plugin_Interface_Command $command = null) {
-        if ($this->sameContentTypes && is_null($command)) {
+    public function direction($commandPart = null) {
+        if ($this->sameContentTypes && is_null($commandPart)) {
             return new Plugin_Null;
         }
         if(class_exists($this->directionClassName, true)) {
-            return new $this->directionClassName($command);
+            return new $this->directionClassName($commandPart);
         }
         throw new Plugin_NotAvailableException($this->directionDescription);
     }
