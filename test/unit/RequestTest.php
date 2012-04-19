@@ -3,10 +3,8 @@
 class RequestTest extends PHPUnit_Framework_TestCase {
 
     public function testExtractsId() {
-        $this->assertEquals(
-            '12345zx',
-            self::request('/12345zx.jpg')->id
-        );
+        $this->assertEquals('12345zx', self::request('/12345zx.jpg')->id);
+        $this->assertEquals('12345zx', self::request('/12345zx')->id);
     }
 
     public function testExtractsGroup() {

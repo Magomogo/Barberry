@@ -92,6 +92,13 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
         self::c(new Request('/', array('content' => dechex(0))))->POST();
     }
 
+    public function testDeleteMethodQueriesStorage() {
+        $storage = $this->getMock('Storage_Interface');
+        $storage->expects($this->once())->method('delete')->with('124234');
+
+        self::c(new Request('/124234'), $storage)->DELETE();
+    }
+
 //--------------------------------------------------------------------------------------------------
 
     private static function c(Request $request = null, Storage_Interface $storage = null) {

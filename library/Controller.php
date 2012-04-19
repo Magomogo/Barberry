@@ -79,6 +79,11 @@ class Controller implements Controller_Interface {
      * @throws Controller_NotFoundException
      */
     public function DELETE() {
+        try {
+            $this->storage->delete($this->request->id);
+        } catch (Storage_NotFoundException $e) {
+            throw new Controller_NotFoundException;
+        }
         return self::response(ContentType::json(), '{}');
     }
 

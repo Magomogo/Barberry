@@ -52,7 +52,7 @@ class Request {
 //--------------------------------------------------------------------------------------------------
 
     private static function extractId($part) {
-        if (preg_match('@^([0-9a-z]+)[_\.]@i', $part, $regs)) {
+        if (preg_match('@^([0-9a-z]+)[_\.]?@i', $part, $regs)) {
             return $regs[1];
         }
         return null;

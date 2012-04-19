@@ -9,11 +9,7 @@ $controller = new Controller(
 
 try {
     $response = $controller->{$_SERVER['REQUEST_METHOD']}();
-
-    if('GET' == strtoupper($_SERVER['REQUEST_METHOD'])) {
-        $cache = new Cache(Config::get()->directoryCache);
-        $cache->save($response->body, new Request($_SERVER['REQUEST_URI']));
-    }
+    invokeCache($response);
 
 } catch (Controller_NotFoundException $e) {
     $response = Response::notFound();
@@ -29,4 +25,13 @@ $response->send();
 
 function postedDataProcessor() {
     return new PostedDataProcessor(new Parser_Factory);
+}
+
+function invokeCache(Response $response) {
+    $cache = new Cache(Config::get()->directoryCache);
+    if('GET' == strtoupper($_SERVER['REQUEST_METHOD'])) {
+        $cache->save($response->body, new Request($_SERVER['REQUEST_URI']));
+    } elseif('DELETE' == strtoupper($_SERVER['REQUEST_METHOD'])) {
+        $cache->invalidate(new Request($_SERVER['REQUEST_URI']));
+    }
 }

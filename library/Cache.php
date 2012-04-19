@@ -14,7 +14,7 @@ class Cache {
     }
 
     public function invalidate(Request $request) {
-        $dir = dirname($this->filePath($request));
+        $dir = $this->path . $request->id;
         if(is_dir($dir)) {
             self::rmDirRecursive($dir);
         }
