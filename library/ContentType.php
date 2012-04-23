@@ -63,6 +63,10 @@ class ContentType {
         return new self(self::$extensionMap['png']);
     }
 
+    public static function txt() {
+        return new self(self::$extensionMap['txt']);
+    }
+
     public static function byExtention($ext) {
         if(isset(self::$extensionMap[$ext])) {
             return new self(self::$extensionMap[$ext]);

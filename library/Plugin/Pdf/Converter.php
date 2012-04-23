@@ -1,14 +1,37 @@
 <?php
 
-class Plugin_PdfToImage_Converter implements Plugin_Interface_Converter {
+class Plugin_Pdf_Converter implements Plugin_Interface_Converter {
 
+    /**
+     * @var string
+     */
     private $tempPath;
 
-    public function __construct($tempPath) {
+    /**
+     * @var ContentType
+     */
+    private $targetContentType;
+
+    public function __construct(ContentType $targetContentType, $tempPath) {
         $this->tempPath = $tempPath;
+        $this->targetContentType = $targetContentType;
     }
 
     public function convert($bin, $commandString = null) {
+        if ($this->targetContentType->standartExtention() == 'txt') {
+            return $this->convertToText($bin);
+        }
+        return $this->convertToJpeg($bin, $commandString);
+    }
+
+//--------------------------------------------------------------------------------------------------
+
+    private function convertToText($bin) {
+        $pipe = new Pipe('pdftotext - -');
+        return $pipe->process($bin);
+    }
+
+    private function convertToJpeg($bin, $commandString) {
         $filename = tempnam($this->tempPath, 'pftops_');
         file_put_contents($filename, $bin);
 
@@ -22,10 +45,8 @@ class Plugin_PdfToImage_Converter implements Plugin_Interface_Converter {
         return $jpeg;
     }
 
-//--------------------------------------------------------------------------------------------------
-
     private static function command($commandString) {
-        return new Plugin_PdfToImage_Command($commandString);
+        return new Plugin_Pdf_Command($commandString);
     }
 
     private static function pdfToPsPopplerCommand($tmpFilename) {

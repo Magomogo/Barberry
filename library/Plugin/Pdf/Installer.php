@@ -1,6 +1,6 @@
 <?php
 
-class Plugin_PdfToImage_Installer implements Plugin_Interface_Installer {
+class Plugin_Pdf_Installer implements Plugin_Interface_Installer {
     /**
      * @var string
      */
@@ -15,7 +15,14 @@ class Plugin_PdfToImage_Installer implements Plugin_Interface_Installer {
             ContentType::pdf(),
             ContentType::jpeg(),
             <<<PHP
-new Plugin_PdfToImage_Converter ('{$this->tempDirectory}');
+new Plugin_Pdf_Converter (ContentType::jpeg(), '{$this->tempDirectory}');
+PHP
+        );
+        $composer->writeClassDeclaration(
+            ContentType::pdf(),
+            ContentType::txt(),
+            <<<PHP
+new Plugin_Pdf_Converter (ContentType::txt(), '{$this->tempDirectory}');
 PHP
         );
     }

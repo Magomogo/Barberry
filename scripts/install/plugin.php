@@ -34,8 +34,8 @@ function openofficeInstaller() {
     return new Plugin_OpenOffice_Installer(Config::get()->directoryTemp);
 }
 
-function pdftoimageInstaller() {
-    return new Plugin_PdfToImage_Installer(Config::get()->directoryTemp);
+function pdfInstaller() {
+    return new Plugin_Pdf_Installer(Config::get()->directoryTemp);
 }
 
 function directionComposer() {

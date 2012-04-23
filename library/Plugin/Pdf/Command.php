@@ -1,6 +1,6 @@
 <?php
 
-class Plugin_PdfToImage_Command implements Plugin_Interface_Command {
+class Plugin_Pdf_Command implements Plugin_Interface_Command {
 
     private $width;
 

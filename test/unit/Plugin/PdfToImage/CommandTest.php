@@ -1,6 +1,6 @@
 <?php
 
-class Plugin_PdfToImage_CommandTest extends PHPUnit_Framework_TestCase {
+class Plugin_Pdf_CommandTest extends PHPUnit_Framework_TestCase {
 
     public function testDefaultWidthDefined() {
         $this->assertEquals(
@@ -33,6 +33,6 @@ class Plugin_PdfToImage_CommandTest extends PHPUnit_Framework_TestCase {
 //--------------------------------------------------------------------------------------------------
 
     private static function command($commandString = null) {
-        return new Plugin_PdfToImage_Command($commandString);
+        return new Plugin_Pdf_Command($commandString);
     }
 }
