@@ -17,20 +17,25 @@ class GETMethodTest extends PHPUnit_Framework_TestCase {
         $id = self::storage()->save(Test_Data::gif1x1());
         $handle = self::get('http://' . Config::get()->httpHost . '/'. $id .'.gif');
         $response = curl_exec($handle);
-
-        $header_size = curl_getinfo($handle,CURLINFO_HEADER_SIZE);
-        $body = substr( $response, $header_size);
-
         $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
         $error = curl_error($handle);
         curl_close($handle);
 
         # clean
-        self::storage()->delete($id);
-        self::cache()->invalidate(new Request('/' . $id . '.gif'));
+        self::deleteDocument($id);
 
         $this->assertEquals(200, $httpCode, $error);
-        $this->assertEquals(Test_Data::gif1x1(), $body);
+        $this->assertEquals(Test_Data::gif1x1(), $response);
+    }
+
+    public function testReturnsOriginalWhenIdOnlyIsProvided() {
+        $id = self::storage()->save(Test_Data::gif1x1());
+        $handle = self::get('http://' . Config::get()->httpHost . '/'. $id);
+        $content = curl_exec($handle);
+        curl_close($handle);
+        self::deleteDocument($id);
+
+        $this->assertEquals(Test_Data::gif1x1(), $content);
     }
 
     public function test_1x1_GifImage_Get_Create_Cache_At_First_Request() {
@@ -45,8 +50,7 @@ class GETMethodTest extends PHPUnit_Framework_TestCase {
         );
 
         # clean
-        self::storage()->delete($id);
-        self::cache()->invalidate(new Request('/' . $id . '.gif'));
+        self::deleteDocument($id);
     }
 
     /**
@@ -66,9 +70,15 @@ class GETMethodTest extends PHPUnit_Framework_TestCase {
     private static function get($url) {
         $handle = curl_init($url);
 
-        curl_setopt($handle, CURLOPT_HEADER, true);
+        curl_setopt($handle, CURLOPT_HEADER, false);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
 
         return $handle;
     }
+
+    private static function deleteDocument($id) {
+        self::storage()->delete($id);
+        self::cache()->invalidate(new Request('/' . $id . '.gif'));
+    }
+
 }

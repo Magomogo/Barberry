@@ -61,6 +61,10 @@ class Controller implements Controller_Interface {
             throw new Controller_NotFoundException;
         }
 
+        if (is_null($this->request->contentType)) {
+            $this->request->defineContentType(ContentType::byString($bin));
+        }
+
         $directionFactory = new Direction_Factory($bin, $this->request->contentType);
 
         try {

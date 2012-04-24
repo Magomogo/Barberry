@@ -49,6 +49,10 @@ class Request {
         }
     }
 
+    public function defineContentType(ContentType $c) {
+        $this->contentType = $c;
+    }
+
 //--------------------------------------------------------------------------------------------------
 
     private static function extractId($part) {

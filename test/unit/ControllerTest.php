@@ -99,6 +99,16 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
         self::c(new Request('/124234'), $storage)->DELETE();
     }
 
+    public function testCanDetectOutputContentTypeByContentsOfStorage() {
+        $this->assertEquals(
+            new Response(ContentType::txt(), '123'),
+            self::c(
+                new Request('/11'),
+                Mockery::mock('Storage_Interface', array('getById' => '123'))
+            )->GET()
+        );
+    }
+
 //--------------------------------------------------------------------------------------------------
 
     private static function c(Request $request = null, Storage_Interface $storage = null) {
