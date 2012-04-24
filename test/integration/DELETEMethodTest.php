@@ -2,7 +2,7 @@
 
 class DELETEMethodTest extends PHPUnit_Framework_TestCase {
 
-    public function test_1x1_GifImage_Get_Returns_GifImage_Content() {
+    public function testDeletesCachedFilesByDocumentId() {
         $id = self::createDocumentAndRequestIt();
 
         $handle = self::get('http://' . Config::get()->httpHost . '/' . $id);
