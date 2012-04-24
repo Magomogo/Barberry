@@ -22,6 +22,7 @@ if (!$can_proceed) {
 reportUnixCommand('soffice', 'Please install openoffice.org-headless');
 reportUnixCommand('python', 'Please install python');
 reportUnixCommand('pdftops', 'Please install poppler (http://poppler.freedesktop.org)');
+reportUnixCommand('pdftotext', 'Please install poppler (http://poppler.freedesktop.org)');
 reportUnixCommand('convert', 'Please install imagemagic (http://www.imagemagick.org)');
 checkOpenOfficeService();
 
