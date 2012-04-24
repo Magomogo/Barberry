@@ -53,14 +53,14 @@ class GETMethodTest extends PHPUnit_Framework_TestCase {
      * @return Storage_File
      */
     private static function storage() {
-        return new Storage_File(Config::get()->directoryStorage);
+        return Resources::get()->storage();
     }
 
     /**
      * @return Cache
      */
     private static function cache() {
-        return new Cache(Config::get()->directoryCache);
+        return Resources::get()->cache();
     }
 
     private static function get($url) {

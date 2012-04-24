@@ -3,8 +3,7 @@
 class DirectAccessToCacheTest extends PHPUnit_Framework_TestCase {
 
     protected function setUp() {
-        $cache = new Cache(Config::get()->directoryCache);
-        $cache->save('123', new Request('/' . __CLASS__ . '.txt'));
+        Resources::get()->cache()->save('123', new Request('/' . __CLASS__ . '.txt'));
     }
 
     protected function tearDown() {

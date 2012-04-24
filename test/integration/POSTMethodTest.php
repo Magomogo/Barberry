@@ -26,7 +26,7 @@ class POSTMethodTest extends PHPUnit_Framework_TestCase {
      * @return Storage_File
      */
     private static function storage() {
-        return new Storage_File(Config::get()->directoryStorage);
+        return Resources::get()->storage();
     }
 
     /**

@@ -28,10 +28,10 @@ class DELETEMethodTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @return Storage_File
+     * @return Storage_Interface
      */
     private static function storage() {
-        return new Storage_File(Config::get()->directoryStorage);
+        return Resources::get()->storage();
     }
 
     private static function get($url) {

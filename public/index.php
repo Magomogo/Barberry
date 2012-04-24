@@ -2,10 +2,7 @@
 
 include __DIR__ . '/../bootstrap.php';
 
-$controller = new Controller(
-    new Request($_SERVER['REQUEST_URI'], postedDataProcessor()->process($_FILES, $_POST)),
-    new Storage_File(Config::get()->directoryStorage)
-);
+$controller = new Controller(Resources::get()->request(), Resources::get()->storage());
 
 try {
     $response = $controller->{$_SERVER['REQUEST_METHOD']}();
@@ -23,15 +20,10 @@ $response->send();
 
 //--------------------------------------------------------------------------------------------------
 
-function postedDataProcessor() {
-    return new PostedDataProcessor(new Parser_Factory);
-}
-
 function invokeCache(Response $response) {
-    $cache = new Cache(Config::get()->directoryCache);
     if('GET' == strtoupper($_SERVER['REQUEST_METHOD'])) {
-        $cache->save($response->body, new Request($_SERVER['REQUEST_URI']));
+        Resources::get()->cache()->save($response->body, Resources::get()->request());
     } elseif('DELETE' == strtoupper($_SERVER['REQUEST_METHOD'])) {
-        $cache->invalidate(new Request($_SERVER['REQUEST_URI']));
+        Resources::get()->cache()->invalidate(Resources::get()->request());
     }
 }
