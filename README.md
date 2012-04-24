@@ -24,7 +24,8 @@ Submitting data to the service.
 
     Url: /
     Data: Document and (optionally) variables to parse if Document is a template
-    Return: {id : "_auto_generated_id_string_"}
+    Return: {id : "_auto_generated_id_string_", contentType: "_content_type_",
+        ext: "_standart_file_extension_", length: _file_size_, filename: "_original_file_name_"}
 
 
 ## GET
@@ -37,6 +38,17 @@ Getting a **document**.
 
 **Example**: /12wkr234ser349.pdf - get document "12wkr234ser349" as PDF
 
+Getting a **document** related to some restricted group
+
+    Url: /_auth_group_3_letters_/_id_string_._ext_
+    Data: no
+    Return: Document
+
+**Example**: /adm/6b12YX.pdf - get document "12wkr234ser349" as PDF
+
+Restriction of /adm/* URIs should be done externally. See section **Authorization** below.
+
+
 ## DELETE
 
 Deleting a **document**.
@@ -45,7 +57,22 @@ Deleting a **document**.
     Data: no
     Return: {}
 
-# Specials
+# Authorization
 
-Some documents shouldn't be available to everyone. Access rules to be implemented (apache basic auth?).
+Authorization should be done externally.
 
+## Example: Restrict all methods except GET with apache web server
+
+    <Directory %PUT_THE_PATH_HERE%/binary/public>
+
+        AuthName "Restricted method"
+        AuthType Basic
+        AuthBasicProvider file
+        AuthUserFile %PUT_THE_PATH_HERE%/passwords
+
+        <LimitExcept GET>
+            Require valid-user
+        </LimitExcept>
+
+        DirectoryIndex index.php
+    </Directory>
