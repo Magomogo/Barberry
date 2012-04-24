@@ -47,7 +47,7 @@ function helpMessage() {
 
 This scripts deploys named plugins
 Usage: ./plugin.php name1[ name2... nameN]
-
+Example: ./plugin.php openoffice pdf
 
 TEXT;
 }

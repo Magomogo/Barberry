@@ -12,7 +12,17 @@ those files should be converted in different ways:
 This application can host a binary/text data (**Documents**) of a particular content type and
 convert it in requested way.
 
-It intended to be deployed at separate hostname as bin._project-hostname_
+It intended to be deployed at separate hostname as bin._project-hostname_. Also it is recommended
+to use cookieless domain for read-only serving of public content.
+
+
+# Installation
+
+    ./scripts/install/check_dependencies.php
+    ./scripts/install/plugin.php _plugin_names_to_install_
+    cd test/
+    phpunit .
+
 
 # Usage
 
