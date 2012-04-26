@@ -15,6 +15,15 @@ class Integration_Plugin_OpenOffice_ConverterTest extends PHPUnit_Framework_Test
         );
     }
 
+    public function testConvertsOttToPdf() {
+        $this->assertEquals(
+            ContentType::pdf(),
+            ContentType::byString(
+                self::c(ContentType::pdf())->convert(Test_Data::ottTemplate())
+            )
+        );
+    }
+
 //--------------------------------------------------------------------------------------------------
 
     private static function c(ContentType $targetContentType) {

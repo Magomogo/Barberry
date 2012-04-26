@@ -30,6 +30,7 @@ PHP
             array(ContentType::ots(), 'ContentType::xls()'),
             array(ContentType::ods(), 'ContentType::xls()'),
             array(ContentType::ott(), 'ContentType::doc()'),
+            array(ContentType::ott(), 'ContentType::pdf()'),
         );
     }
 }

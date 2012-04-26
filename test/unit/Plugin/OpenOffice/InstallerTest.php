@@ -26,6 +26,18 @@ class Plugin_OpenOffice_InstallerTest extends PHPUnit_Framework_TestCase {
         self::installer()->install($composer);
     }
 
+    public function testInstallsOttToPdfDirection() {
+        $composer = Mockery::mock('Direction_Composer');
+        $composer->shouldReceive('writeClassDeclaration')->with(
+            equalTo(ContentType::ott()),
+            equalTo(ContentType::pdf()),
+            containsString('new Plugin_OpenOffice_Converter (ContentType::pdf(),')
+        )->once();
+        $composer->shouldReceive('writeClassDeclaration');
+
+        self::installer()->install($composer);
+    }
+
 //--------------------------------------------------------------------------------------------------
 
     private static function installer() {
