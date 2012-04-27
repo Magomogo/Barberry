@@ -40,6 +40,16 @@ class RequestTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('Text.txt', $request->postedFilename);
     }
 
+    public function testKeepsOriginalUri() {
+        $r = self::request('/adm/123erwe34_absrs.jpg');
+        $this->assertEquals('123erwe34_absrs.jpg', $r->originalBasename);
+    }
+
+    public function testKeepsOriginalUriOfGroupRequest() {
+        $r = self::request('/123erwe34_absrs.jpg');
+        $this->assertEquals('123erwe34_absrs.jpg', $r->originalBasename);
+    }
+
 //--------------------------------------------------------------------------------------------------
 
     private static function request($uri) {

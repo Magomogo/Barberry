@@ -47,10 +47,8 @@ class Cache {
             array_filter(
                 array(
                     $request->group,
-                    $request->id . '/' . $request->id
-                        . ($request->commandString ? '_' . $request->commandString : '')
-                        . '.' . $request->contentType->standartExtention()
-                    )
+                    $request->id . '/' . $request->originalBasename
+                )
             )
         );
     }

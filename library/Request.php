@@ -2,6 +2,8 @@
 
 class Request {
 
+    public $originalBasename;
+
     /**
      * @var string
      */
@@ -33,6 +35,7 @@ class Request {
     public $commandString;
 
     public function __construct($uri, $postInfo = null) {
+
         $parts = array_values(array_filter(explode('/', $uri)));
         switch (1) {
             case (count($parts) == 2) && preg_match('@^[a-z]{3}$@i', $parts[0]):
@@ -47,6 +50,9 @@ class Request {
             $this->postedFilename = array_key_exists('filename', $postInfo) ?
                 $postInfo['filename'] : null;
         }
+
+        $this->originalBasename =
+            trim($this->group ? substr($uri, strlen($this->group) + 1) : $uri, '/');
     }
 
     public function defineContentType(ContentType $c) {
