@@ -17,6 +17,8 @@ class Plugin_Pdf_Installer implements Plugin_Interface_Installer {
             <<<PHP
 new Plugin_Pdf_Converter (ContentType::jpeg(), '{$this->tempDirectory}');
 PHP
+            ,
+            'new Plugin_Pdf_Command'
         );
         $composer->writeClassDeclaration(
             ContentType::pdf(),

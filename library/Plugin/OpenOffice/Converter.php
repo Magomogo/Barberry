@@ -17,7 +17,7 @@ class Plugin_OpenOffice_Converter implements Plugin_Interface_Converter {
         $this->tempPath = $tempPath;
     }
 
-    public function convert($bin, $commandString = null) {
+    public function convert($bin, Plugin_Interface_Command $command = null) {
         $source = tempnam($this->tempPath, "ooconverter_");
         chmod($source, 0664);
         $destination = $source . '.' . $this->targetContentType->standartExtention();

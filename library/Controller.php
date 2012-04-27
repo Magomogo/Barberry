@@ -74,6 +74,8 @@ class Controller implements Controller_Interface {
             );
         } catch (Plugin_NotAvailableException $e) {
             throw new Controller_NotFoundException;
+        } catch (Plugin_AmbiguousCommandException $e) {
+            throw new Controller_NotFoundException;
         }
     }
 

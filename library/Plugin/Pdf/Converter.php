@@ -17,11 +17,11 @@ class Plugin_Pdf_Converter implements Plugin_Interface_Converter {
         $this->targetContentType = $targetContentType;
     }
 
-    public function convert($bin, $commandString = null) {
+    public function convert($bin, Plugin_Interface_Command $command = null) {
         if ($this->targetContentType->standartExtention() == 'txt') {
             return $this->convertToText($bin);
         }
-        return $this->convertToJpeg($bin, $commandString);
+        return $this->convertToJpeg($bin, $command);
     }
 
 //--------------------------------------------------------------------------------------------------
@@ -31,22 +31,15 @@ class Plugin_Pdf_Converter implements Plugin_Interface_Converter {
         return $pipe->process($bin);
     }
 
-    private function convertToJpeg($bin, $commandString) {
+    private function convertToJpeg($bin, Plugin_Pdf_Command $command) {
         $filename = tempnam($this->tempPath, 'pftops_');
         file_put_contents($filename, $bin);
 
         $pipePdf2Ps = new Pipe(self::pdfToPsPopplerCommand($filename));
-        $pipePs2Jpeg = new Pipe(self::psToJpegImagemagic(
-            self::command($commandString)->width()
-        ));
-
+        $pipePs2Jpeg = new Pipe(self::psToJpegImagemagic($command->width()));
         $jpeg = $pipePs2Jpeg->process($pipePdf2Ps->process());
         unlink($filename);
         return $jpeg;
-    }
-
-    private static function command($commandString) {
-        return new Plugin_Pdf_Command($commandString);
     }
 
     private static function pdfToPsPopplerCommand($tmpFilename) {

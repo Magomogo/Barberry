@@ -2,22 +2,22 @@
 
 abstract class Direction_Abstract {
     /**
-     * @var null|string
+     * @var null|Plugin_Interface_Command
      */
-    private $commandString;
+    protected $command;
+
     /**
      * @var Plugin_Interface_Converter
      */
     protected $converter;
 
     public function __construct($commandString = null) {
-        $this->commandString = $commandString;
-        $this->init();
+        $this->init($commandString);
     }
 
-    abstract function init();
+    abstract protected function init($commandString = null);
 
     public function convert($bin) {
-        return $this->converter->convert($bin, $this->commandString);
+        return $this->converter->convert($bin, $this->command);
     }
 }

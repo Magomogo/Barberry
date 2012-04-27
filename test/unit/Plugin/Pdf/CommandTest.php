@@ -30,9 +30,14 @@ class Plugin_Pdf_CommandTest extends PHPUnit_Framework_TestCase {
         );
     }
 
+    public function testAmbiguityTest() {
+        $this->assertFalse(self::command('200sda')->conforms('200'));
+    }
+
 //--------------------------------------------------------------------------------------------------
 
     private static function command($commandString = null) {
-        return new Plugin_Pdf_Command($commandString);
+        $command = new Plugin_Pdf_Command();
+        return $command->configure($commandString);
     }
 }
