@@ -1,38 +1,46 @@
 <?php
-
+/**
+ * @property-read string $originalBasename
+ * @property-read string $id
+ * @property-read null|ContentType $contentType
+ * @property-read null|string $group
+ * @property-read null|string $bin
+ * @property-read null|string $postedFilename
+ * @property-read null|string $commandString
+ */
 class Request {
 
-    public $originalBasename;
-
-    /**
-     * @var string
-     */
-    public $group;
-
-    /**
-     * @var string
-     */
-    public $id;
-
-    /**
-     * @var ContentType
-     */
-    public $contentType;
+    private $_originalBasename;
 
     /**
      * @var null|string
      */
-    public $bin;
-
-    /**
-     * @var null|string
-     */
-    public $postedFilename;
+    private $_group;
 
     /**
      * @var string
      */
-    public $commandString;
+    private $_id;
+
+    /**
+     * @var null|ContentType
+     */
+    private $_contentType;
+
+    /**
+     * @var null|string
+     */
+    private $_bin;
+
+    /**
+     * @var null|string
+     */
+    private $_postedFilename;
+
+    /**
+     * @var null|string
+     */
+    private $_commandString;
 
     public function __construct($uri, $postInfo = null) {
         $this->parseUri($uri);
@@ -43,6 +51,14 @@ class Request {
 
     public function defineContentType(ContentType $c) {
         $this->contentType = $c;
+    }
+
+    public function __get($property) {
+        if (property_exists($this, '_' . $property)) {
+            return $this->{'_' . $property};
+        }
+        trigger_error('Undefined property via __get(): ' . $property, E_USER_NOTICE);
+        return null;
     }
 
 //--------------------------------------------------------------------------------------------------
@@ -76,7 +92,7 @@ class Request {
     }
 
     private static function extractCommandString($uri) {
-        if (preg_match('@^[^_]+_(.*)\.[a-z]+@i', $uri, $regs)) {
+        if (preg_match('@^[^_]+_([^.]*)\.?[a-z]*@i', $uri, $regs)) {
             return $regs[1];
         }
         return null;

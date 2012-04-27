@@ -50,6 +50,11 @@ class RequestTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('123erwe34_absrs.jpg', $r->originalBasename);
     }
 
+    public function testRecognizesCommandWhenExtensionMissed() {
+        $r = self::request('/123erwe34_absrs');
+        $this->assertEquals('absrs', $r->commandString);
+    }
+
 //--------------------------------------------------------------------------------------------------
 
     private static function request($uri) {
