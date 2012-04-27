@@ -35,22 +35,8 @@ class Request {
     public $commandString;
 
     public function __construct($uri, $postInfo = null) {
-
-        $parts = array_values(array_filter(explode('/', $uri)));
-        switch (1) {
-            case (count($parts) == 2) && preg_match('@^[a-z]{3}$@i', $parts[0]):
-                $this->group = array_shift($parts);
-            case count($parts) == 1:
-                $this->id = self::extractId($parts[0]);
-                $this->commandString = self::extractCommandString($parts[0]);
-                $this->contentType = self::extractOutputContentType($parts[0]);
-        }
-        if (is_array($postInfo)) {
-            $this->bin = array_key_exists('content', $postInfo) ? $postInfo['content'] : null;
-            $this->postedFilename = array_key_exists('filename', $postInfo) ?
-                $postInfo['filename'] : null;
-        }
-
+        $this->parseUri($uri);
+        $this->keepPost($postInfo);
         $this->originalBasename =
             trim($this->group ? substr($uri, strlen($this->group) + 1) : $uri, '/');
     }
@@ -60,6 +46,27 @@ class Request {
     }
 
 //--------------------------------------------------------------------------------------------------
+
+    private function keepPost($postInfo) {
+        if (is_array($postInfo)) {
+            $this->bin = array_key_exists('content', $postInfo) ? $postInfo['content'] : null;
+            $this->postedFilename = array_key_exists('filename', $postInfo) ?
+                    $postInfo['filename'] : null;
+        }
+    }
+
+    private function parseUri($uri) {
+        $parts = array_values(array_filter(explode('/', $uri)));
+        switch (1) {
+            case (count($parts) == 2) && preg_match('@^[a-z]{3}$@i', $parts[0]):
+                $this->group = array_shift($parts);
+            // TRICKY: no break.
+            case count($parts) == 1:
+                $this->id = self::extractId($parts[0]);
+                $this->commandString = self::extractCommandString($parts[0]);
+                $this->contentType = self::extractOutputContentType($parts[0]);
+        }
+    }
 
     private static function extractId($part) {
         if (preg_match('@^([0-9a-z]+)[_\.]?@i', $part, $regs)) {
