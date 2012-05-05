@@ -21,7 +21,7 @@ class DELETEMethodTest extends PHPUnit_Framework_TestCase {
 
     private static function createDocumentAndRequestIt() {
         $id = self::storage()->save(Test_Data::gif1x1());
-        $handle = self::get('http://' . Config::get()->httpHost . '/' . $id . '.gif');
+        $handle = self::get('http://' . Config::get()->httpHost . '/' . $id);
         curl_exec($handle);
         curl_close($handle);
         return $id;
