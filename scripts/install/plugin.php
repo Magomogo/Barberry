@@ -38,6 +38,10 @@ function pdfInstaller() {
     return new Plugin_Pdf_Installer(Config::get()->directoryTemp);
 }
 
+function imagemagicInstaller() {
+    return new Plugin_Imagemagic_Installer(Config::get()->directoryTemp);
+}
+
 function directionComposer() {
     return new Direction_Composer(Config::get()->directoryEnabledDirection);
 }
