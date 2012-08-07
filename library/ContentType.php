@@ -2,69 +2,45 @@
 
 class ContentType {
     private static $extensionMap = array(
-        'jpg' => 'image/jpeg',
-        'gif' => 'image/gif',
-        'png' => 'image/png',
+        'jpg'  => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'gif'  => 'image/gif',
+        'png'  => 'image/png',
+
+        'flv'  => 'video/x-flv',
+        'webm' => 'video/webm',
+        'wmv'  => 'video/x-ms-wmv',
+        'mpg'  => 'video/mpeg',
+        'mpeg' => 'video/mpeg',
+        'avi'  => 'video/x-msvideo',
+        'mkv'  => 'video/x-matroska',
+        'mp4'  => 'video/mp4',
+        'mov'  => 'video/quicktime',
+        'qt'   => 'video/quicktime',
+        'ogv'  => 'video/ogg',
+        '3gp'  => 'video/3gpp',
+        '_3gp'  => 'video/3gpp',
+
         'json' => 'application/json',
-        'php' => 'text/x-php',
-        'ott' => 'application/vnd.oasis.opendocument.text-template',
-        'odt' => 'application/vnd.oasis.opendocument.text',
-        'ots' => 'application/vnd.oasis.opendocument.spreadsheet-template',
-        'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
-        'txt' => 'text/plain',
-        'xls' => 'application/vnd.ms-excel',
-        'doc' => 'application/vnd.ms-word',
-        'pdf' => 'application/pdf',
+        'php'  => 'text/x-php',
+        'ott'  => 'application/vnd.oasis.opendocument.text-template',
+        'odt'  => 'application/vnd.oasis.opendocument.text',
+        'ots'  => 'application/vnd.oasis.opendocument.spreadsheet-template',
+        'ods'  => 'application/vnd.oasis.opendocument.spreadsheet',
+        'txt'  => 'text/plain',
+        'xls'  => 'application/vnd.ms-excel',
+        'doc'  => 'application/vnd.ms-word',
+        'pdf'  => 'application/pdf',
     );
 
     private $contentTypeString;
 
-    public static function jpeg() {
-        return new self(self::$extensionMap['jpg']);
-    }
+    public static function __callStatic($method, $args)
+    {
+        if (isset(self::$extensionMap[$method]))
+            return self::byExtention($method);
 
-    public static function gif() {
-        return new self(self::$extensionMap['gif']);
-    }
-
-    public static function json() {
-        return new self(self::$extensionMap['json']);
-    }
-
-    public static function ott() {
-        return new self(self::$extensionMap['ott']);
-    }
-
-    public static function ots() {
-        return new self(self::$extensionMap['ots']);
-    }
-
-    public static function xls() {
-        return new self(self::$extensionMap['xls']);
-    }
-
-    public static function doc() {
-        return new self(self::$extensionMap['doc']);
-    }
-
-    public static function odt() {
-        return new self(self::$extensionMap['odt']);
-    }
-
-    public static function ods() {
-        return new self(self::$extensionMap['ods']);
-    }
-
-    public static function pdf() {
-        return new self(self::$extensionMap['pdf']);
-    }
-
-    public static function png() {
-        return new self(self::$extensionMap['png']);
-    }
-
-    public static function txt() {
-        return new self(self::$extensionMap['txt']);
+        throw new Exception("Undefined method ".get_called_class()."->{$method}() called.");
     }
 
     public static function byExtention($ext) {

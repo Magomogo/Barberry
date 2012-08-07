@@ -42,6 +42,10 @@ function imagemagicInstaller() {
     return new Plugin_Imagemagic_Installer(Config::get()->directoryTemp);
 }
 
+function ffmpegInstaller() {
+    return new Plugin_Ffmpeg_Installer(Config::get()->directoryTemp);
+}
+
 function directionComposer() {
     return new Direction_Composer(Config::get()->directoryEnabledDirection);
 }
