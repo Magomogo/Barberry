@@ -29,10 +29,15 @@ PHP
 
     private static function directions() {
         $videos = array('flv', 'webm', 'wmv', 'mpg', 'mpeg', 'avi', 'mkv', 'mp4', 'mov', 'qt', 'ogv', '_3gp', );
+        $additional = array('jpg');
         $result = array();
         foreach ($videos as $from)
         {
             foreach ($videos as $to)
+            {
+                $result[] = array(call_user_func(array('ContentType', $from)), 'ContentType::'.$to.'()');
+            }
+            foreach ($additional as $to)
             {
                 $result[] = array(call_user_func(array('ContentType', $from)), 'ContentType::'.$to.'()');
             }
