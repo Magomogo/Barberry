@@ -42,7 +42,7 @@ function reportVersion($componentName, $requiredVersion, $currentVersion, $white
     }
     else {
         echo "INSUFFICIENT - $requiredVersion required\n\n";
-        exit;
+        exit(1);
     }
 }
 

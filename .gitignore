@@ -8,3 +8,5 @@ etc/EnabledDirection/*.php
 var/*
 usr/*
 public/cache/*
+composer.lock
+vendor/

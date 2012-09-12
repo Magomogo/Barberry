@@ -18,7 +18,7 @@ to use cookieless domain for read-only serving of public content.
 
 # Installation
 
-    ./scripts/install/check_dependencies.php
+    phing install
     ./scripts/install/plugin.php _plugin_names_to_install_
     cd test/
     phpunit .
