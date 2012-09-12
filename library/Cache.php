@@ -54,11 +54,11 @@ class Cache {
     }
 
     private static function rmDirRecursive($dir) {
-        if (!is_dir($dir) || is_link($dir)) return unlink($dir);
+        if (!is_dir($dir) || is_link($dir)) return @unlink($dir);
         foreach (scandir($dir) as $file) {
             if ($file == '.' || $file == '..') continue;
             if (!self::rmDirRecursive($dir . '/' . $file)) {
-                chmod($dir . '/' . $file, 0777);
+                @chmod($dir . '/' . $file, 0777);
                 if (!self::rmDirRecursive($dir . '/' . $file)) return false;
             };
         }
