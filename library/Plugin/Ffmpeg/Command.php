@@ -9,6 +9,7 @@ class Plugin_Ffmpeg_Command implements Plugin_Interface_Command {
 
     private $_videoBitrate = null;
     private $_audioBitrate = null;
+    private $_screenshotTime = null;
     private $_width = null;
     private $_height = null;
 
@@ -24,6 +25,9 @@ class Plugin_Ffmpeg_Command implements Plugin_Interface_Command {
             }
             else if (preg_match("@^a([\d]*)$@", $val, $regs)) {
                 $this->_audioBitrate = strlen($regs[1]) ? min((int)$regs[1], self::MAX_AUDIO_BITRATE) : null;
+            }
+            else if (preg_match("@^t([\d]*)$@", $val, $regs)) {
+                $this->_screenshotTime = strlen($regs[1]) ? max((int)$regs[1], 0) : null;
             }
             else if (preg_match("@^([\d]*)x([\d]*)$@",$val,$regs)) {
                 $this->_width = strlen($regs[1]) ? min((int)$regs[1], self::MAX_WIDTH) : null;
@@ -45,6 +49,11 @@ class Plugin_Ffmpeg_Command implements Plugin_Interface_Command {
         return $this->_audioBitrate;
     }
 
+    public function screenshotTime() {
+        return $this->_screenshotTime;
+    }
+
+
     public function width() {
         return $this->_width;
     }
@@ -61,6 +70,8 @@ class Plugin_Ffmpeg_Command implements Plugin_Interface_Command {
             $opts[] = 'v'.$this->_videoBitrate;
         if ($this->_audioBitrate)
             $opts[] = 'a'.$this->_audioBitrate;
+        if ($this->_screenshotTime)
+            $opts[] = 't'.$this->_screenshotTime;
         return implode('_', $opts);
     }
 }

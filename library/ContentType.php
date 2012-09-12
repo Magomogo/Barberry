@@ -78,6 +78,14 @@ class ContentType {
         return $this->contentTypeString;
     }
 
+    public function isImage() {
+        return (preg_match('/^image\\//i', $this->contentTypeString));
+    }
+
+    public function isVideo() {
+        return (preg_match('/^video\\//i', $this->contentTypeString));
+    }
+
 //--------------------------------------------------------------------------------------------------
 
     private static function contentTypeString($content) {
