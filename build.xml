@@ -30,7 +30,13 @@
         <exec command="php scripts/install/check_dependencies.php" checkreturn="true"/>
     </target>
 
-    <target name="install" depends="install_dirs,install_script,tests">
+    <target name="install_git_submodules">
+        <echo msg="Install GIT submodules" />
+        <exec command="git submodule init" checkreturn="true"/>
+        <exec command="git submodule update" checkreturn="true"/>
+    </target>
+
+    <target name="install" depends="install_dirs,install_git_submodules,install_script,tests">
         <echo msg="Install complete" />
     </target>
 
