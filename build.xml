@@ -7,6 +7,7 @@
         <echo msg="Install dirs" />
         <propertyprompt propertyName="httpHost" defaultValue="bin.hostname.domain"
                         promptText="Enter your web root" useExistingValue="true" />
+        <property name="directoryStorage" value="${project.basedir}/usr/storage/" override="true"/>
         <mkdir dir="./etc" />
         <copy todir="./etc">
             <filterchain>
