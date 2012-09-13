@@ -1,0 +1,10 @@
+add plugin for URL => screenshot.jpg using wkhtmltopdf
+steps:
+    dependecy on lib (check_dependencies.php)
+    installer (function in plugin.php called NAMEInstaller)
+    create plugin folder (library/Plugin/NAME)
+    mapping
+    tests
+    code
+crossdomain.xml
+sismo config
