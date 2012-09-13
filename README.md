@@ -86,3 +86,10 @@ Authorization should be done externally.
 
         DirectoryIndex index.php
     </Directory>
+
+# Magic
+
+    magic.mime.mgc version 8 (file version 5.09) is compatible only with php >=5.3.11
+    magic.mime.mgc version 7 (file version 5.04) is compatible with php <=5.3.10
+    version 7 is included in distribution
+    to verify versions, run commands "file -v", "file magic.mime.mgc", "php -v"

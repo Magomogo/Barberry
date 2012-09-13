@@ -1,0 +1,5 @@
+# url file
+0	search/1/w	http:// Url
+!:mime	text/url
+0	search/1/w	https://    Url
+!:mime	text/url
