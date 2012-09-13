@@ -31,6 +31,7 @@ class ContentType {
         'xls'  => 'application/vnd.ms-excel',
         'doc'  => 'application/vnd.ms-word',
         'pdf'  => 'application/pdf',
+        'url'  => 'text/url',
     );
 
     private $contentTypeString;

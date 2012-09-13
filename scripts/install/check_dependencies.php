@@ -25,6 +25,8 @@ reportUnixCommand('python', 'Please install python');
 reportUnixCommand('pdftops', 'Please install poppler (http://poppler.freedesktop.org)');
 reportUnixCommand('pdftotext', 'Please install poppler (http://poppler.freedesktop.org)');
 reportUnixCommand('convert', 'Please install imagemagic (http://www.imagemagick.org)');
+reportUnixCommand('wkhtmltopdf', 'Please install wkhtmltopdf (http://code.google.com/p/wkhtmltopdf/)');
+reportUnixCommand('wkhtmltoimage', 'Please install wkhtmltoimage (http://code.google.com/p/wkhtmltopdf/)');
 checkOpenOfficeService();
 
 echo "\nAll critical checks passed SUCCESSFULLY\n\n";

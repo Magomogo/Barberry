@@ -50,6 +50,10 @@ function directionComposer() {
     return new Direction_Composer(Config::get()->directoryEnabledDirection);
 }
 
+function wkHtmlToPdfInstaller() {
+    return new Plugin_WkHtmlToPdf_Installer(Config::get()->directoryTemp);
+}
+
 function helpMessage() {
     return <<<TEXT
 
