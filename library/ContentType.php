@@ -90,9 +90,14 @@ class ContentType {
 //--------------------------------------------------------------------------------------------------
 
     private static function contentTypeString($content) {
+        if (version_compare(PHP_VERSION, '5.3.11') >= 0) {
+            $magic_mime_path = APPLICATION_PATH . '/scripts/v2-magic.mime.mgc';
+        } else {
+            $magic_mime_path = APPLICATION_PATH . '/scripts/magic.mime.mgc';
+        }
         $finfo = new finfo(
             FILEINFO_MIME ^ FILEINFO_MIME_ENCODING,
-            APPLICATION_PATH . '/scripts/magic.mime.mgc'
+            $magic_mime_path
         );
         return $finfo->buffer($content);
     }
