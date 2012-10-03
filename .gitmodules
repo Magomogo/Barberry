@@ -1,3 +1,0 @@
-[submodule "externals/pyodconverter"]
-	path = externals/pyodconverter
-	url = https://github.com/mirkonasato/pyodconverter.git
