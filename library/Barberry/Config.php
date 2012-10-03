@@ -3,8 +3,6 @@ namespace Barberry;
 
 class Config
 {
-    public $httpHost = 'bin.hostname.domain';
-
     public $directoryTemp;
     public $directoryStorage;
     public $directoryCache;
@@ -12,10 +10,13 @@ class Config
 
     public $applicationPath;
 
-    public function __construct($applicationPath, $optionsToOverride = array())
+    public function __construct($applicationPath, $configToInclude = null)
     {
         $this->applicationPath = rtrim($applicationPath, '/');
         $this->setDefaultValues();
+
+        $optionsToOverride = is_file($this->applicationPath . $configToInclude) ?
+            include $this->applicationPath . $configToInclude : array();
 
         foreach ($optionsToOverride as $key => $value) {
             if (property_exists($this, $key)) {
