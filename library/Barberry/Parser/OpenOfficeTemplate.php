@@ -2,8 +2,8 @@
 namespace Barberry\Parser;
 use Barberry\ContentType;
 
-include_once APPLICATION_PATH . '/externals/Tbs/tbs_class.php';
-include_once APPLICATION_PATH . '/externals/Tbs/tbs_plugin_opentbs.php';
+include_once dirname(dirname(dirname(__DIR__))) . '/externals/Tbs/tbs_class.php';
+include_once dirname(dirname(dirname(__DIR__))) . '/externals/Tbs/tbs_plugin_opentbs.php';
 
 class OpenOfficeTemplate implements ParserInterface {
 

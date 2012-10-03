@@ -1,8 +1,8 @@
 <?php
 namespace Barberry;
 
-class Config {
-
+class Config
+{
     public $httpHost = 'bin.hostname.domain';
 
     public $directoryTemp;
@@ -10,24 +10,11 @@ class Config {
     public $directoryCache;
     public $directoryEnabledDirection;
 
-//--------------------------------------------------------------------------------------------------
+    public $applicationPath;
 
-    /**
-     * @var Config
-     */
-    private static $instance;
-
-    public static function get() {
-        if (is_null(self::$instance)) {
-            self::$instance = new self(
-                is_file(APPLICATION_PATH . '/etc/config.php') ?
-                        include APPLICATION_PATH . '/etc/config.php' : array()
-            );
-        }
-        return self::$instance;
-    }
-
-    public function __construct($optionsToOverride = array()) {
+    public function __construct($applicationPath, $optionsToOverride = array())
+    {
+        $this->applicationPath = rtrim($applicationPath, '/');
         $this->setDefaultValues();
 
         foreach ($optionsToOverride as $key => $value) {
@@ -37,12 +24,11 @@ class Config {
         }
     }
 
-//--------------------------------------------------------------------------------------------------
-
-    private function setDefaultValues() {
-        $this->directoryCache = APPLICATION_PATH . '/public/cache/';
-        $this->directoryTemp = APPLICATION_PATH . '/var/';
-        $this->directoryStorage = APPLICATION_PATH . '/usr/storage/';
-        $this->directoryEnabledDirection = APPLICATION_PATH . '/etc/EnabledDirection/';
+    private function setDefaultValues()
+    {
+        $this->directoryCache = $this->applicationPath . '/public/cache/';
+        $this->directoryTemp = $this->applicationPath . '/var/';
+        $this->directoryStorage = $this->applicationPath . '/usr/storage/';
+        $this->directoryEnabledDirection = $this->applicationPath . '/barberry-directions/';
     }
 }

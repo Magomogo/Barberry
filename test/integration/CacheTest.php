@@ -8,11 +8,11 @@ class CacheIntegrationTest extends \PHPUnit_Framework_TestCase {
 
     protected function setUp() {
         $this->cache_path = '/tmp/testCache/';
-        mkdir($this->cache_path);
+        @mkdir($this->cache_path);
     }
 
     protected function tearDown() {
-        self::rmDirRecursive($this->cache_path);
+        exec('rm -rf ' . $this->cache_path);
     }
 
     public function testIsContentSavedInFileSystem() {

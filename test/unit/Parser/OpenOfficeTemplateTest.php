@@ -2,7 +2,7 @@
 namespace Barberry\Parser;
 use Barberry\Test;
 
-include_once APPLICATION_PATH . '/externals/Tbs/tbs_class.php';
+include_once dirname(dirname(dirname(__DIR__))) . '/externals/Tbs/tbs_class.php';
 
 class OpenOfficeTemplateTest extends \PHPUnit_Framework_TestCase {
 

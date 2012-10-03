@@ -3,10 +3,6 @@ namespace Barberry;
 
 class ResourcesTest extends \PHPUnit_Framework_TestCase {
 
-    public function testItIsSingleton() {
-        $this->assertSame(Resources::get(), Resources::get());
-    }
-
     public function testCache() {
         $this->assertInstanceOf('Barberry\\Cache', self::r()->cache());
     }
@@ -27,6 +23,6 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase {
 //--------------------------------------------------------------------------------------------------
 
     private static function r() {
-        return new Resources(Config::get());
+        return new Resources(new Config(__DIR__));
     }
 }

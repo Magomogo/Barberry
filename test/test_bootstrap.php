@@ -1,5 +1,5 @@
 <?php
-include __DIR__ . '/../bootstrap.php';
+include __DIR__ . '/../vendor/autoload.php';
 
 require_once 'Mockery/Loader.php';
 require_once 'Hamcrest/Hamcrest.php';

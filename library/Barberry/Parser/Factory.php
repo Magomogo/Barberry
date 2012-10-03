@@ -14,9 +14,6 @@ class Factory {
 //--------------------------------------------------------------------------------------------------
 
     private function openOfficeTemplateParser() {
-        return new OpenOfficeTemplate(
-            new \clsTinyButStrong,
-            \Barberry\Config::get()->directoryTemp
-        );
+        return new OpenOfficeTemplate(new \clsTinyButStrong, '/tmp/');
     }
 }
