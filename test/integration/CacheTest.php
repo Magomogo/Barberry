@@ -1,11 +1,13 @@
 <?php
+namespace Barberry;
+use Barberry\Test;
 
-class Integration_CacheTest extends PHPUnit_Framework_TestCase {
+class CacheIntegrationTest extends \PHPUnit_Framework_TestCase {
 
     private $cache_path;
 
     protected function setUp() {
-        $this->cache_path = Config::get()->directoryTemp . 'testCache/';
+        $this->cache_path = '/tmp/testCache/';
         mkdir($this->cache_path);
     }
 
@@ -15,24 +17,24 @@ class Integration_CacheTest extends PHPUnit_Framework_TestCase {
 
     public function testIsContentSavedInFileSystem() {
         $this->cache()->save(
-            Test_Data::gif1x1(),
+            Test\Data::gif1x1(),
             new Request('/7yU98sd_1x1.gif')
         );
 
         $expectedPath = $this->cache_path . '/7yU98sd/7yU98sd_1x1.gif';
 
-        $this->assertEquals(file_get_contents($expectedPath), Test_Data::gif1x1());
+        $this->assertEquals(file_get_contents($expectedPath), Test\Data::gif1x1());
     }
 
     public function testIsContentSavedInFileSystemInGroupDirectory() {
         $this->cache()->save(
-            Test_Data::gif1x1(),
+            Test\Data::gif1x1(),
             new Request('/adm/7yU98sd_1x1.gif')
         );
 
         $expectedPath = $this->cache_path.ltrim('/adm/7yU98sd/7yU98sd_1x1.gif');
 
-        $this->assertEquals(file_get_contents($expectedPath), Test_Data::gif1x1());
+        $this->assertEquals(file_get_contents($expectedPath), Test\Data::gif1x1());
     }
 
 //--------------------------------------------------------------------------------------------------

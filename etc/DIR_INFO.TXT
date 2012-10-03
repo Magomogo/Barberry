@@ -1,1 +1,0 @@
-config.php - returns array of config variables to override default

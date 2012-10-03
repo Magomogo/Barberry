@@ -1,6 +1,7 @@
 <?php
+namespace Barberry;
 
-class PostedDataProcessorTest extends PHPUnit_Framework_TestCase {
+class PostedDataProcessorTest extends \PHPUnit_Framework_TestCase {
 
     public function testReadsFirstCorrectlyUploadedFileFromTemporaryDirectory() {
         $partialMock = $this->partiallyMockedProcessor();
@@ -30,12 +31,12 @@ class PostedDataProcessorTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testUtilizesFactoryToCreateAParserForPostedTemplate() {
-        $parserFactory = $this->getMock('Parser_Factory');
+        $parserFactory = $this->getMock('Barberry\\Parser\\Factory');
         $parserFactory->expects($this->once())
                 ->method('ottParser')
-                ->will($this->returnValue(Test_Stub::create('Parser_Interface')));
+                ->will($this->returnValue(Test\Stub::create('Barberry\\Parser\\ParserInterface')));
 
-        $processor = $this->partiallyMockedProcessor($parserFactory, Test_Data::ottTemplate());
+        $processor = $this->partiallyMockedProcessor($parserFactory, Test\Data::ottTemplate());
         $processor->process(
             array(
                 'file' => self::goodFileInPhpFilesArray()
@@ -45,18 +46,18 @@ class PostedDataProcessorTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testUtilizesParserToParsePostedTemplate() {
-        $parser = $this->getMock('Parser_Interface');
+        $parser = $this->getMock('Barberry\\Parser\\ParserInterface');
         $parser->expects($this->once())
                 ->method('parse')
-                ->with(Test_Data::ottTemplate(), array('vars'))
+                ->with(Test\Data::ottTemplate(), array('vars'))
                 ->will($this->returnValue('Parse result'));
 
         $processor = $this->partiallyMockedProcessor(
-            Test_Stub::create('Parser_Factory', 'ottParser', $parser),
-            Test_Data::ottTemplate()
+            Test\Stub::create('Barberry\\Parser\\Factory', 'ottParser', $parser),
+            Test\Data::ottTemplate()
         );
         $processor->expects($this->any())->method('readTempFile')->will($this->returnValue(
-            Test_Data::ottTemplate()
+            Test\Data::ottTemplate()
         ));
 
         $this->assertEquals(
@@ -73,7 +74,7 @@ class PostedDataProcessorTest extends PHPUnit_Framework_TestCase {
     public function testReturnsPostedFileAndItsFilename() {
         $this->assertEquals(
             array(
-                'content' => Test_Data::gif1x1(),
+                'content' => Test\Data::gif1x1(),
                 'filename' => 'Name of a file.txt',
             ),
             $this->partiallyMockedProcessor()->process(
@@ -89,12 +90,12 @@ class PostedDataProcessorTest extends PHPUnit_Framework_TestCase {
 
     private function partiallyMockedProcessor($parserFactory = null, $readFile = null) {
         $partialMock = $this->getMock(
-            'PostedDataProcessor',
+            'Barberry\\PostedDataProcessor',
             array('readTempFile'),
-            array($parserFactory ?: new Parser_Factory)
+            array($parserFactory ?: new Parser\Factory)
         );
         $partialMock->expects($this->any())->method('readTempFile')
-                ->will($this->returnValue($readFile ?: Test_Data::gif1x1()));
+                ->will($this->returnValue($readFile ?: Test\Data::gif1x1()));
         return $partialMock;
     }
 

@@ -1,1 +1,0 @@
-Temporary directory. Can be safely cleaned up.

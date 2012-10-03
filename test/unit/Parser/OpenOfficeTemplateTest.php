@@ -1,11 +1,13 @@
 <?php
+namespace Barberry\Parser;
+use Barberry\Test;
 
 include_once APPLICATION_PATH . '/externals/Tbs/tbs_class.php';
 
-class Parser_OpenOfficeTemplateTest extends PHPUnit_Framework_TestCase {
+class OpenOfficeTemplateTest extends \PHPUnit_Framework_TestCase {
 
     public function testImplementsParserInterface() {
-        $this->assertInstanceOf('Parser_Interface', self::p());
+        $this->assertInstanceOf('Barberry\\Parser\\ParserInterface', self::p());
     }
 
     public function testSurvivesEmptyTemplate() {
@@ -42,8 +44,8 @@ class Parser_OpenOfficeTemplateTest extends PHPUnit_Framework_TestCase {
 //--------------------------------------------------------------------------------------------------
 
     private static function p($tbs = null) {
-        return new Parser_OpenOfficeTemplate(
-            $tbs ?: Test_Stub::create('clsTinyButStrong'), ''
+        return new OpenOfficeTemplate(
+            $tbs ?: Test\Stub::create('clsTinyButStrong'), ''
         );
     }
 }

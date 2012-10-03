@@ -1,9 +1,9 @@
 {
-    "name": "Dilan/Barberry",
+    "name": "barberry/barberry",
     "version": "2.0",
     "autoload": {
         "psr-0": {
-            "Barberry": "library"
+            "Barberry": "library/"
         }
     },
     "repositories": [

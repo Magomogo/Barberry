@@ -1,6 +1,7 @@
 <?php
+namespace Barberry;
 
-class RequestTest extends PHPUnit_Framework_TestCase {
+class RequestTest extends \PHPUnit_Framework_TestCase {
 
     public function testExtractsId() {
         $this->assertEquals('12345zx', self::request('/12345zx.jpg')->id);

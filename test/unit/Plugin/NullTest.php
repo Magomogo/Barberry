@@ -1,16 +1,18 @@
 <?php
+namespace Barberry\Plugin;
+use Barberry\Test;
 
-class Plugin_NullTest extends PHPUnit_Framework_TestCase {
+class NullTest extends \PHPUnit_Framework_TestCase {
 
     public function testDataType() {
-        $this->assertInstanceOf('Plugin_Interface_Converter', new Plugin_Null());
+        $this->assertInstanceOf('Barberry\\Plugin\\InterfaceConverter', new Null());
     }
 
     public function testReturnsTheArgument() {
-        $c = new Plugin_Null();
+        $c = new Null();
         $this->assertEquals(
-            Test_Data::gif1x1(),
-            $c->convert(Test_Data::gif1x1())
+            Test\Data::gif1x1(),
+            $c->convert(Test\Data::gif1x1())
         );
     }
 }

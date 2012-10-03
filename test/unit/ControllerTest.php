@@ -1,22 +1,25 @@
 <?php
+namespace Barberry;
+use Barberry\Storage;
+use Mockery as m;
 
-class ControllerTest extends PHPUnit_Framework_TestCase {
+class ControllerTest extends \PHPUnit_Framework_TestCase {
 
     public function testDataType() {
-        $this->assertInstanceOf('Controller_Interface', self::c());
+        $this->assertInstanceOf('Barberry\Controller\ControllerInterface', self::c());
     }
 
     public function testGETReadsStorage() {
-        $storage = $this->getMock('Storage_Interface');
+        $storage = $this->getMock('Barberry\\Storage\\StorageInterface');
         $storage->expects($this->once())
                 ->method('getById')
-                ->will($this->returnValue(Test_Data::gif1x1()))
+                ->will($this->returnValue(Test\Data::gif1x1()))
                 ->with('123asd');
         $this->c(new Request('/123asd.gif'), $storage)->GET();
     }
 
     public function testGETReturnsAResponseObject() {
-        $this->assertInstanceOf('Response', self::c()->GET());
+        $this->assertInstanceOf('Barberry\\Response', self::c()->GET());
     }
 
     public function testGETResponseContainsCorrectContentType() {
@@ -37,7 +40,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testPOSTReturnsDocumentInformationAtSavingToStorage() {
-        $storage = $this->getMock('Storage_Interface');
+        $storage = $this->getMock('Barberry\\Storage\\StorageInterface');
         $storage->expects($this->once())->method('save')->will($this->returnValue('12345xz'));
 
         $this->assertEquals(
@@ -58,28 +61,28 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testSavesPostedContentToTheStorage() {
-        $storage = $this->getMock('Storage_Interface');
+        $storage = $this->getMock('Barberry\\Storage\\StorageInterface');
         $storage->expects($this->once())->method('save')->with('0101010111');
         $controller = $this->c(self::binaryRequest(), $storage);
         $controller->POST();
     }
 
     public function testThrowsNullPostValueWhenNoContentPosted() {
-        $this->setExpectedException('Controller_NullPostException');
+        $this->setExpectedException('Barberry\\Controller\\NullPostException');
         self::c()->POST();
     }
 
     public function testThrowsNotFoundExceptionWhenUnknownMethodIsCalled() {
-        $this->setExpectedException('Controller_NotFoundException');
+        $this->setExpectedException('Barberry\\Controller\\NotFoundException');
         self::c()->PUT();
     }
 
     public function testThrowsNotFoundExceptionWhenStorageHasNoRequestedDocument() {
-        $storage = $this->getMock('Storage_Interface');
+        $storage = $this->getMock('Barberry\\Storage\\StorageInterface');
         $storage->expects($this->any())->method('getById')
-                ->will($this->throwException(new Storage_NotFoundException('123')));
+                ->will($this->throwException(new Storage\NotFoundException('123')));
 
-        $this->setExpectedException('Controller_NotFoundException');
+        $this->setExpectedException('Barberry\\Controller\\NotFoundException');
         self::c(null, $storage)->GET();
     }
 
@@ -88,12 +91,12 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testPOSTOfUnknownContentTypeReturns501NotImplemented() {
-        $this->setExpectedException('Controller_NotImplementedException');
+        $this->setExpectedException('Barberry\\Controller\\NotImplementedException');
         self::c(new Request('/', array('content' => dechex(0))))->POST();
     }
 
     public function testDeleteMethodQueriesStorage() {
-        $storage = $this->getMock('Storage_Interface');
+        $storage = $this->getMock('Barberry\\Storage\\StorageInterface');
         $storage->expects($this->once())->method('delete')->with('124234');
 
         self::c(new Request('/124234'), $storage)->DELETE();
@@ -104,14 +107,14 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
             new Response(ContentType::txt(), '123'),
             self::c(
                 new Request('/11'),
-                Mockery::mock('Storage_Interface', array('getById' => '123'))
+                m::mock('Barberry\\Storage\\StorageInterface', array('getById' => '123'))
             )->GET()
         );
     }
 
 //--------------------------------------------------------------------------------------------------
 
-    private static function c(Request $request = null, Storage_Interface $storage = null) {
+    private static function c(Request $request = null, Storage\StorageInterface $storage = null) {
         return new Controller(
             $request ?: new Request('/1.gif'),
             $storage ?: self::aGifStorageStub()
@@ -119,7 +122,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase {
     }
 
     private static function aGifStorageStub() {
-        return Test_Stub::create('Storage_Interface', 'getById', Test_Data::gif1x1());
+        return Test\Stub::create('Barberry\\Storage\\StorageInterface', 'getById', Test\Data::gif1x1());
     }
 
     private static function binaryRequest() {

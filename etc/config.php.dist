@@ -1,5 +1,0 @@
-<?php
-return array(
-    'httpHost' => '${httpHost}',
-    'directoryStorage' => '${directoryStorage}',
-);

@@ -11,15 +11,4 @@ set_error_handler(
     E_ALL
 );
 
-#autoloader
-spl_autoload_register(function($className) {
-    if (preg_match('/Direction$/', $className)) {
-        $filename = Config::get()->directoryEnabledDirection . substr($className, 0, -9) . '.php';
-    } else {
-        $filename = __DIR__ . '/library/' . str_replace('_', '/', $className) . '.php';
-    }
-
-    if (file_exists($filename)) {
-        include_once($filename);
-    }
-});
+include __DIR__ . '/vendor/autoload.php';

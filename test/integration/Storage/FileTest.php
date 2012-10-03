@@ -1,11 +1,14 @@
 <?php
+namespace Barberry\Storage;
+use Barberry\Config;
+use Barberry\Test;
 
-class Storage_FileTest extends PHPUnit_Framework_TestCase {
+class FileTest extends \PHPUnit_Framework_TestCase {
 
     private $storage_path;
 
     protected function setUp() {
-        $this->storage_path = Config::get()->directoryTemp . 'testStorage/';
+        $this->storage_path = '/tmp/testStorage/';
         mkdir($this->storage_path);
     }
 
@@ -14,42 +17,42 @@ class Storage_FileTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testIsFileSavedInFileSystem() {
-        $id = $this->storage()->save(Test_Data::gif1x1());
+        $id = $this->storage()->save(Test\Data::gif1x1());
         $expectedPath = $this->storage_path.$id;
-        $this->assertEquals(file_get_contents($expectedPath), Test_Data::gif1x1());
+        $this->assertEquals(file_get_contents($expectedPath), Test\Data::gif1x1());
     }
 
     public function testIsFileReturnById() {
-        $id = $this->storage()->save(Test_Data::gif1x1());
-        $this->assertEquals($this->storage()->getById($id), Test_Data::gif1x1());
+        $id = $this->storage()->save(Test\Data::gif1x1());
+        $this->assertEquals($this->storage()->getById($id), Test\Data::gif1x1());
     }
 
     public function testIsFileDeletedById() {
-        $id = $this->storage()->save(Test_Data::gif1x1());
+        $id = $this->storage()->save(Test\Data::gif1x1());
         $expectedPath = $this->storage_path.$id;
         $this->storage()->delete($id);
         $this->assertFalse(file_exists($expectedPath));
     }
 
     public function testNotFoundException() {
-        $this->setExpectedException('Storage_NotFoundException');
+        $this->setExpectedException('Barberry\\Storage\\NotFoundException');
         $this->storage()->getById('not-existing-id');
     }
 
     public function testGetByIdTestsForFileExistance() {
-        $this->setExpectedException('Storage_NotFoundException');
+        $this->setExpectedException('Barberry\\Storage\\NotFoundException');
         $this->storage()->getById('/');
     }
 
     public function testFailedWriteCausesException() {
-        $this->setExpectedException('Storage_WriteException');
+        $this->setExpectedException('Barberry\\Storage\\WriteException');
         $this->storage('unexisting/path')->save('/');
     }
 
 //--------------------------------------------------------------------------------------------------
 
     private function storage($path = null) {
-        return new Storage_File($path ?: $this->storage_path);
+        return new File($path ?: $this->storage_path);
     }
 
     private static function rmDirRecursive($dir) {
