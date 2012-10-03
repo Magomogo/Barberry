@@ -7,7 +7,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase {
 
     public function testDetectsDirectionClassName() {
         $this->assertAttributeEquals(
-            'PhpToJpgDirection',
+            'Barberry\\Direction\\PhpToJpgDirection',
             'directionClassName',
             self::phpToSomethingDirection()
         );
