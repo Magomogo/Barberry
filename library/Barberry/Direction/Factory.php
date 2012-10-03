@@ -24,7 +24,8 @@ class Factory {
         $sourceContentType = ContentType::byString($sourceBinary);
 
         $this->directionClassName =
-                    ucfirst($sourceContentType->standartExtention())
+                    'Barberry\\Direction\\'
+                    . ucfirst($sourceContentType->standartExtention())
                     . 'To'
                     . ucfirst($destinationContentType->standartExtention())
                     . 'Direction';
@@ -42,6 +43,7 @@ class Factory {
         if ($this->sameContentTypes && is_null($commandPart)) {
             return new Plugin\Null;
         }
+
         if(class_exists($this->directionClassName, true)) {
             return new $this->directionClassName($commandPart);
         }
