@@ -98,7 +98,7 @@ class Request {
         if (preg_match('@^[^_]+_([^.]*)\.?[a-z]*@i', $uri, $regs)) {
             return $regs[1];
         }
-        return null;
+        return '';
     }
 
     private static function extractOutputContentType($uri) {

@@ -56,6 +56,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('absrs', $r->commandString);
     }
 
+    public function testEmptyCommandStringAsString()
+    {
+        $r = self::request('/123erwe34.gif');
+        $this->assertSame('', $r->commandString);
+    }
+
 //--------------------------------------------------------------------------------------------------
 
     private static function request($uri) {
