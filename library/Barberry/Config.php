@@ -6,7 +6,7 @@ class Config
     public $directoryTemp;
     public $directoryStorage;
     public $directoryCache;
-    public $directoryEnabledDirection;
+    public $directoryMonitors;
 
     public $applicationPath;
 
@@ -30,6 +30,6 @@ class Config
         $this->directoryCache = $this->applicationPath . '/public/cache/';
         $this->directoryTemp = $this->applicationPath . '/var/';
         $this->directoryStorage = $this->applicationPath . '/usr/storage/';
-        $this->directoryEnabledDirection = $this->applicationPath . '/barberry-directions/';
+        $this->directoryMonitors = $this->applicationPath . '/barberry-monitors/';
     }
 }
