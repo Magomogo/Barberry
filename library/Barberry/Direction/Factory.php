@@ -40,7 +40,7 @@ class Factory {
      * @throws \Barberry\Plugin\NotAvailableException
      */
     public function direction($commandPart = null) {
-        if ($this->sameContentTypes && is_null($commandPart)) {
+        if ($this->sameContentTypes && $commandPart=='') {
             return new Plugin\Null;
         }
 
