@@ -67,6 +67,18 @@ Deleting a **document**.
     Data: no
     Return: {}
 
+# Deployment
+
+See https://github.com/Magomogo/barberry-images as a reference.
+Target application should depends from barberry/barberry and necessary converter plugins. Dependencies are handled with
+Composer.
+
+## Plugins
+
+https://github.com/Magomogo/barberry-plugin-imagemagic - images conversion
+https://github.com/kevich/barberry-plugin-pdf - PDF to text, PDF to image
+https://github.com/ykovaleva/barberry-plugin-webcapture - make web sites screen shots as image or PDF with webkit engine
+
 # Authorization
 
 Authorization should be done externally.
