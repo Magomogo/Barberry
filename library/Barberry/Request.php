@@ -45,9 +45,9 @@ class Request {
      */
     private $_commandString;
 
-    public function __construct($uri, $postInfo = null) {
+    public function __construct($uri, PostedFile $postedFile = null) {
         $this->parseUri($uri);
-        $this->keepPost($postInfo);
+        $this->keepPost($postedFile);
         $this->originalBasename =
             trim($this->group ? substr($uri, strlen($this->group) + 1) : $uri, '/');
     }
@@ -66,11 +66,10 @@ class Request {
 
 //--------------------------------------------------------------------------------------------------
 
-    private function keepPost($postInfo) {
-        if (is_array($postInfo)) {
-            $this->bin = array_key_exists('content', $postInfo) ? $postInfo['content'] : null;
-            $this->postedFilename = array_key_exists('filename', $postInfo) ?
-                    $postInfo['filename'] : null;
+    private function keepPost(PostedFile $postedFile = null) {
+        if (!is_null($postedFile)) {
+            $this->bin = $postedFile->bin;
+            $this->postedFilename = $postedFile->filename;
         }
     }
 

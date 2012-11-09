@@ -3,19 +3,14 @@ namespace Barberry;
 
 class PostedDataProcessor {
 
-    private $parserFactory;
+    private $filterFactory;
 
-    public function __construct($parserFactory) {
-        $this->parserFactory = $parserFactory;
+    public function __construct($filterFactory) {
+        $this->filterFactory = $filterFactory;
     }
 
     public function process(array $phpFiles, array $request = array()) {
-        foreach ($phpFiles  as $spec) {
-            if (($spec['error'] == UPLOAD_ERR_OK) && ($spec['size'] > 0)) {
-                return $this->goodUploadedFile($spec, $request, $spec['name']);
-            }
-        }
-        return null;
+        return $this->filteredFile($request, $this->goodUploadedFiles($phpFiles));
     }
 
 //--------------------------------------------------------------------------------------------------
@@ -27,20 +22,46 @@ class PostedDataProcessor {
         return null;
     }
 
-    private function goodUploadedFile($spec, array $request, $filename) {
-        $file = $this->readTempFile($spec['tmp_name']);
+    /**
+     * @param array $phpFiles
+     * @return PostedFile[]
+     */
+    private function goodUploadedFiles(array $phpFiles) {
+        $files = array();
 
-        if (count($request)) {
-            $parserFactoryMethod = self::parserFactoryMethod($file);
-            if (method_exists($this->parserFactory, $parserFactoryMethod)) {
-                $file = $this->parserFactory->$parserFactoryMethod()->parse($file, $request);
+        foreach ($phpFiles as $name => $spec) {
+            if (($spec['error'] == UPLOAD_ERR_OK) && ($spec['size'] > 0)) {
+                $files[$name] = new PostedFile($this->readTempFile($spec['tmp_name']), $spec['name']);
             }
         }
 
-        return array('content' => $file, 'filename' => $filename);
+        return $files;
     }
 
-    private static function parserFactoryMethod($file) {
-        return ContentType::byString($file)->standartExtention() . 'Parser';
+    /**
+     * @param array $request
+     * @param PostedFile[] $allFiles
+     * @return PostedFile|null
+     */
+    private function filteredFile(array $request, array $allFiles) {
+        $postedFile = reset($allFiles);
+
+        if ($postedFile === false) {
+            return null;
+        }
+
+        if (!empty($request)) {
+            $filterFactoryMethod = self::filterFactoryMethod($postedFile->bin);
+            if (method_exists($this->filterFactory, $filterFactoryMethod)) {
+                return $this->filterFactory->$filterFactoryMethod()->filter($request, $allFiles);
+            }
+        }
+
+        return $postedFile;
     }
+
+    private static function filterFactoryMethod($file) {
+        return ContentType::byString($file)->standartExtention() . 'Filter';
+    }
+
 }

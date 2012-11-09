@@ -36,7 +36,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testProvidesAccessToPostedFile() {
-        $request = new Request('', array('content' => '123', 'filename' => 'Text.txt'));
+        $request = new Request('', new PostedFile('123', 'Text.txt'));
         $this->assertEquals('123', $request->bin);
         $this->assertEquals('Text.txt', $request->postedFilename);
     }

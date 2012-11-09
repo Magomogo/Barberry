@@ -54,7 +54,7 @@ class Resources
         return $this->getResource(
             __FUNCTION__,
             function () {
-                $dp = new PostedDataProcessor(new Parser\Factory);
+                $dp = new PostedDataProcessor(new Filter\Factory);
                 return new Request(
                     array_key_exists('REQUEST_URI', $_SERVER) ? $_SERVER['REQUEST_URI'] : '/',
                     $dp->process($_FILES, $_POST)

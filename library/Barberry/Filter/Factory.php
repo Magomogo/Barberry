@@ -1,13 +1,17 @@
 <?php
-namespace Barberry\Parser;
+namespace Barberry\Filter;
 
 class Factory {
 
-    public function otsParser() {
+    public function odtFilter() {
         return $this->openOfficeTemplateParser();
     }
 
-    public function ottParser() {
+    public function otsFilter() {
+        return $this->openOfficeTemplateParser();
+    }
+
+    public function ottFilter() {
         return $this->openOfficeTemplateParser();
     }
 

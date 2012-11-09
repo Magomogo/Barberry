@@ -92,7 +92,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
 
     public function testPOSTOfUnknownContentTypeReturns501NotImplemented() {
         $this->setExpectedException('Barberry\\Controller\\NotImplementedException');
-        self::c(new Request('/', array('content' => dechex(0))))->POST();
+        self::c(new Request('/', new PostedFile(dechex(0), 'test.odt')))->POST();
     }
 
     public function testDeleteMethodQueriesStorage() {
@@ -126,6 +126,6 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
     }
 
     private static function binaryRequest() {
-        return new Request('/', array('content' => '0101010111', 'filename' => 'File.txt'));
+        return new Request('/', new PostedFile('0101010111', 'File.txt'));
     }
 }

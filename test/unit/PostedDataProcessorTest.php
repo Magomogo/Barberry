@@ -31,12 +31,12 @@ class PostedDataProcessorTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testUtilizesFactoryToCreateAParserForPostedTemplate() {
-        $parserFactory = $this->getMock('Barberry\\Parser\\Factory');
-        $parserFactory->expects($this->once())
-                ->method('ottParser')
-                ->will($this->returnValue(Test\Stub::create('Barberry\\Parser\\ParserInterface')));
+        $filterFactory = $this->getMock('Barberry\\Filter\\Factory');
+        $filterFactory->expects($this->once())
+                ->method('ottFilter')
+                ->will($this->returnValue(Test\Stub::create('Barberry\\Filter\\FilterInterface')));
 
-        $processor = $this->partiallyMockedProcessor($parserFactory, Test\Data::ottTemplate());
+        $processor = $this->partiallyMockedProcessor($filterFactory, Test\Data::ottTemplate());
         $processor->process(
             array(
                 'file' => self::goodFileInPhpFilesArray()
@@ -46,25 +46,34 @@ class PostedDataProcessorTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testUtilizesParserToParsePostedTemplate() {
-        $parser = $this->getMock('Barberry\\Parser\\ParserInterface');
-        $parser->expects($this->once())
-                ->method('parse')
-                ->with(Test\Data::ottTemplate(), array('vars'))
-                ->will($this->returnValue('Parse result'));
+        $filter = $this->getMock('Barberry\\Filter\\FilterInterface');
+        $filter->expects($this->once())
+                ->method('filter')
+                ->with(
+                    array('vars'),
+                    array(
+                        'file' => new PostedFile(Test\Data::ottTemplate(), 'Name of a file.txt'),
+                        'image' => new PostedFile(Test\Data::gif1x1(), 'some.jpg')
+                    )
+                )
+                ->will($this->returnValue(new PostedFile('Parse result', 'Name of a file.txt')));
 
-        $processor = $this->partiallyMockedProcessor(
-            Test\Stub::create('Barberry\\Parser\\Factory', 'ottParser', $parser),
-            Test\Data::ottTemplate()
+        $processor = $this->partiallyMockedEmptyProcessor(
+            Test\Stub::create('Barberry\\Filter\\Factory', 'ottFilter', $filter)
         );
-        $processor->expects($this->any())->method('readTempFile')->will($this->returnValue(
+        $processor->expects($this->at(0))->method('readTempFile')->with('/tmp/1254432ks3')->will($this->returnValue(
             Test\Data::ottTemplate()
+        ));
+        $processor->expects($this->at(1))->method('readTempFile')->with('/tmp/1214432ks3')->will($this->returnValue(
+            Test\Data::gif1x1()
         ));
 
         $this->assertEquals(
-            array('content' => 'Parse result', 'filename' => 'Name of a file.txt'),
+            new PostedFile('Parse result', 'Name of a file.txt'),
             $processor->process(
                 array(
-                    'file' => self::goodFileInPhpFilesArray()
+                    'file' => self::goodFileInPhpFilesArray(),
+                    'image' => self::additionalFileInPhpFilesArray()
                 ),
                 array('vars')
             )
@@ -73,10 +82,7 @@ class PostedDataProcessorTest extends \PHPUnit_Framework_TestCase {
 
     public function testReturnsPostedFileAndItsFilename() {
         $this->assertEquals(
-            array(
-                'content' => Test\Data::gif1x1(),
-                'filename' => 'Name of a file.txt',
-            ),
+            new PostedFile(Test\Data::gif1x1(), 'Name of a file.txt'),
             $this->partiallyMockedProcessor()->process(
                 array(
                     'file' => self::goodFileInPhpFilesArray()
@@ -88,12 +94,16 @@ class PostedDataProcessorTest extends \PHPUnit_Framework_TestCase {
 
 //--------------------------------------------------------------------------------------------------
 
-    private function partiallyMockedProcessor($parserFactory = null, $readFile = null) {
-        $partialMock = $this->getMock(
+    private function partiallyMockedEmptyProcessor($filterFactory = null) {
+        return $this->getMock(
             'Barberry\\PostedDataProcessor',
             array('readTempFile'),
-            array($parserFactory ?: new Parser\Factory)
+            array($filterFactory ?: new Filter\Factory)
         );
+    }
+
+    private function partiallyMockedProcessor($filterFactory = null, $readFile = null) {
+        $partialMock = $this->partiallyMockedEmptyProcessor($filterFactory, $readFile);
         $partialMock->expects($this->any())->method('readTempFile')
                 ->will($this->returnValue($readFile ?: Test\Data::gif1x1()));
         return $partialMock;
@@ -105,6 +115,15 @@ class PostedDataProcessorTest extends \PHPUnit_Framework_TestCase {
             'tmp_name' => '/tmp/1254432ks3',
             'error' => UPLOAD_ERR_OK,
             'name' => 'Name of a file.txt'
+        );
+    }
+
+    private static function additionalFileInPhpFilesArray() {
+        return array(
+            'size' => 123,
+            'tmp_name' => '/tmp/1214432ks3',
+            'error' => UPLOAD_ERR_OK,
+            'name' => 'some.jpg'
         );
     }
 

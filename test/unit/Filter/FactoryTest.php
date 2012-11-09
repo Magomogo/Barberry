@@ -1,14 +1,14 @@
 <?php
-namespace Barberry\Parser;
+namespace Barberry\Filter;
 
 class FactoryTest extends \PHPUnit_Framework_TestCase {
 
     public function testOpenOfficeSpreadsheetParserIs_Parser_OpenOfficeTemplate() {
-        $this->assertInstanceOf('Barberry\\Parser\\OpenOfficeTemplate', self::factory()->otsParser());
+        $this->assertInstanceOf('Barberry\\Filter\\OpenOfficeTemplate', self::factory()->otsFilter());
     }
 
     public function testOpenOfficeTextParserIs_Parser_OpenOfficeTemplate() {
-        $this->assertInstanceOf('Barberry\\Parser\\OpenOfficeTemplate', self::factory()->ottParser());
+        $this->assertInstanceOf('Barberry\\Filter\\OpenOfficeTemplate', self::factory()->ottFilter());
     }
 
 //--------------------------------------------------------------------------------------------------
