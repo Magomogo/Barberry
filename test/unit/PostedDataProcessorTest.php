@@ -44,6 +44,16 @@ class PostedDataProcessorTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('test content', $partialMock->process($phpFiles, $postVars)->bin);
     }
 
+    public function testReturnPostedFileIfFilterReturnsNull() {
+        $filter = $this->getMock('Barberry\\Filter\\FilterInterface');
+        $filter->expects($this->once())->method('filter')->will($this->returnValue(null));
+
+        $processedFile = self::partiallyMockedProcessor($filter)->process(
+            array('file' => self::goodFileInPhpFilesArray())
+        );
+        $this->assertEquals('Name of a file.txt', $processedFile->filename);
+    }
+
     public function testReturnsPostedFileAndItsFilename() {
         $this->assertEquals(
             new PostedFile(Test\Data::gif1x1(), 'Name of a file.txt'),

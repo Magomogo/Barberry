@@ -22,15 +22,17 @@ class PostedDataProcessor {
      * @return PostedFile|null
      */
     public function process(array $phpFiles, array $request = array()) {
+        $uploadedFiles = $this->goodUploadedFiles($phpFiles);
+
         if (!is_null($this->filter)) {
-            return $this->filter->filter($request, $this->goodUploadedFiles($phpFiles));
-        } else {
-            foreach ($phpFiles as $key => $file) {
-                $files = $this->goodUploadedFiles(array($key => $file));
-                if (!empty($files)) {
-                    return reset($files);
-                }
+            $filtered = $this->filter->filter($request, $uploadedFiles);
+            if (!is_null($filtered)) {
+                return $filtered;
             }
+        }
+
+        if (!empty($uploadedFiles)) {
+            return reset($uploadedFiles);
         }
 
         return null;
