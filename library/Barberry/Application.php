@@ -8,9 +8,9 @@ class Application
      */
     private $resources;
 
-    public function __construct(Config $config)
+    public function __construct(Config $config, Filter\FilterInterface $filter = null)
     {
-        $this->resources = new Resources($config);
+        $this->resources = new Resources($config, $filter);
     }
 
     /**

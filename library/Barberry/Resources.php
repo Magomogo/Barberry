@@ -1,5 +1,6 @@
 <?php
 namespace Barberry;
+use Barberry\Filter;
 
 class Resources
 {
@@ -13,9 +14,19 @@ class Resources
      */
     private $initializedResources = array();
 
-    public function __construct(Config $config)
+    /**
+     * @var Filter\FilterInterface
+     */
+    private $filter;
+
+    /**
+     * @param Config $config
+     * @param Filter\FilterInterface $filter
+     */
+    public function __construct(Config $config, Filter\FilterInterface $filter = null)
     {
         $this->config = $config;
+        $this->filter = $filter;
     }
 
     /**
@@ -51,10 +62,11 @@ class Resources
      */
     public function request()
     {
+        $filter = $this->filter;
         return $this->getResource(
             __FUNCTION__,
-            function () {
-                $dp = new PostedDataProcessor(new Filter\Factory);
+            function () use ($filter) {
+                $dp = new PostedDataProcessor($filter);
                 return new Request(
                     array_key_exists('REQUEST_URI', $_SERVER) ? $_SERVER['REQUEST_URI'] : '/',
                     $dp->process($_FILES, $_POST)

@@ -30,54 +30,18 @@ class PostedDataProcessorTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    public function testUtilizesFactoryToCreateAParserForPostedTemplate() {
-        $filterFactory = $this->getMock('Barberry\\Filter\\Factory');
-        $filterFactory->expects($this->once())
-                ->method('ottFilter')
-                ->will($this->returnValue(Test\Stub::create('Barberry\\Filter\\FilterInterface')));
+    public function testCallsFilterInterfaceSpecifiedInConstructor() {
+        $phpFiles = array('file' => self::goodFileInPhpFilesArray());
+        $postVars = array('var' => 'test val');
 
-        $processor = $this->partiallyMockedProcessor($filterFactory, Test\Data::ottTemplate());
-        $processor->process(
-            array(
-                'file' => self::goodFileInPhpFilesArray()
-            ),
-            array('vars')
-        );
-    }
-
-    public function testUtilizesParserToParsePostedTemplate() {
         $filter = $this->getMock('Barberry\\Filter\\FilterInterface');
         $filter->expects($this->once())
-                ->method('filter')
-                ->with(
-                    array('vars'),
-                    array(
-                        'file' => new PostedFile(Test\Data::ottTemplate(), 'Name of a file.txt'),
-                        'image' => new PostedFile(Test\Data::gif1x1(), 'some.jpg')
-                    )
-                )
-                ->will($this->returnValue(new PostedFile('Parse result', 'Name of a file.txt')));
+            ->method('filter')
+            ->with($postVars, array('file' => new PostedFile(Test\Data::gif1x1(), $phpFiles['file']['name'])))
+            ->will($this->returnValue(new PostedFile('test content', 'test.txt')));
 
-        $processor = $this->partiallyMockedEmptyProcessor(
-            Test\Stub::create('Barberry\\Filter\\Factory', 'ottFilter', $filter)
-        );
-        $processor->expects($this->at(0))->method('readTempFile')->with('/tmp/1254432ks3')->will($this->returnValue(
-            Test\Data::ottTemplate()
-        ));
-        $processor->expects($this->at(1))->method('readTempFile')->with('/tmp/1214432ks3')->will($this->returnValue(
-            Test\Data::gif1x1()
-        ));
-
-        $this->assertEquals(
-            new PostedFile('Parse result', 'Name of a file.txt'),
-            $processor->process(
-                array(
-                    'file' => self::goodFileInPhpFilesArray(),
-                    'image' => self::additionalFileInPhpFilesArray()
-                ),
-                array('vars')
-            )
-        );
+        $partialMock = self::partiallyMockedProcessor($filter);
+        $this->assertEquals('test content', $partialMock->process($phpFiles, $postVars)->bin);
     }
 
     public function testReturnsPostedFileAndItsFilename() {
@@ -89,21 +53,20 @@ class PostedDataProcessorTest extends \PHPUnit_Framework_TestCase {
                 )
             )
         );
-
     }
 
 //--------------------------------------------------------------------------------------------------
 
-    private function partiallyMockedEmptyProcessor($filterFactory = null) {
+    private function partiallyMockedEmptyProcessor(\Barberry\Filter\FilterInterface $filter = null) {
         return $this->getMock(
             'Barberry\\PostedDataProcessor',
             array('readTempFile'),
-            array($filterFactory ?: new Filter\Factory)
+            array($filter)
         );
     }
 
-    private function partiallyMockedProcessor($filterFactory = null, $readFile = null) {
-        $partialMock = $this->partiallyMockedEmptyProcessor($filterFactory, $readFile);
+    private function partiallyMockedProcessor(\Barberry\Filter\FilterInterface $filter = null, $readFile = null) {
+        $partialMock = $this->partiallyMockedEmptyProcessor($filter, $readFile);
         $partialMock->expects($this->any())->method('readTempFile')
                 ->will($this->returnValue($readFile ?: Test\Data::gif1x1()));
         return $partialMock;

@@ -1,16 +1,39 @@
 <?php
 namespace Barberry;
+use Barberry\Filter;
 
 class PostedDataProcessor {
 
-    private $filterFactory;
+    /**
+     * @var Filter\FilterInterface
+     */
+    private $filter;
 
-    public function __construct($filterFactory) {
-        $this->filterFactory = $filterFactory;
+    /**
+     * @param Filter\FilterInterface $filter
+     */
+    public function __construct(Filter\FilterInterface $filter = null) {
+        $this->filter = $filter;
     }
 
+    /**
+     * @param array $phpFiles
+     * @param array $request
+     * @return PostedFile|null
+     */
     public function process(array $phpFiles, array $request = array()) {
-        return $this->filteredFile($request, $this->goodUploadedFiles($phpFiles));
+        if (!is_null($this->filter)) {
+            return $this->filter->filter($request, $this->goodUploadedFiles($phpFiles));
+        } else {
+            foreach ($phpFiles as $key => $file) {
+                $files = $this->goodUploadedFiles(array($key => $file));
+                if (!empty($files)) {
+                    return reset($files);
+                }
+            }
+        }
+
+        return null;
     }
 
 //--------------------------------------------------------------------------------------------------
@@ -36,32 +59,6 @@ class PostedDataProcessor {
         }
 
         return $files;
-    }
-
-    /**
-     * @param array $request
-     * @param PostedFile[] $allFiles
-     * @return PostedFile|null
-     */
-    private function filteredFile(array $request, array $allFiles) {
-        $postedFile = reset($allFiles);
-
-        if ($postedFile === false) {
-            return null;
-        }
-
-        if (!empty($request)) {
-            $filterFactoryMethod = self::filterFactoryMethod($postedFile->bin);
-            if (method_exists($this->filterFactory, $filterFactoryMethod)) {
-                return $this->filterFactory->$filterFactoryMethod()->filter($request, $allFiles);
-            }
-        }
-
-        return $postedFile;
-    }
-
-    private static function filterFactoryMethod($file) {
-        return ContentType::byString($file)->standartExtention() . 'Filter';
     }
 
 }

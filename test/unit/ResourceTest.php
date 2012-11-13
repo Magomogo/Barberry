@@ -1,5 +1,6 @@
 <?php
 namespace Barberry;
+use Barberry\Filter;
 
 class ResourcesTest extends \PHPUnit_Framework_TestCase {
 
@@ -20,9 +21,16 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($r->cache(), $r->cache());
     }
 
+    public function testPassesDataFilterToPostedDataProcessor() {
+        $filter = $this->getMock('Barberry\\Filter\\FilterInterface');
+        $filter->expects($this->once())->method('filter');
+
+        self::r($filter)->request();
+    }
+
 //--------------------------------------------------------------------------------------------------
 
-    private static function r() {
-        return new Resources(new Config(__DIR__));
+    private static function r(Filter\FilterInterface $filter = null) {
+        return new Resources(new Config(__DIR__), $filter);
     }
 }
