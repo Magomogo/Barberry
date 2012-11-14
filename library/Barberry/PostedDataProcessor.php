@@ -22,45 +22,18 @@ class PostedDataProcessor {
      * @return PostedFile|null
      */
     public function process(array $phpFiles, array $request = array()) {
-        $uploadedFiles = $this->goodUploadedFiles($phpFiles);
+        $filesCollection = $this->createCollection($phpFiles);
 
         if (!is_null($this->filter)) {
-            $filtered = $this->filter->filter($request, $uploadedFiles);
-            if (!is_null($filtered)) {
-                return $filtered;
-            }
+            $this->filter->filter($filesCollection, $request);
         }
 
-        if (!empty($uploadedFiles)) {
-            return reset($uploadedFiles);
-        }
-
-        return null;
+        $filesCollection->rewind();
+        return $filesCollection->current();
     }
 
-//--------------------------------------------------------------------------------------------------
-
-    protected function readTempFile($filepath) {
-        if (is_uploaded_file($filepath)) {
-            return file_get_contents($filepath);
-        }
-        return null;
-    }
-
-    /**
-     * @param array $phpFiles
-     * @return PostedFile[]
-     */
-    private function goodUploadedFiles(array $phpFiles) {
-        $files = array();
-
-        foreach ($phpFiles as $name => $spec) {
-            if (($spec['error'] == UPLOAD_ERR_OK) && ($spec['size'] > 0)) {
-                $files[$name] = new PostedFile($this->readTempFile($spec['tmp_name']), $spec['name']);
-            }
-        }
-
-        return $files;
+    protected function createCollection($phpFiles) {
+        return new \Barberry\PostedFile\Collection($phpFiles);
     }
 
 }

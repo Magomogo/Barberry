@@ -1,13 +1,14 @@
 <?php
 namespace Barberry\Filter;
+use Barberry\PostedFile\Collection;
 
 interface FilterInterface {
 
     /**
+     * @param Collection $files
      * @param array $vars
-     * @param array $allFiles
-     * @return \Barberry\PostedFile|null
+     * @return array example array($filteredVars, $filteredFiles)
      */
-    public function filter(array $vars, array $allFiles = array());
+    public function filter(Collection $files, array $vars);
 
 }

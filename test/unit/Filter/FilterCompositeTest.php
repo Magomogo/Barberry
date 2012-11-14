@@ -1,5 +1,6 @@
 <?php
 namespace Barberry\Filter;
+use Barberry\PostedFile\Collection;
 
 class FilterCompositeTest extends \PHPUnit_Framework_TestCase {
 
@@ -8,31 +9,30 @@ class FilterCompositeTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testCallsAssignedFilter() {
-        $filterMock = $this->filterMock(array('vars'), array('files'));
-        $this->c($filterMock)->filter(array('vars'), array('files'));
+        $files = new Collection();
+        $files['file'] = new \Barberry\PostedFile('test', 'test.txt');
+
+        $filterMock = $this->filterMock($files, array('vars'));
+        $this->c($filterMock)->filter($files, array('vars'));
     }
 
-    public function testReturnsFilteredFileFromAssignedFilter() {
-        $file = new \Barberry\PostedFile('bin', 'test.txt');
-
-        $filterMock = $this->filterMock(array('vars'), array('files'), $file);
-        $this->assertEquals($file, $this->c($filterMock)->filter(array('vars'), array('files')));
-    }
-
-    public function testCallsFiltersUntilReturnFilteredFile() {
+    public function testCallsAllFilters() {
         $vars = array('vars');
-        $files = array('files');
 
-        $filter1 = $this->filterMock($vars, $files);
-        $filter2 = $this->filterMock($vars, $files);
-        $filter3 = $this->filterMock($vars, $files, new \Barberry\PostedFile('binary', 'test_name.txt'));
-        $filter4 = $this->getMock('Barberry\\Filter\\FilterInterface');
-        $filter4->expects($this->never())->method('filter');
+        $files = new Collection();
+        $files['file'] = new \Barberry\PostedFile('test', 'test.txt');
 
-        $this->assertEquals(
-            'test_name.txt',
-            $this->c($filter1, $filter2, $filter3, $filter4)->filter($vars, $files)->filename
+        $filter1 = $this->filterMock($files, $vars);
+        $filter2 = $this->filterMock(
+            $files, $vars,
+            function ($files, $vars) {
+                $files['file'] = new \Barberry\PostedFile('dsdgdfg', 'test_name.txt');
+            }
         );
+        $filter3 = $this->filterMock($files, $vars);
+
+        $this->c($filter1, $filter2, $filter3)->filter($files, $vars);
+        $this->assertEquals('test_name.txt', $files['file']->filename);
     }
 
     private function c() {
@@ -45,12 +45,13 @@ class FilterCompositeTest extends \PHPUnit_Framework_TestCase {
         return $rc->newInstanceArgs($args);
     }
 
-    private function filterMock(array $expectedVars, array $expectedFiles, \Barberry\PostedFile $return = null) {
+    private function filterMock(Collection $expectedFiles, array $expectedVars, $callback = null) {
         $f = $this->getMock('Barberry\\Filter\\FilterInterface');
-        $f->expects($this->once())
-            ->method('filter')
-            ->with($expectedVars, $expectedFiles)
-            ->will($this->returnValue($return));
+        $w = $f->expects($this->once())->method('filter')->with($expectedFiles, $expectedVars);
+
+        if (is_callable($callback)) {
+            $w->will($this->returnCallback($callback));
+        }
 
         return $f;
     }

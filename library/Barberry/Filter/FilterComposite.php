@@ -1,5 +1,6 @@
 <?php
 namespace Barberry\Filter;
+use Barberry\PostedFile\Collection;
 
 class FilterComposite implements FilterInterface {
 
@@ -17,19 +18,14 @@ class FilterComposite implements FilterInterface {
     }
 
     /**
+     * @param Collection $files
      * @param array $vars
-     * @param array $allFiles
      * @return \Barberry\PostedFile
      */
-    public function filter(array $vars, array $allFiles = array()) {
+    public function filter(Collection $files, array $vars) {
         foreach ($this->filters as $filter) {
-            $return = $filter->filter($vars, $allFiles);
-            if (!is_null($return)) {
-                return $return;
-            }
+            $filter->filter($files, $vars);
         }
-
-        return null;
     }
 
 }
