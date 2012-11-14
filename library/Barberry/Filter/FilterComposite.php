@@ -20,7 +20,7 @@ class FilterComposite implements FilterInterface {
     /**
      * @param Collection $files
      * @param array $vars
-     * @return \Barberry\PostedFile
+     * @return void
      */
     public function filter(Collection $files, array $vars) {
         foreach ($this->filters as $filter) {

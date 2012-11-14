@@ -7,7 +7,7 @@ interface FilterInterface {
     /**
      * @param Collection $files
      * @param array $vars
-     * @return array example array($filteredVars, $filteredFiles)
+     * @return void
      */
     public function filter(Collection $files, array $vars);
 
