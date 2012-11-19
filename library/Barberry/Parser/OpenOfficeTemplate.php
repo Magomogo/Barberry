@@ -53,7 +53,7 @@ class OpenOfficeTemplate implements ParserInterface {
     private function toTempFileWithExt($template) {
         $filename = tempnam($this->tempPath, 'ooparser_');
         file_put_contents($filename, $template);
-        $ext = ContentType::byString($template)->standartExtention();
+        $ext = ContentType::byString($template)->standardExtension();
         rename($filename, "$filename.$ext");
         return "$filename.$ext";
     }

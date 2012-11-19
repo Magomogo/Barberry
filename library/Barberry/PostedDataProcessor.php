@@ -41,6 +41,6 @@ class PostedDataProcessor {
     }
 
     private static function parserFactoryMethod($file) {
-        return ContentType::byString($file)->standartExtention() . 'Parser';
+        return ContentType::byString($file)->standardExtension() . 'Parser';
     }
 }
