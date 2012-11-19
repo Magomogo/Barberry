@@ -25,9 +25,9 @@ class Factory {
 
         $this->directionClassName =
                     'Barberry\\Direction\\'
-                    . ucfirst($sourceContentType->standartExtention())
+                    . ucfirst($sourceContentType->standardExtension())
                     . 'To'
-                    . ucfirst($destinationContentType->standartExtention())
+                    . ucfirst($destinationContentType->standardExtension())
                     . 'Direction';
 
         $this->directionDescription = $sourceContentType . ' to '. $destinationContentType;

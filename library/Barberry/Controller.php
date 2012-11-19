@@ -45,7 +45,7 @@ class Controller implements Controller\ControllerInterface {
                 array(
                     'id' => $this->storage->save($this->request->bin),
                     'contentType' => strval($contentType),
-                    'ext' => $contentType->standartExtention(),
+                    'ext' => $contentType->standardExtension(),
                     'length' => strlen($this->request->bin),
                     'filename' => $this->request->postedFilename
                 )
