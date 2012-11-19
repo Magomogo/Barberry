@@ -39,7 +39,7 @@ class PostedFile
     public function getStandardExtension()
     {
         if (is_null($this->standardExtension) && !is_null($this->_bin)) {
-            $this->standardExtension = ContentType::byString($this->_bin)->standartExtention();
+            $this->standardExtension = ContentType::byString($this->_bin)->standardExtension();
         }
 
         return $this->standardExtension;
