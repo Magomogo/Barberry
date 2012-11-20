@@ -2,8 +2,14 @@
 namespace Barberry;
 use Barberry\Response;
 use Barberry\Storage;
+use Barberry\Direction;
 
 class Controller implements Controller\ControllerInterface {
+    /**
+     * @var Direction\Factory
+     */
+    private $directionFactory;
+
     /**
      * @var Storage\StorageInterface
      */
@@ -17,10 +23,12 @@ class Controller implements Controller\ControllerInterface {
     /**
      * @param Request $request
      * @param Storage\StorageInterface $storage
+     * @param Direction\Factory $directionFactory
      */
-    public function __construct(Request $request, Storage\StorageInterface $storage) {
+    public function __construct(Request $request, Storage\StorageInterface $storage, Direction\Factory $directionFactory) {
         $this->request = $request;
         $this->storage = $storage;
+        $this->directionFactory = $directionFactory;
     }
 
     /**
@@ -69,16 +77,20 @@ class Controller implements Controller\ControllerInterface {
             $this->request->defineContentType(ContentType::byString($bin));
         }
 
-        $directionFactory = new Direction\Factory($bin, $this->request->contentType);
-
         try {
             return self::response(
                 $this->request->contentType,
-                $directionFactory->direction($this->request->commandString)->convert($bin)
+                $this->directionFactory->direction(
+                    ContentType::byString($bin),
+                    $this->request->contentType,
+                    $this->request->commandString
+                )->convert($bin)
             );
         } catch (Plugin\NotAvailableException $e) {
             throw new Controller\NotFoundException;
         } catch (Exception\AmbiguousPluginCommand $e) {
+            throw new Controller\NotFoundException;
+        } catch (Exception\ConversionNotPossible $e) {
             throw new Controller\NotFoundException;
         }
     }

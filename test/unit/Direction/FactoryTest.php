@@ -6,34 +6,40 @@ use Barberry\Plugin;
 class FactoryTest extends \PHPUnit_Framework_TestCase {
 
     public function testDetectsDirectionClassName() {
-        $this->assertAttributeEquals(
-            'Barberry\\Direction\\PhpToJpgDirection',
-            'directionClassName',
-            self::phpToSomethingDirection()
+        $this->assertInstanceOf(
+            'Barberry\\Direction\\UrlToPhpDirection',
+            self::factory()->direction(ContentType::byExtention('url'), ContentType::byExtention('php'))
         );
     }
 
     public function testThrowExceptionWhenDirectionIsNotAvailable() {
-        $this->setExpectedException('Barberry\Plugin\NotAvailableException');
-
-        self::phpToSomethingDirection('gif')->direction();
+        $this->setExpectedException('Barberry\Plugin\NotAvailableException', 'text/x-php to image/jpeg');
+        self::factory()->direction(ContentType::byExtention('php'), ContentType::byExtention('jpeg'));
     }
 
     public function testSameSourceAndDestinationWithoutCommandActivatesNullPlugin() {
-        $this->assertInstanceOf('Barberry\Plugin\Null', self::phpToSomethingDirection('php')->direction());
+        $this->assertInstanceOf(
+            'Barberry\Plugin\Null',
+            self::factory()->direction(ContentType::byExtention('jpeg'), ContentType::byExtention('jpeg'))
+        );
     }
 
     public function testSameSourceAndDestinationWithCommandRequiresPlugin() {
         $this->setExpectedException('Barberry\Plugin\NotAvailableException');
-        self::phpToSomethingDirection('php')->direction('12');
+        self::factory()->direction(ContentType::byExtention('php'), ContentType::byExtention('php'), '12');
     }
 
 //--------------------------------------------------------------------------------------------------
 
-    private static function phpToSomethingDirection($ext='jpg') {
+    private static function factory($ext='jpg') {
         return new Factory(
             file_get_contents(__FILE__),
             ContentType::byExtention($ext)
         );
     }
+}
+
+class UrlToPhpDirection
+{
+
 }

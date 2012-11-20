@@ -23,7 +23,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testGETResponseContainsCorrectContentType() {
-        $response = $this->c(null, null, ContentType::gif())->GET();
+        $response = $this->c()->GET();
         $this->assertEquals(ContentType::gif(), $response->contentType);
     }
 
@@ -112,12 +112,29 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
+    public function testConversionNotPossibleExceptionCauses404NotFound()
+    {
+        $plugin = m::mock('Barberry\\Plugin\\InterfaceConverter');
+        $plugin->shouldReceive('convert')->andThrow('Barberry\\Exception\\ConversionNotPossible');
+
+        $directionFactory = m::mock(
+            'Barberry\\Direction\\Factory',
+            array('direction' => $plugin)
+        );
+
+
+        $this->setExpectedException('Barberry\\Controller\\NotFoundException');
+        self::c(null, null, $directionFactory)->GET();
+}
+
 //--------------------------------------------------------------------------------------------------
 
-    private static function c(Request $request = null, Storage\StorageInterface $storage = null) {
+    private static function c(Request $request = null, Storage\StorageInterface $storage = null,
+        Direction\Factory $directionFactory = null) {
         return new Controller(
             $request ?: new Request('/1.gif'),
-            $storage ?: self::aGifStorageStub()
+            $storage ?: self::aGifStorageStub(),
+            $directionFactory ?: m::mock('Barberry\\Direction\\Factory', array('direction' => new Plugin\Null))
         );
     }
 

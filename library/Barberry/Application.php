@@ -1,5 +1,6 @@
 <?php
 namespace Barberry;
+use Barberry\Direction;
 
 class Application
 {
@@ -18,7 +19,7 @@ class Application
      */
     public function run()
     {
-        $controller = new Controller($this->resources->request(), $this->resources->storage());
+        $controller = new Controller($this->resources->request(), $this->resources->storage(), new Direction\Factory());
 
         try {
             $response = $controller->{$_SERVER['REQUEST_METHOD']}();
