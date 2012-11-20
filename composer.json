@@ -9,7 +9,7 @@
     },
     "require": {
         "php": ">=5.3.3",
-        "barberry/interfaces": "0.2.x-dev"
+        "barberry/interfaces": "dev-master"
     },
     "minimum-stability": "dev"
 }
