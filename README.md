@@ -18,8 +18,7 @@ to use cookieless domain for read-only serving of public content.
 
 # Installation
 
-    phing install
-    ./scripts/install/plugin.php _plugin_names_to_install_
+    composer install
     cd test/
     phpunit .
 
@@ -78,6 +77,8 @@ Composer.
 * https://github.com/Magomogo/barberry-plugin-imagemagic - images conversion
 * https://github.com/kevich/barberry-plugin-pdf - PDF to text, PDF to image
 * https://github.com/ykovaleva/barberry-plugin-webcapture - make web sites screen shots as image or PDF with webkit engine
+* https://github.com/jamayka/barberry-plugin-openoffice - XSL, DOC, PDF other spreadsheet, templates and documents
+* https://github.com/ykovaleva/barberry-plugin-ffmpeg - converting video, taking frameshots
 
 # Authorization
 
