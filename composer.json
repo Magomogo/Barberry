@@ -1,6 +1,6 @@
 {
     "name": "barberry/barberry",
-    "version": "0.2",
+    "version": "1.0.0",
     "license": "MIT",
     "autoload": {
         "psr-0": {
