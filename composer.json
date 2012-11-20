@@ -1,6 +1,6 @@
 {
     "name": "barberry/barberry",
-    "version": "0.2",
+    "version": "1.0.0",
     "license": "MIT",
     "autoload": {
         "psr-0": {
@@ -9,7 +9,6 @@
     },
     "require": {
         "php": ">=5.3.3",
-        "barberry/interfaces": "dev-master"
-    },
-    "minimum-stability": "dev"
+        "barberry/interfaces": "1.0"
+    }
 }
