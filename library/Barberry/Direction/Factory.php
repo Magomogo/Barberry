@@ -6,47 +6,28 @@ use Barberry\Plugin;
 class Factory {
 
     /**
-     * @var string
-     */
-    private $directionClassName;
-
-    /**
-     * @var string
-     */
-    private $directionDescription;
-
-    /**
-     * @var bool
-     */
-    private $sameContentTypes;
-
-    public function __construct($sourceBinary, ContentType $destinationContentType) {
-        $sourceContentType = ContentType::byString($sourceBinary);
-
-        $this->directionClassName =
-                    'Barberry\\Direction\\'
-                    . ucfirst($sourceContentType->standardExtension())
-                    . 'To'
-                    . ucfirst($destinationContentType->standardExtension())
-                    . 'Direction';
-
-        $this->directionDescription = $sourceContentType . ' to '. $destinationContentType;
-        $this->sameContentTypes = ($sourceContentType == $destinationContentType);
-    }
-
-    /**
+     * @param ContentType $sourceContentType
+     * @param ContentType $destinationContentType
      * @param null|string $commandPart
-     * @return \Barberry\Plugin\InterfaceConverter
      * @throws \Barberry\Plugin\NotAvailableException
+     * @return \Barberry\Plugin\InterfaceConverter
      */
-    public function direction($commandPart = null) {
-        if ($this->sameContentTypes && $commandPart=='') {
+    public function direction(ContentType $sourceContentType, ContentType $destinationContentType, $commandPart = null) {
+
+        $directionClassName =
+            'Barberry\\Direction\\'
+                . ucfirst($sourceContentType->standardExtension())
+                . 'To'
+                . ucfirst($destinationContentType->standardExtension())
+                . 'Direction';
+
+        if (($destinationContentType == $sourceContentType) && !$commandPart) {
             return new Plugin\Null;
         }
 
-        if(class_exists($this->directionClassName, true)) {
-            return new $this->directionClassName($commandPart);
+        if(class_exists($directionClassName, true)) {
+            return new $directionClassName($commandPart);
         }
-        throw new Plugin\NotAvailableException($this->directionDescription);
+        throw new Plugin\NotAvailableException($sourceContentType . ' to '. $destinationContentType);
     }
 }
