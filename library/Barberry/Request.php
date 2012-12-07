@@ -101,7 +101,7 @@ class Request {
     }
 
     private static function extractOutputContentType($uri) {
-        if (preg_match('@\.([a-z]+)$@i', $uri, $regs)) {
+        if (preg_match('@\.([a-z0-9]+)$@i', $uri, $regs)) {
             try {
                 return ContentType::byExtention($regs[1]);
             } catch (ContentType\Exception $e) {}
