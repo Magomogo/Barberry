@@ -20,6 +20,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
             ContentType::jpeg(),
             self::request('/12345zx.jpg')->contentType
         );
+        $this->assertEquals(
+            ContentType::mp4(),
+            self::request('/test.mp4')->contentType
+        );
     }
 
     public function testExtractsCommandStringFromUri() {
