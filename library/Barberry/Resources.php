@@ -20,13 +20,20 @@ class Resources
     private $filter;
 
     /**
+     * @var RequestSource
+     */
+    private $requestSource;
+
+
+    /**
      * @param Config $config
      * @param Filter\FilterInterface $filter
      */
-    public function __construct(Config $config, Filter\FilterInterface $filter = null)
+    public function __construct(Config $config, Filter\FilterInterface $filter = null, RequestSource $requestSource)
     {
         $this->config = $config;
         $this->filter = $filter;
+        $this->requestSource = $requestSource;
     }
 
     /**
@@ -68,8 +75,10 @@ class Resources
             function () use ($filter) {
                 $dp = new PostedDataProcessor($filter);
                 return new Request(
-                    array_key_exists('REQUEST_URI', $_SERVER) ? $_SERVER['REQUEST_URI'] : '/',
-                    $dp->process($_FILES, $_POST)
+                    array_key_exists('REQUEST_URI', $this->requestSource->_SERVER)
+                        ? $this->requestSource->_SERVER['REQUEST_URI']
+                        : '/',
+                    $dp->process($this->requestSource->_FILES, $this->requestSource->_POST)
                 );
             }
         );
