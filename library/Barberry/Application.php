@@ -21,7 +21,7 @@ class Application
         }
         $this->requestSource = $requestSource;
 
-        $this->resources = new Resources($config, $filter, $requestSource);
+        $this->resources = new Resources($config, $requestSource, $filter);
     }
 
     /**

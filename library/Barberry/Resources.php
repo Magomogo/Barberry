@@ -29,7 +29,7 @@ class Resources
      * @param Config $config
      * @param Filter\FilterInterface $filter
      */
-    public function __construct(Config $config, Filter\FilterInterface $filter = null, RequestSource $requestSource)
+    public function __construct(Config $config, RequestSource $requestSource, Filter\FilterInterface $filter = null)
     {
         $this->config = $config;
         $this->filter = $filter;

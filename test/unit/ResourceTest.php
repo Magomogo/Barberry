@@ -31,6 +31,6 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase {
 //--------------------------------------------------------------------------------------------------
 
     private static function r(Filter\FilterInterface $filter = null) {
-        return new Resources(new Config(__DIR__), $filter, new RequestSource());
+        return new Resources(new Config(__DIR__), new RequestSource(), $filter);
     }
 }
