@@ -38,4 +38,8 @@ class Data {
     public static function gif1x1Path() {
         return realpath(__DIR__) . '/data/1x1.gif';
     }
+
+    public static function pdfDocumentPath() {
+        return realpath(__DIR__) . '/data/sample.pdf';
+    }
 }
