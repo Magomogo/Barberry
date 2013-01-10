@@ -109,7 +109,6 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
 
     public function testCanReadTrustedTempFile() {
         $collection = new Collection(array('file' => $this->goodTrustedFileInPhpFilesArray()));
-        print_r($collection);
         $this->assertEquals(Test\Data::gif1x1(), $collection['file']->bin);
     }
 

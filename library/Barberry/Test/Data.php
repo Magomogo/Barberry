@@ -36,6 +36,6 @@ class Data {
     }
 
     public static function gif1x1Path() {
-        return __DIR__ . '/data/1x1.gif';
+        return realpath(__DIR__) . '/data/1x1.gif';
     }
 }
