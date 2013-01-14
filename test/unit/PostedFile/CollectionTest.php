@@ -107,6 +107,11 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(Test\Data::gif1x1(), $collection['file']->bin);
     }
 
+    public function testCanReadTrustedTempFile() {
+        $collection = new Collection(array('file' => $this->goodTrustedFileInPhpFilesArray()));
+        $this->assertEquals(Test\Data::gif1x1(), $collection['file']->bin);
+    }
+
 //--------------------------------------------------------------------------------------------------
 
     private static function goodFileInPhpFilesArray() {
@@ -131,6 +136,16 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
         return array(
             'size' => 0,
             'error' => UPLOAD_ERR_CANT_WRITE
+        );
+    }
+
+    private static function goodTrustedFileInPhpFilesArray() {
+        return array(
+            'size' => 43,
+            'tmp_name' => Test\Data::gif1x1Path(),
+            'error' => UPLOAD_ERR_OK,
+            'name' => 'Name of a file.txt',
+            'trusted' => true,
         );
     }
 

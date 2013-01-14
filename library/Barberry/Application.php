@@ -9,9 +9,19 @@ class Application
      */
     private $resources;
 
-    public function __construct(Config $config, Filter\FilterInterface $filter = null)
+    /**
+     * @var RequestSource
+     */
+    private $requestSource;
+
+    public function __construct(Config $config, Filter\FilterInterface $filter = null, RequestSource $requestSource = null)
     {
-        $this->resources = new Resources($config, $filter);
+        if (is_null($requestSource)) {
+            $requestSource = new RequestSource();
+        }
+        $this->requestSource = $requestSource;
+
+        $this->resources = new Resources($config, $requestSource, $filter);
     }
 
     /**
@@ -22,7 +32,7 @@ class Application
         $controller = new Controller($this->resources->request(), $this->resources->storage(), new Direction\Factory());
 
         try {
-            $response = $controller->{$_SERVER['REQUEST_METHOD']}();
+            $response = $controller->{$this->requestSource->_SERVER['REQUEST_METHOD']}();
             $this->invokeCache($response);
 
             return $response;
@@ -41,9 +51,9 @@ class Application
 
     private function invokeCache(Response $response)
     {
-        if('GET' == strtoupper($_SERVER['REQUEST_METHOD'])) {
+        if('GET' == strtoupper($this->requestSource->_SERVER['REQUEST_METHOD'])) {
             $this->resources->cache()->save($response->body, $this->resources->request());
-        } elseif('DELETE' == strtoupper($_SERVER['REQUEST_METHOD'])) {
+        } elseif('DELETE' == strtoupper($this->requestSource->_SERVER['REQUEST_METHOD'])) {
             $this->resources->cache()->invalidate($this->resources->request());
         }
     }
