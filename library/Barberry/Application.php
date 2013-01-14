@@ -44,7 +44,7 @@ class Application
         if('GET' == strtoupper($_SERVER['REQUEST_METHOD'])) {
             $this->resources->cache()->save($response->body, $this->resources->request());
         } elseif('DELETE' == strtoupper($_SERVER['REQUEST_METHOD'])) {
-            $this->resources->cache()->invalidate($this->resources->request());
+            $this->resources->cache()->invalidate($this->resources->request()->id);
         }
     }
 
