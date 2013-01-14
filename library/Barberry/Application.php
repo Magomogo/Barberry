@@ -47,4 +47,9 @@ class Application
             $this->resources->cache()->invalidate($this->resources->request());
         }
     }
+
+    public function getResources()
+    {
+        return $this->resources;
+    }
 }
