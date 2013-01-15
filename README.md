@@ -72,14 +72,14 @@ Deleting a **document**.
 
 Getting a Application **resources**.
 
-*Request*
+*Request*:
 
-$application = new Application($config);
-$resources = $application->resources();
+    $application = new Application($config);
+    $resources = $application->resources();
 
-*Response*
+*Response*:
 
-Barberry\Resources object type.
+    Barberry\Resources object type.
 
 # Deployment
 
