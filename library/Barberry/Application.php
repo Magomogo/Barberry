@@ -48,7 +48,7 @@ class Application
         }
     }
 
-    public function getResources()
+    public function resources()
     {
         return $this->resources;
     }

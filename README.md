@@ -66,6 +66,21 @@ Deleting a **document**.
     Data: no
     Return: {}
 
+# Additional
+
+## Resources
+
+Getting a Application **resources**.
+
+*Request*
+
+$application = new Application($config);
+$resources = $application->resources();
+
+*Response*
+
+Barberry\Resources object type.
+
 # Deployment
 
 See https://github.com/Magomogo/barberry-images as a reference.

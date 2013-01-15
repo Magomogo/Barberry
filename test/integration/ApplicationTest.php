@@ -17,6 +17,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $_SERVER['REQUEST_METHOD'] = 'GET';
 
         $a = new Application(new Config(__DIR__));
-        $this->assertInstanceOf('Barberry\\Resources', $a->getResources());
+        $this->assertInstanceOf('Barberry\\Resources', $a->resources());
     }
 }
