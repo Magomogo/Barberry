@@ -14,8 +14,8 @@ class Cache {
         $this->assertFileWasWritten($this->filePath($request));
     }
 
-    public function invalidate(Request $request) {
-        $dir = $this->path . $request->id;
+    public function invalidate($id) {
+        $dir = $this->path . $id;
         if(is_dir($dir)) {
             self::rmDirRecursive($dir);
         }
