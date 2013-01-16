@@ -48,6 +48,9 @@ class Application
         }
     }
 
+    /**
+     * @return Resources
+     */
     public function resources()
     {
         return $this->resources;
