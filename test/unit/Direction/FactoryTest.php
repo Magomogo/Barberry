@@ -7,7 +7,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase {
 
     public function testDetectsDirectionClassName() {
         $this->assertInstanceOf(
-            'Barberry\\Direction\\UrlToPhpDirection',
+            'Barberry\\Direction\\DirectionUrlToPhp',
             self::factory()->direction(ContentType::byExtention('url'), ContentType::byExtention('php'))
         );
     }
@@ -39,7 +39,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase {
     }
 }
 
-class UrlToPhpDirection
+class DirectionUrlToPhp
 {
 
 }

@@ -16,10 +16,10 @@ class Factory {
 
         $directionClassName =
             'Barberry\\Direction\\'
+                . 'Direction'
                 . ucfirst($sourceContentType->standardExtension())
                 . 'To'
-                . ucfirst($destinationContentType->standardExtension())
-                . 'Direction';
+                . ucfirst($destinationContentType->standardExtension());
 
         if (($destinationContentType == $sourceContentType) && !$commandPart) {
             return new Plugin\Null;
