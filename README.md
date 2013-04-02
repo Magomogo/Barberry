@@ -70,7 +70,7 @@ Deleting a **document**.
 
 # Deployment
 
-See https://github.com/Magomogo/barberry-images as a reference.
+See https://github.com/Magomogo/barberry-service as a reference.
 Target application should depends from barberry/barberry and necessary converter plugins. Dependencies are handled with
 Composer.
 
