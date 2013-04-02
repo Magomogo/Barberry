@@ -1,6 +1,6 @@
 <phpunit backupGlobals="false"
          backupStaticAttributes="false"
-         bootstrap="test_bootstrap.php"
+         bootstrap="test/test_bootstrap.php"
          cacheTokens="true"
          colors="true"
          convertErrorsToExceptions="true"
@@ -18,11 +18,18 @@
          strict="false"
          verbose="false">
     <listeners>
-        <listener class="\Mockery\Adapter\Phpunit\TestListener" file="Mockery/Adapter/Phpunit/TestListener.php"> </listener>
+        <listener class="\Mockery\Adapter\Phpunit\TestListener"
+                  file="vendor/mockery/mockery/library/Mockery/Adapter/Phpunit/TestListener.php"> </listener>
     </listeners>
 
     <php>
         <env name="APPLICATION_ENV" value="testing"/>
     </php>
+
+    <testsuites>
+        <testsuite>
+            <directory>test</directory>
+        </testsuite>
+    </testsuites>
 
 </phpunit>
