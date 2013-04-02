@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Magomogo/Barberry.png)](https://travis-ci.org/Magomogo/Barberry)
+
 # The problem
 
 Every web project have different binary data to host and handle: images, PDFs, etc. In most cases
