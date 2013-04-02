@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Magomogo/Barberry.png?branch=1.1)](https://travis-ci.org/Magomogo/Barberry)
+[![Build Status](https://travis-ci.org/Magomogo/Barberry.png?branch=master)](https://travis-ci.org/Magomogo/Barberry)
 
 # The problem
 
