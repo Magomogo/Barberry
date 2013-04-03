@@ -25,7 +25,7 @@ class Cache {
 
     protected function writeToFilesystem($content, $filePath) {
         if(!is_dir(dirname($filePath))) {
-            mkdir(dirname($filePath), 0777, true);
+            @mkdir(dirname($filePath), 0777, true);
         }
 
         file_put_contents($filePath, $content);
