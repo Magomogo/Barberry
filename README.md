@@ -21,8 +21,7 @@ to use cookieless domain for read-only serving of public content.
 # Installation
 
     composer install
-    cd test/
-    phpunit .
+    ./phpunit
 
 
 # Usage
