@@ -3,6 +3,9 @@ namespace Barberry;
 
 class Cache {
 
+    const FILE_MODE = 0664;
+    const DIR_MODE = 0775;
+
     private $path;
 
     public function __construct($path) {
@@ -16,24 +19,22 @@ class Cache {
 
     public function invalidate($id) {
         $dir = $this->path . $id;
-        if(is_dir($dir)) {
+        if (is_dir($dir)) {
             self::rmDirRecursive($dir);
         }
     }
 
-//--------------------------------------------------------------------------------------------------
-
     protected function writeToFilesystem($content, $filePath) {
-        if(!is_dir(dirname($filePath))) {
-            mkdir(dirname($filePath), 0777, true);
+        if (!is_dir($d = dirname($filePath))) {
+            mkdir($d, self::DIR_MODE, true);
         }
 
         file_put_contents($filePath, $content);
-        chmod($filePath, 0777);
+        chmod($filePath, self::FILE_MODE);
     }
 
     private function assertFileWasWritten($filePath) {
-        if (false == is_file($filePath)) {
+        if (!is_file($filePath)) {
             throw new Cache\Exception($filePath);
         }
     }
@@ -55,14 +56,16 @@ class Cache {
     }
 
     private static function rmDirRecursive($dir) {
-        if (!is_dir($dir) || is_link($dir)) return @unlink($dir);
+        if (!is_dir($dir) || is_link($dir)) return unlink($dir);
+
         foreach (scandir($dir) as $file) {
             if ($file == '.' || $file == '..') continue;
             if (!self::rmDirRecursive($dir . '/' . $file)) {
-                @chmod($dir . '/' . $file, 0777);
+                chmod($dir . '/' . $file, self::FILE_MODE);
                 if (!self::rmDirRecursive($dir . '/' . $file)) return false;
             };
         }
+
         return rmdir($dir);
     }
 }

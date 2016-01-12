@@ -1,5 +1,6 @@
 <?php
 namespace Barberry;
+
 use Barberry\Test;
 
 class CacheIntegrationTest extends \PHPUnit_Framework_TestCase {
@@ -41,17 +42,5 @@ class CacheIntegrationTest extends \PHPUnit_Framework_TestCase {
 
     private function cache() {
         return new Cache($this->cache_path);
-    }
-
-    private static function rmDirRecursive($dir) {
-        if (!is_dir($dir) || is_link($dir)) return unlink($dir);
-        foreach (scandir($dir) as $file) {
-            if ($file == '.' || $file == '..') continue;
-            if (!self::rmDirRecursive($dir . '/' . $file)) {
-                chmod($dir . '/' . $file, 0777);
-                if (!self::rmDirRecursive($dir . '/' . $file)) return false;
-            };
-        }
-        return rmdir($dir);
     }
 }

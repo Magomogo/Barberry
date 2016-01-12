@@ -9,7 +9,9 @@ class FileTest extends \PHPUnit_Framework_TestCase {
 
     protected function setUp() {
         $this->storage_path = '/tmp/testStorage/';
-        mkdir($this->storage_path);
+        if (!is_dir($this->storage_path)) {
+            mkdir($this->storage_path);
+        }
     }
 
     protected function tearDown() {
@@ -18,8 +20,16 @@ class FileTest extends \PHPUnit_Framework_TestCase {
 
     public function testIsFileSavedInFileSystem() {
         $id = $this->storage()->save(Test\Data::gif1x1());
-        $expectedPath = $this->storage_path.$id;
-        $this->assertEquals(file_get_contents($expectedPath), Test\Data::gif1x1());
+        $content = $this->storage()->getById($id);
+        $this->assertEquals(Test\Data::gif1x1(), $content);
+    }
+
+    public function testReadLinearFile() {
+        $file = tempnam($this->storage_path, '');
+        file_put_contents($file, Test\Data::gif1x1());
+
+        $content = $this->storage()->getById(basename($file));
+        $this->assertEquals(Test\Data::gif1x1(), $content);
     }
 
     public function testIsFileReturnById() {
@@ -44,12 +54,13 @@ class FileTest extends \PHPUnit_Framework_TestCase {
         $this->storage()->getById('/');
     }
 
+    /**
+     * @setExpectedException \Barberry\Storage\WriteException
+     * @throws WriteException
+     */
     public function testFailedWriteCausesException() {
-        $this->setExpectedException('Barberry\\Storage\\WriteException');
         $this->storage('unexisting/path')->save('/');
     }
-
-//--------------------------------------------------------------------------------------------------
 
     private function storage($path = null) {
         return new File($path ?: $this->storage_path);
