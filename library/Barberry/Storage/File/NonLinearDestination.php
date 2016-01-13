@@ -50,7 +50,8 @@ class NonLinearDestination
         if (!is_dir($d = self::als($basePath) . $destination)) {
             $created = mkdir($d, $mode, true);
             if ($created === false) {
-                throw new WriteException($this->base, error_get_last()['message']);
+                $error = error_get_last();
+                throw new WriteException($this->base, $error['message']);
             }
         }
 
