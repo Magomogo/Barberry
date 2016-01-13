@@ -65,11 +65,11 @@ class File implements StorageInterface {
     }
 
     private function generateUniqueId() {
-        $destination = NonLinearDestination::factory(uniqid('', true))->make($this->permanentStoragePath, self::DIR_MODE);
-        $tempFile = tempnam($destination, '');
-        chmod($tempFile, self::FILE_MODE);
+        $destination = NonLinearDestination::factory($uId = uniqid(''))->make($this->permanentStoragePath, self::DIR_MODE);
+        file_put_contents($emptyFile = $destination . $uId, '');
+        chmod($emptyFile, self::FILE_MODE);
 
-        return basename($tempFile);
+        return $uId;
     }
 
     private function filePathById($id) {

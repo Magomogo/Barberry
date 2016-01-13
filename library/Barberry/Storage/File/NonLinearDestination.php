@@ -18,6 +18,7 @@ class NonLinearDestination
 
     private function __construct($base, $depth)
     {
+        $this->base = $base;
         $this->depth = $depth;
     }
 
