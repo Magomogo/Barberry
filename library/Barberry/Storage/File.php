@@ -40,7 +40,8 @@ class File implements StorageInterface {
 
         $bytes = file_put_contents($filePath, $content);
         if ($bytes === false) {
-            throw new WriteException($id, error_get_last()['message']);
+            $error = error_get_last();
+            throw new WriteException($id, $error['message']);
         }
 
         if (is_file($filePath)) {
