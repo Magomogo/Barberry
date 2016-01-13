@@ -63,7 +63,7 @@ class NonLinearDestination
         $hash = $this->generateHash();
         $start = 0;
         $d = $this->depth;
-        $dir = [];
+        $dir = array();
 
         while ($d-- > 0) {
             $dir[] = substr($hash, $start, $this->len);
