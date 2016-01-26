@@ -18,11 +18,11 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
 
     public static function uriCacheDataProvider() {
         return array(
-            array('/asd23.gif', '/asd23/asd23.gif'),
-            array('/asd23.jpg', '/asd23/asd23.jpg'),
-            array('/asd23_1x1.gif', '/asd23/asd23_1x1.gif'),
-            array('/adm/asd23.gif', '/adm/asd23/asd23.gif'),
-            array('/adm/asd23_1x1.gif', '/adm/asd23/asd23_1x1.gif'),
+            array('/asd23.gif', '/as/d2/3/asd23/asd23.gif'),
+            array('/asd23.jpg', '/as/d2/3/asd23/asd23.jpg'),
+            array('/asd23_1x1.gif', '/as/d2/3/asd23/asd23_1x1.gif'),
+            array('/adm/asd23.gif', '/as/d2/3/adm/asd23/asd23.gif'),
+            array('/adm/asd23_1x1.gif', '/as/d2/3/adm/asd23/asd23_1x1.gif'),
         );
     }
 }

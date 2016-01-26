@@ -75,7 +75,7 @@ class NonLinearDestination
 
     protected function generateHash()
     {
-        return md5($this->base);
+        return $this->base;
     }
 
     /**

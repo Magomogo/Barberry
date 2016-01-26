@@ -1,6 +1,8 @@
 <?php
 namespace Barberry;
 
+use Barberry\Storage\File\NonLinearDestination;
+
 class Cache {
 
     const FILE_MODE = 0664;
@@ -15,6 +17,8 @@ class Cache {
     public function save($content, Request $request) {
         $this->writeToFilesystem($content, $this->filePath($request));
         $this->assertFileWasWritten($this->filePath($request));
+
+        return $request->id;
     }
 
     public function invalidate($id) {
@@ -40,12 +44,19 @@ class Cache {
     }
 
     private function filePath(Request $request) {
-        return $this->path . self::idIsDirectoryName($request);
+        $file = self::directoryByRequest($request);
+        if (is_file($f = $this->path . $file)) {
+            return $f;
+        }
+
+        $path = NonLinearDestination::factory($request->id)->generate();
+
+        return $this->path . $path . $file;
     }
 
-    private static function idIsDirectoryName(Request $request) {
+    private static function directoryByRequest(Request $request) {
         return join(
-            '/',
+            DIRECTORY_SEPARATOR,
             array_filter(
                 array(
                     $request->group,
