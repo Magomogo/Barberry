@@ -2,6 +2,7 @@
 namespace Barberry\Storage;
 
 use Barberry\Storage\File\NonLinearDestination;
+use Barberry\Uniq;
 
 class File implements StorageInterface {
 
@@ -65,7 +66,7 @@ class File implements StorageInterface {
     }
 
     private function generateUniqueId() {
-        $destination = NonLinearDestination::factory($uId = uniqid(''))->make($this->permanentStoragePath, self::DIR_MODE);
+        $destination = NonLinearDestination::factory($uId = Uniq::id())->make($this->permanentStoragePath, self::DIR_MODE);
         file_put_contents($emptyFile = $destination . $uId, '');
         chmod($emptyFile, self::FILE_MODE);
 
