@@ -5,13 +5,10 @@ use Barberry\Storage\File\NonLinearDestination;
 
 class Cache {
 
-    const FILE_MODE = 0664;
-    const DIR_MODE = 0775;
-
     private $path;
 
     public function __construct($path) {
-        $this->path = rtrim($path,'/') . '/';
+        $this->path = NonLinearDestination::als($path);
     }
 
     public function save($content, Request $request) {
@@ -30,11 +27,10 @@ class Cache {
 
     protected function writeToFilesystem($content, $filePath) {
         if (!is_dir($d = dirname($filePath))) {
-            mkdir($d, self::DIR_MODE, true);
+            mkdir($d, 0777, true);
         }
 
         file_put_contents($filePath, $content);
-        chmod($filePath, self::FILE_MODE);
     }
 
     private function assertFileWasWritten($filePath) {
@@ -49,9 +45,9 @@ class Cache {
             return $f;
         }
 
-        $path = NonLinearDestination::factory($request->id)->generate();
+        $path = NonLinearDestination::factory($this->path, $request->id)->generate();
 
-        return $this->path . $path . $file;
+        return $path . $file;
     }
 
     private static function directoryByRequest(Request $request) {
@@ -67,12 +63,15 @@ class Cache {
     }
 
     private static function rmDirRecursive($dir) {
-        if (!is_dir($dir) || is_link($dir)) return unlink($dir);
+        if (!is_dir($dir) || is_link($dir)) {
+            return unlink($dir);
+        }
 
         foreach (scandir($dir) as $file) {
-            if ($file == '.' || $file == '..') continue;
+            if ($file == '.' || $file == '..') {
+                continue;
+            }
             if (!self::rmDirRecursive($dir . '/' . $file)) {
-                chmod($dir . '/' . $file, self::FILE_MODE);
                 if (!self::rmDirRecursive($dir . '/' . $file)) return false;
             };
         }

@@ -23,8 +23,8 @@ class CacheIntegrationTest extends \PHPUnit_Framework_TestCase {
             new Request('/7yU98sd_1x1.gif')
         );
 
-        $path = NonLinearDestination::factory($id)->generate();
-        $expectedPath = $this->cache_path .$path . '/7yU98sd/7yU98sd_1x1.gif';
+        $path = NonLinearDestination::factory($this->cache_path, $id)->generate();
+        $expectedPath = $path . '/7yU98sd/7yU98sd_1x1.gif';
 
         $this->assertEquals(file_get_contents($expectedPath), Test\Data::gif1x1());
     }
@@ -35,8 +35,8 @@ class CacheIntegrationTest extends \PHPUnit_Framework_TestCase {
             new Request('/adm/7yU98sd_1x1.gif')
         );
 
-        $path = NonLinearDestination::factory($id)->generate();
-        $expectedPath = $this->cache_path . $path .ltrim('/adm/7yU98sd/7yU98sd_1x1.gif');
+        $path = NonLinearDestination::factory($this->cache_path, $id)->generate();
+        $expectedPath = $path . '/adm/7yU98sd/7yU98sd_1x1.gif';
 
         $this->assertEquals(file_get_contents($expectedPath), Test\Data::gif1x1());
     }

@@ -2,12 +2,8 @@
 namespace Barberry\Storage;
 
 use Barberry\Storage\File\NonLinearDestination;
-use Barberry\Uniq;
 
 class File implements StorageInterface {
-
-    const FILE_MODE = 0664;
-    const DIR_MODE = 0775;
 
     private $permanentStoragePath;
 
@@ -36,7 +32,7 @@ class File implements StorageInterface {
      * @throws WriteException
      */
     public function save($content) {
-        $id = $this->generateUniqueId();
+        $id = NonLinearDestination::factory($this->permanentStoragePath)->getBase();
         $filePath = $this->filePathById($id);
 
         $bytes = file_put_contents($filePath, $content);
@@ -45,10 +41,7 @@ class File implements StorageInterface {
             throw new WriteException($id, $error['message']);
         }
 
-        if (is_file($filePath)) {
-            return $id;
-        }
-        throw new WriteException($id);
+        return $id;
     }
 
     /**
@@ -65,21 +58,17 @@ class File implements StorageInterface {
         }
     }
 
-    private function generateUniqueId() {
-        $destination = NonLinearDestination::factory($uId = Uniq::id())->make($this->permanentStoragePath, self::DIR_MODE);
-        file_put_contents($emptyFile = $destination . $uId, '');
-        chmod($emptyFile, self::FILE_MODE);
-
-        return $uId;
-    }
-
+    /**
+     * @param $id
+     * @return string
+     */
     private function filePathById($id) {
         if (is_file($f = $this->permanentStoragePath . $id)) {
             return $f;
         }
 
-        $d = NonLinearDestination::factory($id)->generate();
+        $d = NonLinearDestination::factory($this->permanentStoragePath, $id)->generate();
 
-        return $this->permanentStoragePath . $d . $id;
+        return $d . $id;
     }
 }
