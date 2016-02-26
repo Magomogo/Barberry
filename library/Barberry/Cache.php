@@ -1,19 +1,19 @@
 <?php
 namespace Barberry;
 
-use Barberry\Storage\File\NonLinearDestination;
+use function Barberry\file\als;
 
 class Cache {
 
     private $path;
 
     public function __construct($path) {
-        $this->path = NonLinearDestination::als($path);
+        $this->path = als($path);
+        set_error_handler(array($this, 'errorHandler'));
     }
 
     public function save($content, Request $request) {
         $this->writeToFilesystem($content, $this->filePath($request));
-        $this->assertFileWasWritten($this->filePath($request));
 
         return $request->id;
     }
@@ -25,7 +25,7 @@ class Cache {
         }
     }
 
-    protected function writeToFilesystem($content, $filePath) {
+    private function writeToFilesystem($content, $filePath) {
         if (!is_dir($d = dirname($filePath))) {
             mkdir($d, 0777, true);
         }
@@ -33,21 +33,14 @@ class Cache {
         file_put_contents($filePath, $content);
     }
 
-    private function assertFileWasWritten($filePath) {
-        if (!is_file($filePath)) {
-            throw new Cache\Exception($filePath);
-        }
-    }
-
     private function filePath(Request $request) {
         $file = self::directoryByRequest($request);
+
         if (is_file($f = $this->path . $file)) {
             return $f;
         }
 
-        $path = NonLinearDestination::factory($this->path, $request->id)->generate();
-
-        return $path . $file;
+        return $this->path . destination\nonlinear\generate($request->id) . $file;
     }
 
     private static function directoryByRequest(Request $request) {
@@ -77,5 +70,13 @@ class Cache {
         }
 
         return rmdir($dir);
+    }
+
+    public function errorHandler($errNo, $errStr, $errFile, $errLine, $errContext)
+    {
+        if (!array_key_exists('filePath', $errContext)) {
+            return false;
+        }
+        throw new Cache\Exception($errContext['filePath'], $errStr);
     }
 }

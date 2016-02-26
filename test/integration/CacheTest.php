@@ -1,7 +1,7 @@
 <?php
 namespace Barberry;
 
-use Barberry\Storage\File\NonLinearDestination;
+use function Barberry\destination\nonlinear\generate;
 use Barberry\Test;
 
 class CacheIntegrationTest extends \PHPUnit_Framework_TestCase {
@@ -23,7 +23,7 @@ class CacheIntegrationTest extends \PHPUnit_Framework_TestCase {
             new Request('/7yU98sd_1x1.gif')
         );
 
-        $path = NonLinearDestination::factory($this->cache_path, $id)->generate();
+        $path = $this->cache_path . generate($id);
         $expectedPath = $path . '/7yU98sd/7yU98sd_1x1.gif';
 
         $this->assertEquals(file_get_contents($expectedPath), Test\Data::gif1x1());
@@ -35,13 +35,11 @@ class CacheIntegrationTest extends \PHPUnit_Framework_TestCase {
             new Request('/adm/7yU98sd_1x1.gif')
         );
 
-        $path = NonLinearDestination::factory($this->cache_path, $id)->generate();
+        $path = $this->cache_path . generate($id);
         $expectedPath = $path . '/adm/7yU98sd/7yU98sd_1x1.gif';
 
         $this->assertEquals(file_get_contents($expectedPath), Test\Data::gif1x1());
     }
-
-//--------------------------------------------------------------------------------------------------
 
     private function cache() {
         return new Cache($this->cache_path);

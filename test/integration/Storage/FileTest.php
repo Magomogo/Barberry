@@ -1,7 +1,7 @@
 <?php
 namespace Barberry\Storage;
 
-use Barberry\Storage\File\NonLinearDestination;
+use function Barberry\destination\nonlinear\generate;
 use Barberry\Test;
 
 class FileTest extends \PHPUnit_Framework_TestCase {
@@ -27,8 +27,7 @@ class FileTest extends \PHPUnit_Framework_TestCase {
 
     public function testIsFileSavedInNonLinearStructure() {
         $id = $this->storage()->save(Test\Data::gif1x1());
-
-        $path = NonLinearDestination::factory($this->storage_path, $id)->generate();
+        $path = $this->storage_path . generate($id);
         $this->assertCount(5, array_filter(explode(DIRECTORY_SEPARATOR, $path), function($item) { return !empty($item); }));
 
         $content = file_get_contents($path . $id);

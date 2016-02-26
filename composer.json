@@ -22,7 +22,11 @@
     "autoload": {
         "psr-0": {
             "Barberry": "library/"
-        }
+        },
+        "files": [
+            "library/Barberry/destination/nonlinear/helper.php",
+            "library/Barberry/file/helper.php"
+        ]
     },
     "require": {
         "php": ">=5.3.3",

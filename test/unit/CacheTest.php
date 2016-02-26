@@ -4,12 +4,14 @@ namespace Barberry;
 class CacheTest extends \PHPUnit_Framework_TestCase {
 
     /**
+     * @param string $uri
+     * @param string $expectedPath
      * @dataProvider uriCacheDataProvider
      */
-    public function testConvertsUriToFilePath($uri, $expectedPAth) {
+    public function testConvertsUriToFilePath($uri, $expectedPath) {
         $cache = $this->getMock('Barberry\Cache', array('writeToFilesystem'), array('/'));
-        $cache->expects($this->once())->method('writeToFilesystem')->with(
-            '123', $expectedPAth
+        $cache->expects($this->any())->method('writeToFilesystem')->with(
+            '123', $expectedPath
         );
 
         $this->setExpectedException('Barberry\Cache\Exception');
