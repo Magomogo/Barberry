@@ -1,8 +1,8 @@
 <?php
 namespace Barberry\Storage;
 
-use function Barberry\file\als;
-use function Barberry\destination\nonlinear\generate;
+use Barberry\fs;
+use Barberry\nonlinear;
 
 class File implements StorageInterface {
 
@@ -11,8 +11,7 @@ class File implements StorageInterface {
     private $baseLen = 10;
 
     public function __construct($path) {
-        $this->permanentStoragePath = als($path);
-        set_error_handler(array($this, 'errorHandler'));
+        $this->permanentStoragePath = fs\als($path);
     }
 
     /**
@@ -22,12 +21,17 @@ class File implements StorageInterface {
      */
     public function getById($id) {
         $filePath = $this->filePathById($id);
+        $content = false;
 
         if (is_file($filePath)) {
-            return file_get_contents($filePath);
-        } else {
+            $content = file_get_contents($filePath);
+        }
+
+        if ($content === false) {
             throw new NotFoundException($filePath);
         }
+
+        return $content;
     }
 
     /**
@@ -41,7 +45,9 @@ class File implements StorageInterface {
         } while (file_exists($filePath = $this->filePathById($id)));
 
         mkdir(dirname($filePath), 0777, true);
-        file_put_contents($filePath, $content);
+        if (file_put_contents($filePath, $content) === false) {
+            throw new WriteException($id);
+        }
 
         return $id;
     }
@@ -69,7 +75,7 @@ class File implements StorageInterface {
             return $f;
         }
 
-        return $this->permanentStoragePath . generate($id) . $id;
+        return $this->permanentStoragePath . nonlinear\generateDestination($id) . $id;
     }
 
     private function generateUniqueId()
@@ -79,13 +85,5 @@ class File implements StorageInterface {
             return bin2hex($bytes);
         }
         return $this->baseLen > 10 ? md5(uniqid('', true)) : uniqid('');
-    }
-
-    public function errorHandler($errNo, $errStr, $errFile, $errLine, $errContext)
-    {
-        if (!array_key_exists('id', $errContext)) {
-            return false;
-        }
-        throw new WriteException($errContext['id'], $errStr);
     }
 }

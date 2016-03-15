@@ -1,15 +1,15 @@
 <?php
 namespace Barberry;
 
-use function Barberry\file\als;
+use Barberry\nonlinear;
+use Barberry\fs;
 
 class Cache {
 
     private $path;
 
     public function __construct($path) {
-        $this->path = als($path);
-        set_error_handler(array($this, 'errorHandler'));
+        $this->path = fs\als($path);
     }
 
     public function save($content, Request $request) {
@@ -30,7 +30,11 @@ class Cache {
             mkdir($d, 0777, true);
         }
 
-        file_put_contents($filePath, $content);
+        $bytes = file_put_contents($filePath, $content);
+        if ($bytes === false) {
+            $msg = error_get_last();
+            throw new Cache\Exception($filePath, isset($msg['message']) ? $msg['message'] : '');
+        }
     }
 
     private function filePath(Request $request) {
@@ -40,7 +44,7 @@ class Cache {
             return $f;
         }
 
-        return $this->path . destination\nonlinear\generate($request->id) . $file;
+        return $this->path . nonlinear\generateDestination($request->id) . $file;
     }
 
     private static function directoryByRequest(Request $request) {
@@ -70,13 +74,5 @@ class Cache {
         }
 
         return rmdir($dir);
-    }
-
-    public function errorHandler($errNo, $errStr, $errFile, $errLine, $errContext)
-    {
-        if (!array_key_exists('filePath', $errContext)) {
-            return false;
-        }
-        throw new Cache\Exception($errContext['filePath'], $errStr);
     }
 }

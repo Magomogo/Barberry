@@ -24,8 +24,7 @@
             "Barberry": "library/"
         },
         "files": [
-            "library/Barberry/destination/nonlinear/helper.php",
-            "library/Barberry/file/helper.php"
+            "library/Barberry/functions.php"
         ]
     },
     "require": {
