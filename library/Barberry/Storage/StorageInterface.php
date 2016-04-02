@@ -19,7 +19,6 @@ interface StorageInterface {
     /**
      * @param string $content
      * @return string content id
-     * @throws WriteException
      */
     public function save($content);
 }

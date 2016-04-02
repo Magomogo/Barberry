@@ -1,6 +1,7 @@
 <?php
 namespace Barberry\Storage;
-use Barberry\Config;
+
+use Barberry\nonlinear;
 use Barberry\Test;
 
 class FileTest extends \PHPUnit_Framework_TestCase {
@@ -9,7 +10,9 @@ class FileTest extends \PHPUnit_Framework_TestCase {
 
     protected function setUp() {
         $this->storage_path = '/tmp/testStorage/';
-        mkdir($this->storage_path);
+        if (!is_dir($this->storage_path)) {
+            mkdir($this->storage_path);
+        }
     }
 
     protected function tearDown() {
@@ -18,8 +21,26 @@ class FileTest extends \PHPUnit_Framework_TestCase {
 
     public function testIsFileSavedInFileSystem() {
         $id = $this->storage()->save(Test\Data::gif1x1());
-        $expectedPath = $this->storage_path.$id;
-        $this->assertEquals(file_get_contents($expectedPath), Test\Data::gif1x1());
+        $content = $this->storage()->getById($id);
+        $this->assertEquals(Test\Data::gif1x1(), $content);
+    }
+
+    public function testIsFileSavedInNonLinearStructure() {
+        $id = $this->storage()->save(Test\Data::gif1x1());
+        $path = $this->storage_path . nonlinear\generateDestination($id);
+        $this->assertCount(5, array_filter(explode(DIRECTORY_SEPARATOR, $path), function($item) { return !empty($item); }));
+
+        $content = file_get_contents($path . $id);
+        $this->assertEquals($content, $this->storage()->getById($id));
+
+    }
+
+    public function testReadLinearFile() {
+        $file = tempnam($this->storage_path, '');
+        file_put_contents($file, Test\Data::gif1x1());
+
+        $content = $this->storage()->getById(basename($file));
+        $this->assertEquals(Test\Data::gif1x1(), $content);
     }
 
     public function testIsFileReturnById() {
@@ -43,13 +64,6 @@ class FileTest extends \PHPUnit_Framework_TestCase {
         $this->setExpectedException('Barberry\\Storage\\NotFoundException');
         $this->storage()->getById('/');
     }
-
-    public function testFailedWriteCausesException() {
-        $this->setExpectedException('Barberry\\Storage\\WriteException');
-        $this->storage('unexisting/path')->save('/');
-    }
-
-//--------------------------------------------------------------------------------------------------
 
     private function storage($path = null) {
         return new File($path ?: $this->storage_path);

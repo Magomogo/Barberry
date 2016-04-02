@@ -1,12 +1,17 @@
 <?php
 namespace Barberry\Storage;
 
+use Barberry\fs;
+use Barberry\nonlinear;
+
 class File implements StorageInterface {
 
     private $permanentStoragePath;
 
+    private $baseLen = 10;
+
     public function __construct($path) {
-        $this->permanentStoragePath = rtrim($path, '/') . '/';
+        $this->permanentStoragePath = fs\als($path);
     }
 
     /**
@@ -16,30 +21,35 @@ class File implements StorageInterface {
      */
     public function getById($id) {
         $filePath = $this->filePathById($id);
+        $content = false;
 
         if (is_file($filePath)) {
-            return file_get_contents($filePath);
+            $content = file_get_contents($filePath);
         }
-        else {
+
+        if ($content === false) {
             throw new NotFoundException($filePath);
         }
+
+        return $content;
     }
 
     /**
      * @param string $content
      * @return string content id
-     * @throws WriteException
      */
     public function save($content) {
-        $id = $this->generateUniqueId();
-        $filePath = $this->filePathById($id);
+        do {
+            $id = $this->generateUniqueId();
+        } while (file_exists($filePath = $this->filePathById($id)));
 
-        @file_put_contents($filePath, $content);
-
-        if(is_file($filePath)) {
-            return $id;
+        if (!is_dir(dirname($filePath))) {
+            mkdir(dirname($filePath), 0777, true);
         }
-        throw new WriteException($id);
+
+        file_put_contents($filePath, $content);
+
+        return $id;
     }
 
     /**
@@ -51,21 +61,29 @@ class File implements StorageInterface {
 
         if (is_file($filePath)) {
             unlink($filePath);
-        }
-        else {
+        } else {
             throw new NotFoundException($filePath);
         }
     }
 
-//--------------------------------------------------------------------------------------------------
+    /**
+     * @param $id
+     * @return string
+     */
+    private function filePathById($id) {
+        if (is_file($f = $this->permanentStoragePath . $id)) {
+            return $f;
+        }
 
-    private function generateUniqueId() {
-        $tempFile = tempnam($this->permanentStoragePath, '');
-        chmod($tempFile, 0664);
-        return basename($tempFile);
+        return $this->permanentStoragePath . nonlinear\generateDestination($id) . $id;
     }
 
-    private function filePathById($id) {
-        return $this->permanentStoragePath . $id;
+    private function generateUniqueId()
+    {
+        if (extension_loaded('openssl')) {
+            $bytes = openssl_random_pseudo_bytes($this->baseLen);
+            return bin2hex($bytes);
+        }
+        return $this->baseLen > 10 ? md5(uniqid('', true)) : uniqid('');
     }
 }

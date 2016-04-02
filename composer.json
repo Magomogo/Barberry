@@ -22,11 +22,17 @@
     "autoload": {
         "psr-0": {
             "Barberry": "library/"
-        }
+        },
+        "files": [
+            "library/Barberry/functions.php"
+        ]
     },
     "require": {
         "php": ">=5.3.3",
         "barberry/interfaces": "1.1.*"
+    },
+    "suggest": {
+        "ext-openssl": "*"
     },
     "require-dev": {
         "mockery/mockery": "0.7.*",
