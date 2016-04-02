@@ -27,7 +27,7 @@ class Cache {
 
     private function writeToFilesystem($content, $filePath) {
         if (!is_dir($d = dirname($filePath))) {
-            mkdir($d, 0777, true);
+            @mkdir($d, 0777, true);
         }
 
         $bytes = file_put_contents($filePath, $content);
