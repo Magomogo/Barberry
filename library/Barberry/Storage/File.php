@@ -37,17 +37,17 @@ class File implements StorageInterface {
     /**
      * @param string $content
      * @return string content id
-     * @throws WriteException
      */
     public function save($content) {
         do {
             $id = $this->generateUniqueId();
         } while (file_exists($filePath = $this->filePathById($id)));
 
-        mkdir(dirname($filePath), 0777, true);
-        if (file_put_contents($filePath, $content) === false) {
-            throw new WriteException($id);
+        if (!is_dir(dirname($filePath))) {
+            mkdir(dirname($filePath), 0777, true);
         }
+
+        file_put_contents($filePath, $content);
 
         return $id;
     }
