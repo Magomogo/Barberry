@@ -26,4 +26,21 @@ namespace Barberry\fs {
     {
         return rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
     }
+
+    function rmDirRecursive($dir) {
+        if (!is_dir($dir) || is_link($dir)) {
+            return unlink($dir);
+        }
+
+        foreach (scandir($dir) as $file) {
+            if ($file == '.' || $file == '..') {
+                continue;
+            }
+            if (!rmDirRecursive($dir . '/' . $file)) {
+                if (!rmDirRecursive($dir . '/' . $file)) return false;
+            };
+        }
+
+        return rmdir($dir);
+    }
 }

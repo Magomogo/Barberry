@@ -21,16 +21,16 @@ class Cache {
     public function invalidate($id) {
         $dir = $this->path . $id;
         if (is_dir($dir)) {
-            self::rmDirRecursive($dir);
+            fs\rmDirRecursive($dir);
         }
     }
 
     private function writeToFilesystem($content, $filePath) {
         if (!is_dir($d = dirname($filePath))) {
-            mkdir($d, 0777, true);
+            @mkdir($d, 0777, true);
         }
 
-        $bytes = file_put_contents($filePath, $content);
+        $bytes = @file_put_contents($filePath, $content);
         if ($bytes === false) {
             $msg = error_get_last();
             throw new Cache\Exception($filePath, isset($msg['message']) ? $msg['message'] : '');
@@ -59,20 +59,4 @@ class Cache {
         );
     }
 
-    private static function rmDirRecursive($dir) {
-        if (!is_dir($dir) || is_link($dir)) {
-            return unlink($dir);
-        }
-
-        foreach (scandir($dir) as $file) {
-            if ($file == '.' || $file == '..') {
-                continue;
-            }
-            if (!self::rmDirRecursive($dir . '/' . $file)) {
-                if (!self::rmDirRecursive($dir . '/' . $file)) return false;
-            };
-        }
-
-        return rmdir($dir);
-    }
 }
