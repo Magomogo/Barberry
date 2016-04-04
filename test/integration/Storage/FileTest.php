@@ -66,14 +66,6 @@ class FileTest extends \PHPUnit_Framework_TestCase {
         $this->storage()->getById('/');
     }
 
-    /**
-     * @setExpectedException \Barberry\Storage\WriteException
-     * @throws WriteException
-     */
-    public function testFailedWriteCausesException() {
-        $this->storage('unexisting/path')->save('/');
-    }
-
     private function storage($path = null) {
         return new File($path ?: $this->storage_path);
     }
