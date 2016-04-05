@@ -15,7 +15,6 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
         );
 
         $this->setExpectedException('Barberry\Cache\Exception');
-        //restore_error_handler();
         $cache->save('123', new Request($uri));
     }
 
