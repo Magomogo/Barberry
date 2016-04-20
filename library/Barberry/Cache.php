@@ -19,7 +19,7 @@ class Cache {
     }
 
     public function invalidate($id) {
-        $dir = $this->path . $id;
+        $dir = $this->path . nonlinear\generateDestination($id);
         if (is_dir($dir)) {
             self::rmDirRecursive($dir);
         }

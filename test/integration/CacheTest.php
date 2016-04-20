@@ -18,27 +18,37 @@ class CacheIntegrationTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testIsContentSavedInFileSystem() {
-        $id = $this->cache()->save(
+        $this->cache()->save(
             Test\Data::gif1x1(),
             new Request('/7yU98sd_1x1.gif')
         );
 
-        $path = $this->cache_path . nonlinear\generateDestination($id);
-        $expectedPath = $path . '/7yU98sd/7yU98sd_1x1.gif';
+        $expectedPath = $this->cache_path . '/7y/U9/8s/7yU98sd/7yU98sd_1x1.gif';
 
         $this->assertEquals(file_get_contents($expectedPath), Test\Data::gif1x1());
     }
 
     public function testIsContentSavedInFileSystemInGroupDirectory() {
-        $id  = $this->cache()->save(
+        $this->cache()->save(
             Test\Data::gif1x1(),
             new Request('/adm/7yU98sd_1x1.gif')
         );
 
-        $path = $this->cache_path . nonlinear\generateDestination($id);
-        $expectedPath = $path . '/adm/7yU98sd/7yU98sd_1x1.gif';
+        $expectedPath = $this->cache_path . '/7y/U9/8s/adm/7yU98sd/7yU98sd_1x1.gif';
 
         $this->assertEquals(file_get_contents($expectedPath), Test\Data::gif1x1());
+    }
+
+    public function testInvalidateRemovesCachedContent()
+    {
+        $this->cache()->save(
+            Test\Data::gif1x1(),
+            new Request('/7yU98sd_1x1.gif')
+        );
+
+        $this->cache()->invalidate('7yU98sd');
+
+        $this->assertFalse(is_dir($this->cache_path . '/7y/U9/8s/7yU98sd'));
     }
 
     private function cache() {
