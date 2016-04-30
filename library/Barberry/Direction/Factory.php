@@ -22,7 +22,7 @@ class Factory {
                 . ucfirst($destinationContentType->standardExtension());
 
         if (($destinationContentType == $sourceContentType) && !$commandPart) {
-            return new Plugin\Null;
+            return new Plugin\NullPlugin;
         }
 
         if(class_exists($directionClassName, true)) {

@@ -134,7 +134,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
         return new Controller(
             $request ?: new Request('/1.gif'),
             $storage ?: self::aGifStorageStub(),
-            $directionFactory ?: m::mock('Barberry\\Direction\\Factory', array('direction' => new Plugin\Null))
+            $directionFactory ?: m::mock('Barberry\\Direction\\Factory', array('direction' => new Plugin\NullPlugin))
         );
     }
 

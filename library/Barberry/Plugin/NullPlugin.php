@@ -2,7 +2,7 @@
 namespace Barberry\Plugin;
 use Barberry\ContentType;
 
-class Null implements InterfaceConverter {
+class NullPlugin implements InterfaceConverter {
 
     public function convert($bin, InterfaceCommand $command = null) {
         return $bin;

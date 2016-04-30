@@ -19,7 +19,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase {
 
     public function testSameSourceAndDestinationWithoutCommandActivatesNullPlugin() {
         $this->assertInstanceOf(
-            'Barberry\Plugin\Null',
+            'Barberry\Plugin\NullPlugin',
             self::factory()->direction(ContentType::byExtention('jpeg'), ContentType::byExtention('jpeg'))
         );
     }
