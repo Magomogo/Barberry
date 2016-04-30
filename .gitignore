@@ -1,4 +1,4 @@
-.idea
-var/*
-composer.lock
-vendor/
+/.idea
+/var/*
+/vendor/
+/composer.lock

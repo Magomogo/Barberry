@@ -29,7 +29,7 @@
     },
     "require": {
         "php": ">=5.3.3",
-        "barberry/interfaces": "1.1.*"
+        "barberry/interfaces": "1.2.*"
     },
     "suggest": {
         "ext-openssl": "*"
