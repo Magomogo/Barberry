@@ -9,6 +9,7 @@ use Barberry\ContentType;
  * @property-read null|string $group
  * @property-read null|string $bin
  * @property-read null|string $postedFilename
+ * @property-read null|string $postedMd5
  * @property-read null|string $commandString
  */
 class Request {
@@ -41,6 +42,11 @@ class Request {
     private $_postedFilename;
 
     /**
+     * @var string
+     */
+    private $_postedMd5;
+
+    /**
      * @var null|string
      */
     private $_commandString;
@@ -48,12 +54,12 @@ class Request {
     public function __construct($uri, PostedFile $postedFile = null) {
         $this->parseUri($uri);
         $this->keepPost($postedFile);
-        $this->originalBasename =
-            trim($this->group ? substr($uri, strlen($this->group) + 1) : $uri, '/');
+        $this->_originalBasename =
+            trim($this->_group ? substr($uri, strlen($this->_group) + 1) : $uri, '/');
     }
 
     public function defineContentType(ContentType $c) {
-        $this->contentType = $c;
+        $this->_contentType = $c;
     }
 
     public function __get($property) {
@@ -68,8 +74,9 @@ class Request {
 
     private function keepPost(PostedFile $postedFile = null) {
         if (!is_null($postedFile)) {
-            $this->bin = $postedFile->bin;
-            $this->postedFilename = $postedFile->filename;
+            $this->_bin = $postedFile->bin;
+            $this->_postedFilename = $postedFile->filename;
+            $this->_postedMd5 = $postedFile->md5;
         }
     }
 
@@ -77,12 +84,12 @@ class Request {
         $parts = array_values(array_filter(explode('/', $uri)));
         switch (1) {
             case (count($parts) == 2) && preg_match('@^[a-z]{3}$@i', $parts[0]):
-                $this->group = array_shift($parts);
+                $this->_group = array_shift($parts);
             // TRICKY: no break.
             case count($parts) == 1:
-                $this->id = self::extractId($parts[0]);
-                $this->commandString = self::extractCommandString($parts[0]);
-                $this->contentType = self::extractOutputContentType($parts[0]);
+                $this->_id = self::extractId($parts[0]);
+                $this->_commandString = self::extractCommandString($parts[0]);
+                $this->_contentType = self::extractOutputContentType($parts[0]);
         }
     }
 
