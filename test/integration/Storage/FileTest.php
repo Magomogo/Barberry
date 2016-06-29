@@ -3,6 +3,7 @@ namespace Barberry\Storage;
 
 use Barberry\nonlinear;
 use Barberry\Test;
+use Barberry\fs;
 
 class FileTest extends \PHPUnit_Framework_TestCase {
 
@@ -16,7 +17,7 @@ class FileTest extends \PHPUnit_Framework_TestCase {
     }
 
     protected function tearDown() {
-        self::rmDirRecursive($this->storage_path);
+        fs\rmDirRecursive($this->storage_path);
     }
 
     public function testIsFileSavedInFileSystem() {
@@ -67,17 +68,5 @@ class FileTest extends \PHPUnit_Framework_TestCase {
 
     private function storage($path = null) {
         return new File($path ?: $this->storage_path);
-    }
-
-    private static function rmDirRecursive($dir) {
-        if (!is_dir($dir) || is_link($dir)) return unlink($dir);
-        foreach (scandir($dir) as $file) {
-            if ($file == '.' || $file == '..') continue;
-            if (!self::rmDirRecursive($dir . '/' . $file)) {
-                chmod($dir . '/' . $file, 0777);
-                if (!self::rmDirRecursive($dir . '/' . $file)) return false;
-            };
-        }
-        return rmdir($dir);
     }
 }
