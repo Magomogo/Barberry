@@ -6,6 +6,7 @@ use Barberry\ContentType;
 /**
  * @property-read string $bin
  * @property-read string $filename
+ * @property-read string $md5
  *
  */
 class PostedFile
@@ -14,6 +15,8 @@ class PostedFile
     private $_bin;
 
     private $_filename;
+
+    private $_md5;
 
     private $standardExtension;
 
@@ -25,6 +28,7 @@ class PostedFile
     {
         $this->_bin = $bin;
         $this->_filename = $filename;
+        $this->_md5 = md5($bin);
     }
 
     public function __get($property)

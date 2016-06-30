@@ -52,6 +52,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
                         'ext' => 'txt',
                         'length' => 10,
                         'filename' => 'File.txt',
+                        'md5' => '53cd331224e92796bacd68433b111fca'
                     )
                 ),
                 201

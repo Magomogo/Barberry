@@ -55,7 +55,8 @@ class Controller implements Controller\ControllerInterface {
                     'contentType' => strval($contentType),
                     'ext' => $contentType->standardExtension(),
                     'length' => strlen($this->request->bin),
-                    'filename' => $this->request->postedFilename
+                    'filename' => $this->request->postedFilename,
+                    'md5' => $this->request->postedMd5
                 )
             ),
             201

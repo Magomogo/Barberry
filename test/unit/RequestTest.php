@@ -43,6 +43,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $request = new Request('', new PostedFile('123', 'Text.txt'));
         $this->assertEquals('123', $request->bin);
         $this->assertEquals('Text.txt', $request->postedFilename);
+        $this->assertEquals('202cb962ac59075b964b07152d234b70', $request->postedMd5);
     }
 
     public function testKeepsOriginalUri() {
