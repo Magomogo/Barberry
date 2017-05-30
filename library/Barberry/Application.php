@@ -29,6 +29,9 @@ class Application
         } catch (Controller\NotFoundException $e) {
 
             return Response::notFound();
+        } catch (Controller\NullPostException $e) {
+
+            return Response::badRequest();
         } catch (Controller\NotImplementedException $e) {
 
             return  Response::notImplemented($e->getMessage());

@@ -14,6 +14,10 @@ class Response {
         return new self(ContentType::json(), '{}', 404);
     }
 
+    public static function badRequest() {
+        return new self(ContentType::json(), '{}', 400);
+    }
+
     public static function notImplemented($msg) {
         return new self(
             ContentType::json(),
