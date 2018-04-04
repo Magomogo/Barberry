@@ -105,10 +105,35 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
 
     public function testCanDetectOutputContentTypeByContentsOfStorage() {
         $this->assertEquals(
-            new Response(ContentType::txt(), '123'),
+            new Response(ContentType::txt(), '123', 200, false),
             self::c(
                 new Request('/11'),
                 m::mock('Barberry\\Storage\\StorageInterface', array('getById' => '123'))
+            )->GET()
+        );
+    }
+
+    public function testNotCacheableIfNullConverter() {
+        $this->assertEquals(
+            new Response(ContentType::txt(), '123', 200, false),
+            self::c(
+                new Request('/11.txt'),
+                m::mock('Barberry\\Storage\\StorageInterface', array('getById' => '123')),
+                m::mock('Barberry\\Direction\\Factory', array('direction' => new Plugin\NullPlugin))
+            )->GET()
+        );
+    }
+
+    public function testCacheableIfNotNullConverter() {
+        $this->assertEquals(
+            new Response(ContentType::txt(), '123', 200, true),
+            self::c(
+                new Request('/11.txt'),
+                null,
+                m::mock(
+                    'Barberry\\Direction\\Factory',
+                    array('direction' => m::mock('Barberry\\Plugin\\InterfaceConverter', array('convert' => '123')))
+                )
             )->GET()
         );
     }
