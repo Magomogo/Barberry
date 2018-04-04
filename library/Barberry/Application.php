@@ -44,7 +44,7 @@ class Application
 
     private function invokeCache(Response $response)
     {
-        if('GET' == strtoupper($_SERVER['REQUEST_METHOD'])) {
+        if('GET' == strtoupper($_SERVER['REQUEST_METHOD']) && $response->cacheable) {
             $this->resources->cache()->save($response->body, $this->resources->request());
         } elseif('DELETE' == strtoupper($_SERVER['REQUEST_METHOD'])) {
             $this->resources->cache()->invalidate($this->resources->request()->id);

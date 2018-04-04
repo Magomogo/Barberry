@@ -1,6 +1,6 @@
 <?php
 namespace Barberry;
-use Barberry\Response;
+use Barberry\Plugin\NullPlugin;
 use Barberry\Storage;
 use Barberry\Direction;
 
@@ -35,6 +35,7 @@ class Controller implements Controller\ControllerInterface {
      * @return Response
      * @throws Controller\NullPostException
      * @throws Controller\NotImplementedException
+     * @throws ContentType\Exception
      */
     public function POST() {
         if (!strlen($this->request->bin)) {
@@ -66,6 +67,7 @@ class Controller implements Controller\ControllerInterface {
     /**
      * @return Response
      * @throws Controller\NotFoundException
+     * @throws ContentType\Exception
      */
     public function GET() {
         try {
@@ -79,13 +81,17 @@ class Controller implements Controller\ControllerInterface {
         }
 
         try {
+            $converter = $this->directionFactory->direction(
+                ContentType::byString($bin),
+                $this->request->contentType,
+                $this->request->commandString
+            );
             return self::response(
                 $this->request->contentType,
-                $this->directionFactory->direction(
-                    ContentType::byString($bin),
-                    $this->request->contentType,
-                    $this->request->commandString
-                )->convert($bin)
+                $converter->convert($bin),
+                200,
+                !($converter instanceof NullPlugin)
+
             );
         } catch (Plugin\NotAvailableException $e) {
             throw new Controller\NotFoundException;
@@ -109,14 +115,19 @@ class Controller implements Controller\ControllerInterface {
         return self::response(ContentType::json(), '{}');
     }
 
+    /**
+     * @param $name
+     * @param $args
+     * @throws Controller\NotFoundException
+     */
     public function __call($name, $args) {
         throw new Controller\NotFoundException;
     }
 
 //--------------------------------------------------------------------------------------------------
 
-    private static function response($contentType, $body, $code = 200) {
-        return new Response($contentType, $body, $code);
+    private static function response($contentType, $body, $code = 200, $cacheable = true) {
+        return new Response($contentType, $body, $code, $cacheable);
     }
 
 }
