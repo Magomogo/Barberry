@@ -139,7 +139,12 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
             $specs = array('file' => self::goodFileInPhpFilesArray());
         }
 
-        return $this->getMock('Barberry\\PostedFile\\Collection', array('readTempFile'), array($specs));
+        return $this->getMockBuilder('Barberry\\PostedFile\\Collection')
+            ->setMethods(['readTempFile'])
+            ->enableOriginalConstructor()
+            ->setConstructorArgs(array($specs))
+            ->getMock();
+
     }
 
     private function partiallyMockedCollection(array $specs = null, $readFile = null) {

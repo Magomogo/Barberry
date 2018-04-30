@@ -22,7 +22,7 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testPassesDataFilterToPostedDataProcessor() {
-        $filter = $this->getMock('Barberry\\Filter\\FilterInterface');
+        $filter = $this->createMock('Barberry\\Filter\\FilterInterface');
         $filter->expects($this->once())->method('filter');
 
         self::r($filter)->request();

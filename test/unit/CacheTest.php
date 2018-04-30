@@ -9,7 +9,12 @@ class CacheTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider uriCacheDataProvider
      */
     public function testConvertsUriToFilePath($uri, $expectedPath) {
-        $cache = $this->getMock('Barberry\Cache', array('writeToFilesystem'), array('/'));
+        $cache = $this->getMockBuilder('Barberry\Cache')
+            ->setMethods(['writeToFilesystem'])
+            ->enableOriginalConstructor()
+            ->setConstructorArgs(array('/'))
+            ->getMock();
+
         $cache->expects($this->any())->method('writeToFilesystem')->with(
             '123', $expectedPath
         );

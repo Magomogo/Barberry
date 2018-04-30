@@ -39,14 +39,14 @@ class FilterCompositeTest extends \PHPUnit_Framework_TestCase {
         $args = func_get_args();
 
         if (!isset($args[0])) {
-            $args[0] = $this->getMock('Barberry\\Filter\\FilterInterface');
+            $args[0] = $this->createMock('Barberry\\Filter\\FilterInterface');
         }
         $rc = new \ReflectionClass('Barberry\\Filter\\FilterComposite');
         return $rc->newInstanceArgs($args);
     }
 
     private function filterMock(Collection $expectedFiles, array $expectedVars, $callback = null) {
-        $f = $this->getMock('Barberry\\Filter\\FilterInterface');
+        $f = $this->createMock('Barberry\\Filter\\FilterInterface');
         $w = $f->expects($this->once())->method('filter')->with($expectedFiles, $expectedVars);
 
         if (is_callable($callback)) {

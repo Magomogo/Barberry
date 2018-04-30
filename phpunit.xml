@@ -17,10 +17,6 @@
          testSuiteLoaderClass="PHPUnit_Runner_StandardTestSuiteLoader"
          strict="false"
          verbose="false">
-    <listeners>
-        <listener class="\Mockery\Adapter\Phpunit\TestListener"
-                  file="vendor/mockery/mockery/library/Mockery/Adapter/Phpunit/TestListener.php"> </listener>
-    </listeners>
 
     <php>
         <env name="APPLICATION_ENV" value="testing"/>
