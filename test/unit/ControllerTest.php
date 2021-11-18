@@ -16,13 +16,12 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        self::$filesystem = vfsStream::setup();
-        vfsStream::create([
+        self::$filesystem = vfsStream::setup('root', null, [
             'tmp' => [
                 'aD6gsl' => "Column1\tColumn2\tColumn3",
                 'test.odt' => dechex(0)
             ]
-        ], self::$filesystem);
+        ]);
     }
 
     public function testDataType()
