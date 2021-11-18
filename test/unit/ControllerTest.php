@@ -145,6 +145,6 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
     }
 
     private static function binaryRequest() {
-        return new Request('/', new PostedFile('0101010111', 'File.txt'));
+        return new Request('/', new PostedFile('0101010111', '/tmp/aD6gsl', 'File.txt'));
     }
 }

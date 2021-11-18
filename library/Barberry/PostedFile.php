@@ -1,10 +1,10 @@
 <?php
 
 namespace Barberry;
-use Barberry\ContentType;
 
 /**
  * @property-read string $bin
+ * @property-read string $tmpName
  * @property-read string $filename
  * @property-read string $md5
  *
@@ -22,11 +22,13 @@ class PostedFile
 
     /**
      * @param string $bin
+     * @param string $tmpName
      * @param string $filename
      */
-    public function __construct($bin, $filename = null)
+    public function __construct($bin, $tmpName, $filename = null)
     {
         $this->_bin = $bin;
+        $this->_tmpName = $tmpName;
         $this->_filename = $filename;
         $this->_md5 = md5($bin);
     }

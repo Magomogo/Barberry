@@ -149,6 +149,7 @@ class Collection implements \ArrayAccess, \Iterator
         if (is_array($spec)) {
             $this->specsIterator[$key] = new \Barberry\PostedFile(
                 $this->readTempFile($spec['tmp_name']),
+                $spec['tmp_name'],
                 $spec['name']
             );
         }

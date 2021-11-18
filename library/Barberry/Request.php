@@ -39,6 +39,11 @@ class Request {
     /**
      * @var null|string
      */
+    private $_tmpName;
+
+    /**
+     * @var null|string
+     */
     private $_postedFilename;
 
     /**
@@ -75,6 +80,7 @@ class Request {
     private function keepPost(PostedFile $postedFile = null) {
         if (!is_null($postedFile)) {
             $this->_bin = $postedFile->bin;
+            $this->_tmpName = $postedFile->tmpName;
             $this->_postedFilename = $postedFile->filename;
             $this->_postedMd5 = $postedFile->md5;
         }

@@ -13,7 +13,7 @@ class PostedDataProcessorTest extends \PHPUnit_Framework_TestCase {
             ->will(
                 $this->returnCallback(
                     function (\Barberry\PostedFile\Collection $files, $vars) {
-                        $files['file'] = new PostedFile('test content', 'test.txt');
+                        $files['file'] = new PostedFile('test content', '/tmp/asD6yhq', 'test.txt');
                     }
                 )
             );
@@ -35,8 +35,8 @@ class PostedDataProcessorTest extends \PHPUnit_Framework_TestCase {
                 $this->returnValue(
                     new PostedFile\Collection(
                         array(
-                            'file' => new PostedFile('some', 'Name of a file.txt'),
-                            'image' => new PostedFile(Test\Data::gif1x1(), 'test.gif')
+                            'file' => new PostedFile('some', '/tmp/asD6yhq', 'Name of a file.txt'),
+                            'image' => new PostedFile(Test\Data::gif1x1(), '/tmp/zAq8ugi', 'test.gif')
                         )
                     )
                 )
