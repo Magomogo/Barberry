@@ -1,11 +1,29 @@
 <?php
+
 namespace Barberry;
+
 use Barberry\Storage;
 use Mockery as m;
+use org\bovigo\vfs\vfsStream;
 
-class ControllerTest extends \PHPUnit_Framework_TestCase {
-
+class ControllerTest extends \PHPUnit_Framework_TestCase
+{
     use m\Adapter\Phpunit\MockeryPHPUnitIntegration;
+
+    private static $filesystem;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        self::$filesystem = vfsStream::setup();
+        vfsStream::create([
+            'tmp' => [
+                'aD6gsl' => "Column1\tColumn2\tColumn3",
+                'test.odt' => dechex(0)
+            ]
+        ], self::$filesystem);
+    }
 
     public function testDataType() {
         $this->assertInstanceOf('Barberry\Controller\ControllerInterface', self::c());
@@ -93,9 +111,12 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(201, self::c(self::binaryRequest())->POST()->code);
     }
 
-    public function testPOSTOfUnknownContentTypeReturns501NotImplemented() {
-        $this->setExpectedException('Barberry\\Controller\\NotImplementedException');
-        self::c(new Request('/', new PostedFile(dechex(0), 'test.odt')))->POST();
+    public function testPOSTOfUnknownContentTypeReturns501NotImplemented()
+    {
+        $this->expectException('Barberry\\Controller\\NotImplementedException');
+
+        $postedFile = new PostedFile(dechex(0), self::$filesystem->url() . '/tmp/test.odt', 'test.odt');
+        self::c(new Request('/', $postedFile))->POST();
     }
 
     public function testDeleteMethodQueriesStorage() {
@@ -144,7 +165,8 @@ class ControllerTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    private static function binaryRequest() {
-        return new Request('/', new PostedFile('0101010111', '/tmp/aD6gsl', 'File.txt'));
+    private static function binaryRequest()
+    {
+        return new Request('/', new PostedFile('0101010111', self::$filesystem->url() . '/tmp/aD6gsl', 'File.txt'));
     }
 }

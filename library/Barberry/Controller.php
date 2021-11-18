@@ -42,7 +42,7 @@ class Controller implements Controller\ControllerInterface {
         }
 
         try {
-            $contentType = ContentType::byString($this->request->bin);
+            $contentType = ContentType::byFilename($this->request->tmpName);
         } catch (ContentType\Exception $e) {
             throw new Controller\NotImplementedException($e->getMessage());
         }
@@ -52,7 +52,7 @@ class Controller implements Controller\ControllerInterface {
             json_encode(
                 array(
                     'id' => $this->storage->save($this->request->bin),
-                    'contentType' => strval($contentType),
+                    'contentType' => (string) $contentType,
                     'ext' => $contentType->standardExtension(),
                     'length' => strlen($this->request->bin),
                     'filename' => $this->request->postedFilename,

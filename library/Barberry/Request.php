@@ -8,6 +8,7 @@ use Barberry\ContentType;
  * @property-read null|ContentType $contentType
  * @property-read null|string $group
  * @property-read null|string $bin
+ * @property-read null|string $tmpName
  * @property-read null|string $postedFilename
  * @property-read null|string $postedMd5
  * @property-read null|string $commandString
