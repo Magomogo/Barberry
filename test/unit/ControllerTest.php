@@ -25,41 +25,49 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         ], self::$filesystem);
     }
 
-    public function testDataType() {
-        $this->assertInstanceOf('Barberry\Controller\ControllerInterface', self::c());
+    public function testDataType()
+    {
+        $this->assertInstanceOf('Barberry\Controller\ControllerInterface', self::controller());
     }
 
-    public function testGETReadsStorage() {
+    public function testGETReadsStorage()
+    {
         $storage = $this->createMock('Barberry\\Storage\\StorageInterface');
         $storage->expects($this->once())
                 ->method('getById')
-                ->will($this->returnValue(Test\Data::gif1x1()))
+                ->willReturn(Test\Data::gif1x1())
                 ->with('123asd');
-        $this->c(new Request('/123asd.gif'), $storage)->GET();
+
+        self::controller(new Request('/123asd.gif'), $storage)->GET();
     }
 
-    public function testGETReturnsAResponseObject() {
-        $this->assertInstanceOf('Barberry\\Response', self::c()->GET());
+    public function testGETReturnsAResponseObject()
+    {
+        $this->assertInstanceOf('Barberry\\Response', self::controller()->GET());
     }
 
-    public function testGETResponseContainsCorrectContentType() {
-        $response = $this->c()->GET();
+    public function testGETResponseContainsCorrectContentType()
+    {
+        $response = self::controller()->GET();
         $this->assertEquals(ContentType::gif(), $response->contentType);
     }
 
-    public function testPOSTResponseIsJson() {
+    public function testPOSTResponseIsJson()
+    {
         $this->assertEquals(
             ContentType::json(),
-            self::c(self::binaryRequest())->POST()->contentType
+            self::controller(self::binaryRequest())->POST()->contentType
         );
     }
 
-    public function testDELETEResponseIsJson() {
-        $response = self::c()->DELETE();
+    public function testDELETEResponseIsJson()
+    {
+        $response = self::controller()->DELETE();
         $this->assertEquals(ContentType::json(), $response->contentType);
     }
 
-    public function testPOSTReturnsDocumentInformationAtSavingToStorage() {
+    public function testPOSTReturnsDocumentInformationAtSavingToStorage()
+    {
         $storage = $this->createMock('Barberry\\Storage\\StorageInterface');
         $storage->expects($this->once())->method('save')->will($this->returnValue('12345xz'));
 
@@ -77,38 +85,43 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
                 ),
                 201
             ),
-            $this->c(self::binaryRequest(), $storage)->POST()
+            self::controller(self::binaryRequest(), $storage)->POST()
         );
     }
 
-    public function testSavesPostedContentToTheStorage() {
+    public function testSavesPostedContentToTheStorage()
+    {
         $storage = $this->createMock('Barberry\\Storage\\StorageInterface');
         $storage->expects($this->once())->method('save')->with('0101010111');
-        $controller = $this->c(self::binaryRequest(), $storage);
+        $controller = self::controller(self::binaryRequest(), $storage);
         $controller->POST();
     }
 
-    public function testThrowsNullPostValueWhenNoContentPosted() {
-        $this->setExpectedException('Barberry\\Controller\\NullPostException');
-        self::c()->POST();
+    public function testThrowsNullPostValueWhenNoContentPosted()
+    {
+        $this->expectException('Barberry\\Controller\\NullPostException');
+        self::controller()->POST();
     }
 
-    public function testThrowsNotFoundExceptionWhenUnknownMethodIsCalled() {
-        $this->setExpectedException('Barberry\\Controller\\NotFoundException');
-        self::c()->PUT();
+    public function testThrowsNotFoundExceptionWhenUnknownMethodIsCalled()
+    {
+        $this->expectException('Barberry\\Controller\\NotFoundException');
+        self::controller()->PUT();
     }
 
-    public function testThrowsNotFoundExceptionWhenStorageHasNoRequestedDocument() {
+    public function testThrowsNotFoundExceptionWhenStorageHasNoRequestedDocument()
+    {
         $storage = $this->createMock('Barberry\\Storage\\StorageInterface');
         $storage->expects($this->any())->method('getById')
                 ->will($this->throwException(new Storage\NotFoundException('123')));
 
-        $this->setExpectedException('Barberry\\Controller\\NotFoundException');
-        self::c(null, $storage)->GET();
+        $this->expectException('Barberry\\Controller\\NotFoundException');
+        self::controller(null, $storage)->GET();
     }
 
-    public function testSuccessfullPOSTReturns201CreatedCode() {
-        $this->assertEquals(201, self::c(self::binaryRequest())->POST()->code);
+    public function testSuccessfullPOSTReturns201CreatedCode()
+    {
+        $this->assertEquals(201, self::controller(self::binaryRequest())->POST()->code);
     }
 
     public function testPOSTOfUnknownContentTypeReturns501NotImplemented()
@@ -116,20 +129,22 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         $this->expectException('Barberry\\Controller\\NotImplementedException');
 
         $postedFile = new PostedFile(dechex(0), self::$filesystem->url() . '/tmp/test.odt', 'test.odt');
-        self::c(new Request('/', $postedFile))->POST();
+        self::controller(new Request('/', $postedFile))->POST();
     }
 
-    public function testDeleteMethodQueriesStorage() {
+    public function testDeleteMethodQueriesStorage()
+    {
         $storage = $this->createMock('Barberry\\Storage\\StorageInterface');
         $storage->expects($this->once())->method('delete')->with('124234');
 
-        self::c(new Request('/124234'), $storage)->DELETE();
+        self::controller(new Request('/124234'), $storage)->DELETE();
     }
 
-    public function testCanDetectOutputContentTypeByContentsOfStorage() {
+    public function testCanDetectOutputContentTypeByContentsOfStorage()
+    {
         $this->assertEquals(
             new Response(ContentType::txt(), '123'),
-            self::c(
+            self::controller(
                 new Request('/11'),
                 m::mock('Barberry\\Storage\\StorageInterface', array('getById' => '123'))
             )->GET()
@@ -146,15 +161,15 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
             array('direction' => $plugin)
         );
 
+        $this->expectException('Barberry\\Controller\\NotFoundException');
+        self::controller(null, null, $directionFactory)->GET();
+    }
 
-        $this->setExpectedException('Barberry\\Controller\\NotFoundException');
-        self::c(null, null, $directionFactory)->GET();
-}
-
-//--------------------------------------------------------------------------------------------------
-
-    private static function c(Request $request = null, Storage\StorageInterface $storage = null,
-        Direction\Factory $directionFactory = null) {
+    private static function controller(
+        Request $request = null,
+        Storage\StorageInterface $storage = null,
+        Direction\Factory $directionFactory = null
+    ) {
         return new Controller(
             $request ?: new Request('/1.gif'),
             $storage ?: m::mock(
