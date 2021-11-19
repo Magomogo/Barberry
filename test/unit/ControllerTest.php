@@ -32,10 +32,16 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
     public function testGETReadsStorage()
     {
         $storage = $this->createMock('Barberry\\Storage\\StorageInterface');
-        $storage->expects($this->once())
-                ->method('getById')
-                ->willReturn(Test\Data::gif1x1())
-                ->with('123asd');
+        $storage
+            ->expects($this->once())
+            ->method('getById')
+            ->willReturn(Test\Data::gif1x1())
+            ->with('123asd');
+
+        $storage
+            ->expects($this->once())
+            ->method('getContentTypeById')
+            ->willReturn(ContentType::gif());
 
         self::controller(new Request('/123asd.gif'), $storage)->GET();
     }
@@ -145,7 +151,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
             new Response(ContentType::txt(), '123'),
             self::controller(
                 new Request('/11'),
-                m::mock('Barberry\\Storage\\StorageInterface', array('getById' => '123'))
+                m::mock('Barberry\\Storage\\StorageInterface', array('getById' => '123', 'getContentTypeById' => ContentType::txt()))
             )->GET()
         );
     }
@@ -173,7 +179,11 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
             $request ?: new Request('/1.gif'),
             $storage ?: m::mock(
                 'Barberry\\Storage\\StorageInterface',
-                array('getById' => Test\Data::gif1x1(), 'save' => null, 'delete' => null)
+                array(
+                    'getById' => Test\Data::gif1x1(),
+                    'getContentTypeById' => ContentType::jpeg(),
+                    'save' => null,'delete' => null
+                )
             ),
             $directionFactory ?: m::mock('Barberry\\Direction\\Factory', array('direction' => new Plugin\NullPlugin))
         );

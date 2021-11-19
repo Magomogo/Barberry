@@ -1,6 +1,7 @@
 <?php
 namespace Barberry\Storage;
 
+use Barberry\ContentType;
 use Barberry\fs;
 use Barberry\nonlinear;
 
@@ -32,6 +33,18 @@ class File implements StorageInterface {
         }
 
         return $content;
+    }
+
+    /**
+     * @param string $id
+     * @return ContentType
+     * @throws ContentType\Exception
+     */
+    public function getContentTypeById($id)
+    {
+        return ContentType::byFilename(
+            $this->filePathById($id)
+        );
     }
 
     /**

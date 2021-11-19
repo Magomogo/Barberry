@@ -1,6 +1,7 @@
 <?php
+
 namespace Barberry;
-use Barberry\Response;
+
 use Barberry\Storage;
 use Barberry\Direction;
 
@@ -66,6 +67,7 @@ class Controller implements Controller\ControllerInterface {
     /**
      * @return Response
      * @throws Controller\NotFoundException
+     * @throws ContentType\Exception
      */
     public function GET() {
         try {
@@ -74,15 +76,17 @@ class Controller implements Controller\ControllerInterface {
             throw new Controller\NotFoundException;
         }
 
+        $contentType = $this->storage->getContentTypeById($this->request->id);
+
         if (is_null($this->request->contentType)) {
-            $this->request->defineContentType(ContentType::byString($bin));
+            $this->request->defineContentType($contentType);
         }
 
         try {
             return self::response(
                 $this->request->contentType,
                 $this->directionFactory->direction(
-                    ContentType::byString($bin),
+                    $contentType,
                     $this->request->contentType,
                     $this->request->commandString
                 )->convert($bin)
