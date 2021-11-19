@@ -41,14 +41,4 @@ class PostedFile
         trigger_error('Undefined property via __get(): ' . $property, E_USER_NOTICE);
         return null;
     }
-
-    public function getStandardExtension()
-    {
-        if (is_null($this->standardExtension) && !is_null($this->_bin)) {
-            $this->standardExtension = ContentType::byString($this->_bin)->standardExtension();
-        }
-
-        return $this->standardExtension;
-    }
-
 }
