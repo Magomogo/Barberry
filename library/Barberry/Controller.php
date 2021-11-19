@@ -5,7 +5,8 @@ namespace Barberry;
 use Barberry\Storage;
 use Barberry\Direction;
 
-class Controller implements Controller\ControllerInterface {
+class Controller implements Controller\ControllerInterface
+{
     /**
      * @var Direction\Factory
      */
@@ -26,7 +27,8 @@ class Controller implements Controller\ControllerInterface {
      * @param Storage\StorageInterface $storage
      * @param Direction\Factory $directionFactory
      */
-    public function __construct(Request $request, Storage\StorageInterface $storage, Direction\Factory $directionFactory) {
+    public function __construct(Request $request, Storage\StorageInterface $storage, Direction\Factory $directionFactory)
+    {
         $this->request = $request;
         $this->storage = $storage;
         $this->directionFactory = $directionFactory;
@@ -37,7 +39,8 @@ class Controller implements Controller\ControllerInterface {
      * @throws Controller\NullPostException
      * @throws Controller\NotImplementedException
      */
-    public function POST() {
+    public function POST()
+    {
         if (!strlen($this->request->bin)) {
             throw new Controller\NullPostException;
         }
@@ -69,7 +72,8 @@ class Controller implements Controller\ControllerInterface {
      * @throws Controller\NotFoundException
      * @throws ContentType\Exception
      */
-    public function GET() {
+    public function GET()
+    {
         try {
             $bin = $this->storage->getById($this->request->id);
         } catch (Storage\NotFoundException $e) {
@@ -104,7 +108,8 @@ class Controller implements Controller\ControllerInterface {
      * @return Response
      * @throws Controller\NotFoundException
      */
-    public function DELETE() {
+    public function DELETE()
+    {
         try {
             $this->storage->delete($this->request->id);
         } catch (Storage\NotFoundException $e) {
@@ -113,13 +118,13 @@ class Controller implements Controller\ControllerInterface {
         return self::response(ContentType::json(), '{}');
     }
 
-    public function __call($name, $args) {
+    public function __call($name, $args)
+    {
         throw new Controller\NotFoundException;
     }
 
-//--------------------------------------------------------------------------------------------------
-
-    private static function response($contentType, $body, $code = 200) {
+    private static function response($contentType, $body, $code = 200)
+    {
         return new Response($contentType, $body, $code);
     }
 
