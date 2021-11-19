@@ -1,10 +1,12 @@
 <?php
+
 namespace Barberry;
-use Barberry\Response;
+
 use Barberry\Storage;
 use Barberry\Direction;
 
-class Controller implements Controller\ControllerInterface {
+class Controller implements Controller\ControllerInterface
+{
     /**
      * @var Direction\Factory
      */
@@ -25,7 +27,8 @@ class Controller implements Controller\ControllerInterface {
      * @param Storage\StorageInterface $storage
      * @param Direction\Factory $directionFactory
      */
-    public function __construct(Request $request, Storage\StorageInterface $storage, Direction\Factory $directionFactory) {
+    public function __construct(Request $request, Storage\StorageInterface $storage, Direction\Factory $directionFactory)
+    {
         $this->request = $request;
         $this->storage = $storage;
         $this->directionFactory = $directionFactory;
@@ -36,13 +39,14 @@ class Controller implements Controller\ControllerInterface {
      * @throws Controller\NullPostException
      * @throws Controller\NotImplementedException
      */
-    public function POST() {
+    public function POST()
+    {
         if (!strlen($this->request->bin)) {
             throw new Controller\NullPostException;
         }
 
         try {
-            $contentType = ContentType::byString($this->request->bin);
+            $contentType = ContentType::byFilename($this->request->tmpName);
         } catch (ContentType\Exception $e) {
             throw new Controller\NotImplementedException($e->getMessage());
         }
@@ -52,7 +56,7 @@ class Controller implements Controller\ControllerInterface {
             json_encode(
                 array(
                     'id' => $this->storage->save($this->request->bin),
-                    'contentType' => strval($contentType),
+                    'contentType' => (string) $contentType,
                     'ext' => $contentType->standardExtension(),
                     'length' => strlen($this->request->bin),
                     'filename' => $this->request->postedFilename,
@@ -66,23 +70,27 @@ class Controller implements Controller\ControllerInterface {
     /**
      * @return Response
      * @throws Controller\NotFoundException
+     * @throws ContentType\Exception
      */
-    public function GET() {
+    public function GET()
+    {
         try {
             $bin = $this->storage->getById($this->request->id);
         } catch (Storage\NotFoundException $e) {
             throw new Controller\NotFoundException;
         }
 
+        $contentType = $this->storage->getContentTypeById($this->request->id);
+
         if (is_null($this->request->contentType)) {
-            $this->request->defineContentType(ContentType::byString($bin));
+            $this->request->defineContentType($contentType);
         }
 
         try {
             return self::response(
                 $this->request->contentType,
                 $this->directionFactory->direction(
-                    ContentType::byString($bin),
+                    $contentType,
                     $this->request->contentType,
                     $this->request->commandString
                 )->convert($bin)
@@ -100,7 +108,8 @@ class Controller implements Controller\ControllerInterface {
      * @return Response
      * @throws Controller\NotFoundException
      */
-    public function DELETE() {
+    public function DELETE()
+    {
         try {
             $this->storage->delete($this->request->id);
         } catch (Storage\NotFoundException $e) {
@@ -109,13 +118,13 @@ class Controller implements Controller\ControllerInterface {
         return self::response(ContentType::json(), '{}');
     }
 
-    public function __call($name, $args) {
+    public function __call($name, $args)
+    {
         throw new Controller\NotFoundException;
     }
 
-//--------------------------------------------------------------------------------------------------
-
-    private static function response($contentType, $body, $code = 200) {
+    private static function response($contentType, $body, $code = 200)
+    {
         return new Response($contentType, $body, $code);
     }
 

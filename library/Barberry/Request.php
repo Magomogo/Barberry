@@ -8,6 +8,7 @@ use Barberry\ContentType;
  * @property-read null|ContentType $contentType
  * @property-read null|string $group
  * @property-read null|string $bin
+ * @property-read null|string $tmpName
  * @property-read null|string $postedFilename
  * @property-read null|string $postedMd5
  * @property-read null|string $commandString
@@ -35,6 +36,11 @@ class Request {
      * @var null|string
      */
     private $_bin;
+
+    /**
+     * @var null|string
+     */
+    private $_tmpName;
 
     /**
      * @var null|string
@@ -75,6 +81,7 @@ class Request {
     private function keepPost(PostedFile $postedFile = null) {
         if (!is_null($postedFile)) {
             $this->_bin = $postedFile->bin;
+            $this->_tmpName = $postedFile->tmpName;
             $this->_postedFilename = $postedFile->filename;
             $this->_postedMd5 = $postedFile->md5;
         }

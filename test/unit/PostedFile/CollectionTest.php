@@ -41,14 +41,14 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
 
     public function testCanSetPostedFile() {
         $collection = $this->partiallyMockedCollection();
-        $collection['file'] = new \Barberry\PostedFile('ssdgsdfg', 'test.txt');
+        $collection['file'] = new \Barberry\PostedFile('ssdgsdfg', '/tmp/asD6yhq', 'test.txt');
 
         $this->assertEquals('test.txt', $collection['file']->filename);
     }
 
     public function testCanAddNewPostedFile() {
         $collection = $this->partiallyMockedCollection();
-        $collection['image'] = new \Barberry\PostedFile('ssdgsdfg', 'test.txt');
+        $collection['image'] = new \Barberry\PostedFile('ssdgsdfg', '/tmp/asD6yhq', 'test.txt');
 
         $collection->rewind();
         $collection->next();
@@ -58,7 +58,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
 
     public function testCanUnshiftPostedFileToTheBeginning() {
         $collection = $this->partiallyMockedCollection();
-        $collection->unshift('image', new \Barberry\PostedFile('ssdgsdfg', 'test.txt'));
+        $collection->unshift('image', new \Barberry\PostedFile('ssdgsdfg', '/tmp/asD6yhq', 'test.txt'));
 
         $collection->rewind();
         $this->assertEquals('test.txt', $collection->current()->filename);
@@ -103,7 +103,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testCanBeCreatedWithPostedFilesInConstructor() {
-        $collection = new Collection(array('file' => new \Barberry\PostedFile(Test\Data::gif1x1(), 'test.gif')));
+        $collection = new Collection(array('file' => new \Barberry\PostedFile(Test\Data::gif1x1(), '/tmp/asD6yhq', 'test.gif')));
         $this->assertEquals(Test\Data::gif1x1(), $collection['file']->bin);
     }
 

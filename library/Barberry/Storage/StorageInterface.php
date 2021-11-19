@@ -1,5 +1,8 @@
 <?php
+
 namespace Barberry\Storage;
+
+use Barberry\ContentType;
 
 interface StorageInterface {
 
@@ -9,6 +12,13 @@ interface StorageInterface {
      * @throws NotFoundException
      */
     public function getById($id);
+
+    /**
+     * @param string $id
+     * @return ContentType
+     * @throws ContentType\Exception
+     */
+    public function getContentTypeById($id);
 
     /**
      * @param string $id

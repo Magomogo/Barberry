@@ -10,7 +10,7 @@ class FilterCompositeTest extends \PHPUnit_Framework_TestCase {
 
     public function testCallsAssignedFilter() {
         $files = new Collection();
-        $files['file'] = new \Barberry\PostedFile('test', 'test.txt');
+        $files['file'] = new \Barberry\PostedFile('test', '/tmp/asD6yhq', 'test.txt');
 
         $filterMock = $this->filterMock($files, array('vars'));
         $this->c($filterMock)->filter($files, array('vars'));
@@ -20,13 +20,13 @@ class FilterCompositeTest extends \PHPUnit_Framework_TestCase {
         $vars = array('vars');
 
         $files = new Collection();
-        $files['file'] = new \Barberry\PostedFile('test', 'test.txt');
+        $files['file'] = new \Barberry\PostedFile('test', '/tmp/asD6yhq', 'test.txt');
 
         $filter1 = $this->filterMock($files, $vars);
         $filter2 = $this->filterMock(
             $files, $vars,
             function ($files, $vars) {
-                $files['file'] = new \Barberry\PostedFile('dsdgdfg', 'test_name.txt');
+                $files['file'] = new \Barberry\PostedFile('dsdgdfg', '/tmp/asD6yhq', 'test_name.txt');
             }
         );
         $filter3 = $this->filterMock($files, $vars);

@@ -10,14 +10,16 @@
         ]
     },
     "require": {
+        "ext-json": "*",
         "php": "^5.6 || ^7.0",
-        "barberry/interfaces": "^2.0"
+        "barberry/interfaces": "^2.5"
     },
     "suggest": {
         "ext-openssl": "*"
     },
     "require-dev": {
         "mockery/mockery": "^1.0",
-        "phpunit/phpunit": "^5.7"
+        "phpunit/phpunit": "^5.7",
+        "mikey179/vfsstream": "^1.6"
     }
 }
