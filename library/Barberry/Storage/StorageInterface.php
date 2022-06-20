@@ -3,6 +3,8 @@
 namespace Barberry\Storage;
 
 use Barberry\ContentType;
+use GuzzleHttp\Psr7\UploadedFile;
+use Psr\Http\Message\StreamInterface;
 
 interface StorageInterface {
 
@@ -27,8 +29,8 @@ interface StorageInterface {
     public function delete($id);
 
     /**
-     * @param string $content
+     * @param UploadedFile $uploadedFile
      * @return string content id
      */
-    public function save($content);
+    public function save(UploadedFile $uploadedFile);
 }

@@ -41,27 +41,33 @@ class Controller implements Controller\ControllerInterface
      */
     public function POST()
     {
-        if (!strlen($this->request->bin)) {
+        if (
+            is_null($this->request->postedFile) ||
+            $this->request->postedFile->uploadedFile->getStream()->getSize() === 0
+        ) {
             throw new Controller\NullPostException;
         }
 
         try {
-            $contentType = ContentType::byFilename($this->request->tmpName);
+            $contentType = ContentType::byFilename($this->request->postedFile->tmpName);
         } catch (ContentType\Exception $e) {
             throw new Controller\NotImplementedException($e->getMessage());
         }
 
+        $uploadedFile = $this->request->postedFile->uploadedFile;
+        $fileMd5 = md5_file($this->request->postedFile->tmpName);
+
         return self::response(
             ContentType::json(),
             json_encode(
-                array(
-                    'id' => $this->storage->save($this->request->bin),
+                [
+                    'id' => $this->storage->save($uploadedFile),
                     'contentType' => (string) $contentType,
                     'ext' => $contentType->standardExtension(),
-                    'length' => strlen($this->request->bin),
-                    'filename' => $this->request->postedFilename,
-                    'md5' => $this->request->postedMd5
-                )
+                    'length' => $uploadedFile->getSize(),
+                    'filename' => $uploadedFile->getClientFilename(),
+                    'md5' => $fileMd5
+                ]
             ),
             201
         );

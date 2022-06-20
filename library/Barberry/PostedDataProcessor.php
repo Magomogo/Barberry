@@ -1,9 +1,11 @@
 <?php
+
 namespace Barberry;
+
 use Barberry\Filter;
 
-class PostedDataProcessor {
-
+class PostedDataProcessor
+{
     /**
      * @var Filter\FilterInterface
      */
@@ -12,7 +14,8 @@ class PostedDataProcessor {
     /**
      * @param Filter\FilterInterface $filter
      */
-    public function __construct(Filter\FilterInterface $filter = null) {
+    public function __construct(Filter\FilterInterface $filter = null)
+    {
         $this->filter = $filter;
     }
 
@@ -21,7 +24,8 @@ class PostedDataProcessor {
      * @param array $request
      * @return PostedFile|null
      */
-    public function process(array $phpFiles, array $request = array()) {
+    public function process(array $phpFiles, array $request = array())
+    {
         $filesCollection = $this->createCollection($phpFiles);
 
         if (!is_null($this->filter)) {
@@ -32,8 +36,8 @@ class PostedDataProcessor {
         return $filesCollection->current();
     }
 
-    protected function createCollection($phpFiles) {
+    protected function createCollection($phpFiles)
+    {
         return new \Barberry\PostedFile\Collection($phpFiles);
     }
-
 }

@@ -2,21 +2,20 @@
 
 namespace Barberry;
 
+use GuzzleHttp\Psr7\UploadedFile;
+use GuzzleHttp\Psr7\Utils;
+
 class PostedFileTest extends \PHPUnit_Framework_TestCase
 {
     public function testProvidesAccessToFileProperties()
     {
-        $postedFile = new PostedFile(Test\Data::gif1x1(), '/tmp/asD6yhq', 'some filename');
+        $postedFile = new PostedFile(
+            new UploadedFile(Utils::streamFor('GIF image'), 10, UPLOAD_ERR_OK, 'image.gif'),
+            '/tmp/asD6yhq'
+        );
 
-        $this->assertEquals(Test\Data::gif1x1(), $postedFile->bin);
+        $this->assertEquals('GIF image', $postedFile->uploadedFile->getStream()->getContents());
         $this->assertEquals('/tmp/asD6yhq', $postedFile->tmpName);
-        $this->assertEquals('some filename', $postedFile->filename);
-    }
-
-    public function testCalculatesMd5HashOfContent()
-    {
-        $postedFile = new PostedFile(Test\Data::gif1x1(), '/tmp/asD6yhq', '');
-
-        $this->assertSame('325472601571f31e1bf00674c368d335', $postedFile->md5);
+        $this->assertEquals('image.gif', $postedFile->uploadedFile->getClientFilename());
     }
 }

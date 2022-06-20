@@ -2,7 +2,11 @@
 
 namespace Barberry;
 
+use Barberry\Controller\NotFoundException;
+use Barberry\Controller\NullPostException;
 use Barberry\Storage;
+use GuzzleHttp\Psr7\UploadedFile;
+use GuzzleHttp\Psr7\Utils;
 use Mockery as m;
 use org\bovigo\vfs\vfsStream;
 
@@ -79,14 +83,14 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             new Response(
                 ContentType::json(), json_encode(
-                    array(
+                    [
                         'id'=>'12345xz',
                         'contentType' => 'text/plain',
                         'ext' => 'txt',
                         'length' => 10,
                         'filename' => 'File.txt',
-                        'md5' => '53cd331224e92796bacd68433b111fca'
-                    )
+                        'md5' => 'ac0f570b0a82fc7d0b08f5098acc1a33'
+                    ]
                 ),
                 201
             ),
@@ -96,21 +100,27 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
 
     public function testSavesPostedContentToTheStorage()
     {
-        $storage = $this->createMock('Barberry\\Storage\\StorageInterface');
-        $storage->expects($this->once())->method('save')->with('0101010111');
+        $storage = m::mock(Storage\StorageInterface::class);
+        $storage
+            ->shouldReceive('save')
+            ->with(m::on(function ($file) {
+                return $file instanceof UploadedFile && $file->getStream()->getContents() === '0101010111';
+            }))
+            ->once();
+
         $controller = self::controller(self::binaryRequest(), $storage);
         $controller->POST();
     }
 
     public function testThrowsNullPostValueWhenNoContentPosted()
     {
-        $this->expectException('Barberry\\Controller\\NullPostException');
+        $this->expectException(NullPostException::class);
         self::controller()->POST();
     }
 
     public function testThrowsNotFoundExceptionWhenUnknownMethodIsCalled()
     {
-        $this->expectException('Barberry\\Controller\\NotFoundException');
+        $this->expectException(NotFoundException::class);
         self::controller()->PUT();
     }
 
@@ -127,14 +137,6 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
     public function testSuccessfullPOSTReturns201CreatedCode()
     {
         $this->assertEquals(201, self::controller(self::binaryRequest())->POST()->code);
-    }
-
-    public function testPOSTOfUnknownContentTypeReturns501NotImplemented()
-    {
-        $this->expectException('Barberry\\Controller\\NotImplementedException');
-
-        $postedFile = new PostedFile(dechex(0), self::$filesystem->url() . '/tmp/test.odt', 'test.odt');
-        self::controller(new Request('/', $postedFile))->POST();
     }
 
     public function testDeleteMethodQueriesStorage()
@@ -179,11 +181,11 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
             $request ?: new Request('/1.gif'),
             $storage ?: m::mock(
                 'Barberry\\Storage\\StorageInterface',
-                array(
+                [
                     'getById' => Test\Data::gif1x1(),
                     'getContentTypeById' => ContentType::jpeg(),
                     'save' => null,'delete' => null
-                )
+                ]
             ),
             $directionFactory ?: m::mock('Barberry\\Direction\\Factory', array('direction' => new Plugin\NullPlugin))
         );
@@ -191,6 +193,12 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
 
     private static function binaryRequest()
     {
-        return new Request('/', new PostedFile('0101010111', self::$filesystem->url() . '/tmp/aD6gsl', 'File.txt'));
+        return new Request(
+            '/',
+            new PostedFile(
+                new UploadedFile(Utils::streamFor('0101010111'), 10, UPLOAD_ERR_OK, 'File.txt'),
+                self::$filesystem->url() . '/tmp/aD6gsl'
+            )
+        );
     }
 }

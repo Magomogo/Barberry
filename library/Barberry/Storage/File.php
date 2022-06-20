@@ -4,14 +4,16 @@ namespace Barberry\Storage;
 use Barberry\ContentType;
 use Barberry\fs;
 use Barberry\nonlinear;
+use GuzzleHttp\Psr7\UploadedFile;
 
-class File implements StorageInterface {
-
+class File implements StorageInterface
+{
     private $permanentStoragePath;
 
     private $baseLen = 10;
 
-    public function __construct($path) {
+    public function __construct($path)
+    {
         $this->permanentStoragePath = fs\als($path);
     }
 
@@ -20,7 +22,8 @@ class File implements StorageInterface {
      * @return string
      * @throws NotFoundException
      */
-    public function getById($id) {
+    public function getById($id)
+    {
         $filePath = $this->filePathById($id);
         $content = false;
 
@@ -48,19 +51,22 @@ class File implements StorageInterface {
     }
 
     /**
-     * @param string $content
+     * @param UploadedFile $uploadedFile
      * @return string content id
      */
-    public function save($content) {
+    public function save(UploadedFile $uploadedFile)
+    {
         do {
             $id = $this->generateUniqueId();
         } while (file_exists($filePath = $this->filePathById($id)));
 
         if (!is_dir(dirname($filePath))) {
-            mkdir(dirname($filePath), 0777, true);
+            if (!mkdir($directory = dirname($filePath), 0777, true) && !is_dir($directory)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $directory));
+            }
         }
 
-        file_put_contents($filePath, $content);
+        $uploadedFile->moveTo($filePath);
 
         return $id;
     }
@@ -69,7 +75,8 @@ class File implements StorageInterface {
      * @param string $id
      * @throws NotFoundException
      */
-    public function delete($id) {
+    public function delete($id)
+    {
         $filePath = $this->filePathById($id);
 
         if (is_file($filePath)) {
@@ -83,7 +90,8 @@ class File implements StorageInterface {
      * @param $id
      * @return string
      */
-    private function filePathById($id) {
+    private function filePathById($id)
+    {
         if (is_file($f = $this->permanentStoragePath . $id)) {
             return $f;
         }

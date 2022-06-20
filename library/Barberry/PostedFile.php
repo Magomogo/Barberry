@@ -2,41 +2,38 @@
 
 namespace Barberry;
 
+use GuzzleHttp\Psr7\UploadedFile;
+
 /**
- * @property-read string $bin
+ * @property-read UploadedFile $uploadedFile
  * @property-read string $tmpName
- * @property-read string $filename
- * @property-read string $md5
- *
  */
 class PostedFile
 {
-
-    private $_bin;
-
-    private $_filename;
-
-    private $_md5;
-
-    private $standardExtension;
+    /**
+     * @var UploadedFile
+     */
+    private $uploadedFile;
 
     /**
-     * @param string $bin
-     * @param string $tmpName
-     * @param string $filename
+     * @var string
      */
-    public function __construct($bin, $tmpName, $filename = null)
+    private $tmpName;
+
+    /**
+     * @param UploadedFile $uploadedFile
+     * @param string $tmpName
+     */
+    public function __construct(UploadedFile $uploadedFile, string $tmpName)
     {
-        $this->_bin = $bin;
-        $this->_tmpName = $tmpName;
-        $this->_filename = $filename;
-        $this->_md5 = md5($bin);
+        $this->uploadedFile = $uploadedFile;
+        $this->tmpName = $tmpName;
     }
 
     public function __get($property)
     {
-        if (property_exists($this, '_' . $property)) {
-            return $this->{'_' . $property};
+        if (property_exists($this, $property)) {
+            return $this->{$property};
         }
         trigger_error('Undefined property via __get(): ' . $property, E_USER_NOTICE);
         return null;
