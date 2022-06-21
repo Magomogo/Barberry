@@ -6,27 +6,28 @@ use Barberry\ContentType;
 use GuzzleHttp\Psr7\UploadedFile;
 use Psr\Http\Message\StreamInterface;
 
-interface StorageInterface {
+interface StorageInterface
+{
 
     /**
      * @param string $id
-     * @return string
+     * @return StreamInterface
      * @throws NotFoundException
      */
-    public function getById($id);
+    public function getById(string $id): StreamInterface;
 
     /**
      * @param string $id
      * @return ContentType
      * @throws ContentType\Exception
      */
-    public function getContentTypeById($id);
+    public function getContentTypeById(string $id): ContentType;
 
     /**
      * @param string $id
      * @throws NotFoundException
      */
-    public function delete($id);
+    public function delete(string $id);
 
     /**
      * @param UploadedFile $uploadedFile

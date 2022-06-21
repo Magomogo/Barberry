@@ -5,6 +5,8 @@ use Barberry\ContentType;
 use Barberry\fs;
 use Barberry\nonlinear;
 use GuzzleHttp\Psr7\UploadedFile;
+use GuzzleHttp\Psr7\Utils;
+use Psr\Http\Message\StreamInterface;
 
 class File implements StorageInterface
 {
@@ -19,23 +21,20 @@ class File implements StorageInterface
 
     /**
      * @param string $id
-     * @return string
+     * @return StreamInterface
      * @throws NotFoundException
      */
-    public function getById($id)
+    public function getById(string $id): StreamInterface
     {
         $filePath = $this->filePathById($id);
-        $content = false;
 
         if (is_file($filePath)) {
-            $content = file_get_contents($filePath);
+            return Utils::streamFor(
+                Utils::tryFopen($filePath, 'rb')
+            );
         }
 
-        if ($content === false) {
-            throw new NotFoundException($filePath);
-        }
-
-        return $content;
+        throw new NotFoundException($filePath);
     }
 
     /**
@@ -43,7 +42,7 @@ class File implements StorageInterface
      * @return ContentType
      * @throws ContentType\Exception
      */
-    public function getContentTypeById($id)
+    public function getContentTypeById(string $id): ContentType
     {
         return ContentType::byFilename(
             $this->filePathById($id)
@@ -75,7 +74,7 @@ class File implements StorageInterface
      * @param string $id
      * @throws NotFoundException
      */
-    public function delete($id)
+    public function delete(string $id)
     {
         $filePath = $this->filePathById($id);
 

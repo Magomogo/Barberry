@@ -44,7 +44,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         $storage
             ->expects($this->once())
             ->method('getById')
-            ->willReturn(Test\Data::gif1x1())
+            ->willReturn(Utils::streamFor('GIF image'))
             ->with('123asd');
 
         $storage
@@ -163,20 +163,47 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
     public function testCanDetectOutputContentTypeByContentsOfStorage(): void
     {
         $storageMock = m::mock(Storage\StorageInterface::class, [
-            'getById' => '123',
+            'getById' => Utils::streamFor('Content of TXT file'),
             'getContentTypeById' => ContentType::txt()
         ]);
 
-        $expectedResponse = (new HttpFoundation\Response(
-            '123',
-            200,
-            ['Content-type' => ContentType::txt()])
-        )->setProtocolVersion('1.1');
+        $response = self::controller(new Request('/11'), $storageMock)->get();
+        self::assertEquals('text/plain', $response->headers->get('Content-type'));
+    }
 
-        self::assertEquals(
-            $expectedResponse,
-            self::controller(new Request('/11'), $storageMock)->GET()
-        );
+    public function testOutputStreamedResponseContent(): void
+    {
+        $storageMock = m::mock(Storage\StorageInterface::class, [
+            'getById' => Utils::streamFor('Content of TXT file'),
+            'getContentTypeById' => ContentType::txt()
+        ]);
+
+        $response = self::controller(new Request('/11'), $storageMock)->get();
+        self::assertInstanceOf(HttpFoundation\StreamedResponse::class, $response);
+
+        ob_start();
+        $response->send();
+        $streamedContent = ob_get_clean();
+
+        self::assertEquals('Content of TXT file', $streamedContent);
+    }
+
+    public function testCallConvertForSpecificDirection(): void
+    {
+        $storageMock = m::mock(Storage\StorageInterface::class, [
+            'getById' => Utils::streamFor('Image content'),
+            'getContentTypeById' => ContentType::jpeg()
+        ]);
+
+        $plugin = m::mock(InterfaceConverter::class);
+        $plugin
+            ->shouldReceive('convert')
+            ->with('Image content')
+            ->once();
+
+        $directionFactory = m::mock(Factory::class, ['direction' => $plugin]);
+
+        self::controller(null, $storageMock, $directionFactory)->get();
     }
 
     public function testConversionNotPossibleExceptionCauses404NotFound(): void
@@ -201,14 +228,14 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         return new Controller(
             $request ?: new Request('/1.gif'),
             $storage ?: m::mock(
-                'Barberry\\Storage\\StorageInterface',
+                Storage\StorageInterface::class,
                 [
-                    'getById' => Test\Data::gif1x1(),
+                    'getById' => Utils::streamFor('GIF image'),
                     'getContentTypeById' => ContentType::jpeg(),
                     'save' => null,'delete' => null
                 ]
             ),
-            $directionFactory ?: m::mock('Barberry\\Direction\\Factory', array('direction' => new Plugin\NullPlugin))
+            $directionFactory ?: m::mock(Factory::class, ['direction' => new Plugin\NullPlugin])
         );
     }
 

@@ -2,6 +2,7 @@
 
 namespace Barberry;
 
+use Barberry\Plugin\NullPlugin;
 use Symfony\Component\HttpFoundation;
 use Barberry\Storage;
 use Barberry\Direction;
@@ -79,7 +80,7 @@ class Controller implements Controller\ControllerInterface
     public function get(): HttpFoundation\Response
     {
         try {
-            $bin = $this->storage->getById($this->request->id);
+            $stream = $this->storage->getById($this->request->id);
         } catch (Storage\NotFoundException $e) {
             throw new Controller\NotFoundException;
         }
@@ -91,12 +92,30 @@ class Controller implements Controller\ControllerInterface
         }
 
         try {
+            $direction = $this->directionFactory->direction(
+                $contentType,
+                $this->request->contentType,
+                $this->request->commandString
+            );
+
+            if ($direction instanceof NullPlugin) {
+                return (new HttpFoundation\StreamedResponse(
+                    static function() use ($stream) {
+                        $stream->rewind();
+                        while (!$stream->eof()) {
+                            echo $stream->read(4096);
+                        }
+                        $stream->close();
+                    },
+                    HttpFoundation\Response::HTTP_OK,
+                    [
+                        'Content-type' => (string) $this->request->contentType
+                    ]
+                ))->setProtocolVersion('1.1');
+            }
+
             return (new HttpFoundation\Response(
-                $this->directionFactory->direction(
-                    $contentType,
-                    $this->request->contentType,
-                    $this->request->commandString
-                )->convert($bin),
+                $direction->convert($stream->getContents()),
                 HttpFoundation\Response::HTTP_OK,
                 [
                     'Content-type' => (string) $this->request->contentType

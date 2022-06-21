@@ -12,7 +12,8 @@ class Cache {
         $this->path = fs\als($path);
     }
 
-    public function save($content, Request $request) {
+    public function save($content, Request $request)
+    {
         $this->writeToFilesystem($content, $this->filePath($request));
 
         return $request->id;

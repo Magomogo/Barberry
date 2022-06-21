@@ -9,6 +9,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     public function testCanRun(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/Asd98';
 
         $app = new Application(new Config(__DIR__));
         $response = $app->run();
