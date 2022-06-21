@@ -2,6 +2,7 @@
 
 namespace Barberry;
 
+use Symfony\Component\HttpFoundation;
 use Barberry\Storage;
 use Barberry\Direction;
 
@@ -35,11 +36,11 @@ class Controller implements Controller\ControllerInterface
     }
 
     /**
-     * @return Response
+     * @return HttpFoundation\Response
      * @throws Controller\NullPostException
      * @throws Controller\NotImplementedException
      */
-    public function POST()
+    public function post(): HttpFoundation\Response
     {
         if (
             is_null($this->request->postedFile) ||
@@ -57,28 +58,25 @@ class Controller implements Controller\ControllerInterface
         $uploadedFile = $this->request->postedFile->uploadedFile;
         $fileMd5 = md5_file($this->request->postedFile->tmpName);
 
-        return self::response(
-            ContentType::json(),
-            json_encode(
-                [
-                    'id' => $this->storage->save($uploadedFile),
-                    'contentType' => (string) $contentType,
-                    'ext' => $contentType->standardExtension(),
-                    'length' => $uploadedFile->getSize(),
-                    'filename' => $uploadedFile->getClientFilename(),
-                    'md5' => $fileMd5
-                ]
-            ),
-            201
+        return self::jsonResponse(
+            [
+                'id' => $this->storage->save($uploadedFile),
+                'contentType' => (string) $contentType,
+                'ext' => $contentType->standardExtension(),
+                'length' => $uploadedFile->getSize(),
+                'filename' => $uploadedFile->getClientFilename(),
+                'md5' => $fileMd5
+            ],
+            HttpFoundation\Response::HTTP_CREATED
         );
     }
 
     /**
-     * @return Response
+     * @return HttpFoundation\Response
      * @throws Controller\NotFoundException
      * @throws ContentType\Exception
      */
-    public function GET()
+    public function get(): HttpFoundation\Response
     {
         try {
             $bin = $this->storage->getById($this->request->id);
@@ -93,14 +91,17 @@ class Controller implements Controller\ControllerInterface
         }
 
         try {
-            return self::response(
-                $this->request->contentType,
+            return (new HttpFoundation\Response(
                 $this->directionFactory->direction(
                     $contentType,
                     $this->request->contentType,
                     $this->request->commandString
-                )->convert($bin)
-            );
+                )->convert($bin),
+                HttpFoundation\Response::HTTP_OK,
+                [
+                    'Content-type' => (string) $this->request->contentType
+                ]
+            ))->setProtocolVersion('1.1');
         } catch (Plugin\NotAvailableException $e) {
             throw new Controller\NotFoundException;
         } catch (Exception\AmbiguousPluginCommand $e) {
@@ -111,17 +112,17 @@ class Controller implements Controller\ControllerInterface
     }
 
     /**
-     * @return Response
+     * @return HttpFoundation\Response
      * @throws Controller\NotFoundException
      */
-    public function DELETE()
+    public function delete(): HttpFoundation\Response
     {
         try {
             $this->storage->delete($this->request->id);
         } catch (Storage\NotFoundException $e) {
             throw new Controller\NotFoundException;
         }
-        return self::response(ContentType::json(), '{}');
+        return self::jsonResponse([]);
     }
 
     public function __call($name, $args)
@@ -129,9 +130,13 @@ class Controller implements Controller\ControllerInterface
         throw new Controller\NotFoundException;
     }
 
-    private static function response($contentType, $body, $code = 200)
+    /**
+     * @param $data
+     * @param int $status
+     * @return HttpFoundation\Response
+     */
+    private static function jsonResponse($data, int $status = HttpFoundation\Response::HTTP_OK): HttpFoundation\Response
     {
-        return new Response($contentType, $body, $code);
+        return (new HttpFoundation\JsonResponse($data,$status))->setProtocolVersion('1.1');
     }
-
 }

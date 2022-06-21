@@ -2,13 +2,18 @@
 
 namespace Barberry;
 
+use Barberry\Controller\ControllerInterface;
 use Barberry\Controller\NotFoundException;
 use Barberry\Controller\NullPostException;
+use Barberry\Direction\Factory;
+use Barberry\Exception\ConversionNotPossible;
+use Barberry\Plugin\InterfaceConverter;
 use Barberry\Storage;
 use GuzzleHttp\Psr7\UploadedFile;
 use GuzzleHttp\Psr7\Utils;
 use Mockery as m;
 use org\bovigo\vfs\vfsStream;
+use Symfony\Component\HttpFoundation;
 
 class ControllerTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +21,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
 
     private static $filesystem;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -28,12 +33,12 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         ]);
     }
 
-    public function testDataType()
+    public function testDataType(): void
     {
-        $this->assertInstanceOf('Barberry\Controller\ControllerInterface', self::controller());
+        self::assertInstanceOf(ControllerInterface::class, self::controller());
     }
 
-    public function testGETReadsStorage()
+    public function testGETReadsStorage(): void
     {
         $storage = $this->createMock('Barberry\\Storage\\StorageInterface');
         $storage
@@ -50,55 +55,56 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         self::controller(new Request('/123asd.gif'), $storage)->GET();
     }
 
-    public function testGETReturnsAResponseObject()
+    public function testGETReturnsAResponseObject(): void
     {
-        $this->assertInstanceOf('Barberry\\Response', self::controller()->GET());
+        self::assertInstanceOf(HttpFoundation\Response::class, self::controller()->GET());
     }
 
-    public function testGETResponseContainsCorrectContentType()
+    public function testGETResponseContainsCorrectContentType(): void
     {
         $response = self::controller()->GET();
-        $this->assertEquals(ContentType::gif(), $response->contentType);
+        self::assertEquals('image/gif', $response->headers->get('Content-type'));
     }
 
-    public function testPOSTResponseIsJson()
+    public function testPOSTResponseIsJson(): void
     {
-        $this->assertEquals(
-            ContentType::json(),
-            self::controller(self::binaryRequest())->POST()->contentType
+        self::assertEquals(
+            'application/json',
+            self::controller(self::binaryRequest())->POST()->headers->get('Content-type')
         );
     }
 
-    public function testDELETEResponseIsJson()
+    public function testDELETEResponseIsJson(): void
     {
         $response = self::controller()->DELETE();
-        $this->assertEquals(ContentType::json(), $response->contentType);
+        self::assertEquals('application/json', $response->headers->get('Content-type'));
     }
 
-    public function testPOSTReturnsDocumentInformationAtSavingToStorage()
+    public function testPOSTReturnsDocumentInformationAtSavingToStorage(): void
     {
-        $storage = $this->createMock('Barberry\\Storage\\StorageInterface');
-        $storage->expects($this->once())->method('save')->will($this->returnValue('12345xz'));
+        $storageMock = m::mock(Storage\StorageInterface::class);
+        $storageMock
+            ->shouldReceive('save')
+            ->andReturn('12345xz')
+            ->once();
 
         $this->assertEquals(
-            new Response(
-                ContentType::json(), json_encode(
-                    [
-                        'id'=>'12345xz',
-                        'contentType' => 'text/plain',
-                        'ext' => 'txt',
-                        'length' => 10,
-                        'filename' => 'File.txt',
-                        'md5' => 'ac0f570b0a82fc7d0b08f5098acc1a33'
-                    ]
-                ),
+            (new HttpFoundation\JsonResponse(
+                [
+                    'id'=>'12345xz',
+                    'contentType' => 'text/plain',
+                    'ext' => 'txt',
+                    'length' => 10,
+                    'filename' => 'File.txt',
+                    'md5' => 'ac0f570b0a82fc7d0b08f5098acc1a33'
+                ],
                 201
-            ),
-            self::controller(self::binaryRequest(), $storage)->POST()
+            ))->setProtocolVersion('1.1'),
+            self::controller(self::binaryRequest(), $storageMock)->POST()
         );
     }
 
-    public function testSavesPostedContentToTheStorage()
+    public function testSavesPostedContentToTheStorage(): void
     {
         $storage = m::mock(Storage\StorageInterface::class);
         $storage
@@ -112,63 +118,77 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         $controller->POST();
     }
 
-    public function testThrowsNullPostValueWhenNoContentPosted()
+    public function testThrowsNullPostValueWhenNoContentPosted(): void
     {
         $this->expectException(NullPostException::class);
         self::controller()->POST();
     }
 
-    public function testThrowsNotFoundExceptionWhenUnknownMethodIsCalled()
+    public function testThrowsNotFoundExceptionWhenUnknownMethodIsCalled(): void
     {
         $this->expectException(NotFoundException::class);
         self::controller()->PUT();
     }
 
-    public function testThrowsNotFoundExceptionWhenStorageHasNoRequestedDocument()
+    public function testThrowsNotFoundExceptionWhenStorageHasNoRequestedDocument(): void
     {
-        $storage = $this->createMock('Barberry\\Storage\\StorageInterface');
-        $storage->expects($this->any())->method('getById')
-                ->will($this->throwException(new Storage\NotFoundException('123')));
+        $storageMock = m::mock(Storage\StorageInterface::class);
+        $storageMock
+            ->shouldReceive('getById')
+            ->andThrow(new Storage\NotFoundException('123'));
 
-        $this->expectException('Barberry\\Controller\\NotFoundException');
-        self::controller(null, $storage)->GET();
+        $this->expectException(NotFoundException::class);
+        self::controller(null, $storageMock)->GET();
     }
 
-    public function testSuccessfullPOSTReturns201CreatedCode()
+    public function testSuccessfulPOSTReturns201CreatedCode(): void
     {
-        $this->assertEquals(201, self::controller(self::binaryRequest())->POST()->code);
-    }
-
-    public function testDeleteMethodQueriesStorage()
-    {
-        $storage = $this->createMock('Barberry\\Storage\\StorageInterface');
-        $storage->expects($this->once())->method('delete')->with('124234');
-
-        self::controller(new Request('/124234'), $storage)->DELETE();
-    }
-
-    public function testCanDetectOutputContentTypeByContentsOfStorage()
-    {
-        $this->assertEquals(
-            new Response(ContentType::txt(), '123'),
-            self::controller(
-                new Request('/11'),
-                m::mock('Barberry\\Storage\\StorageInterface', array('getById' => '123', 'getContentTypeById' => ContentType::txt()))
-            )->GET()
+        self::assertEquals(
+            201,
+            self::controller(self::binaryRequest())->POST()->getStatusCode()
         );
     }
 
-    public function testConversionNotPossibleExceptionCauses404NotFound()
+    public function testDeleteMethodQueriesStorage(): void
     {
-        $plugin = m::mock('Barberry\\Plugin\\InterfaceConverter');
-        $plugin->shouldReceive('convert')->andThrow('Barberry\\Exception\\ConversionNotPossible');
+        $storageMock = m::mock(Storage\StorageInterface::class);
+        $storageMock
+            ->shouldReceive('delete')
+            ->with('124234')
+            ->once();
 
-        $directionFactory = m::mock(
-            'Barberry\\Direction\\Factory',
-            array('direction' => $plugin)
+        self::controller(new Request('/124234'), $storageMock)->DELETE();
+    }
+
+    public function testCanDetectOutputContentTypeByContentsOfStorage(): void
+    {
+        $storageMock = m::mock(Storage\StorageInterface::class, [
+            'getById' => '123',
+            'getContentTypeById' => ContentType::txt()
+        ]);
+
+        $expectedResponse = (new HttpFoundation\Response(
+            '123',
+            200,
+            ['Content-type' => ContentType::txt()])
+        )->setProtocolVersion('1.1');
+
+        self::assertEquals(
+            $expectedResponse,
+            self::controller(new Request('/11'), $storageMock)->GET()
         );
+    }
 
-        $this->expectException('Barberry\\Controller\\NotFoundException');
+    public function testConversionNotPossibleExceptionCauses404NotFound(): void
+    {
+        $plugin = m::mock(InterfaceConverter::class);
+        $plugin
+            ->shouldReceive('convert')
+            ->andThrow(ConversionNotPossible::class);
+
+        $directionFactory = m::mock(Factory::class, ['direction' => $plugin]);
+
+        $this->expectException(NotFoundException::class);
         self::controller(null, null, $directionFactory)->GET();
     }
 
@@ -176,7 +196,8 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         Request $request = null,
         Storage\StorageInterface $storage = null,
         Direction\Factory $directionFactory = null
-    ) {
+    ): Controller
+    {
         return new Controller(
             $request ?: new Request('/1.gif'),
             $storage ?: m::mock(
@@ -191,7 +212,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    private static function binaryRequest()
+    private static function binaryRequest(): Request
     {
         return new Request(
             '/',
