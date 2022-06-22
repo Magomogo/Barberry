@@ -22,13 +22,15 @@ class Application
      */
     public function run(): HttpFoundation\Response
     {
-        $controller = new Controller($this->resources->request(), $this->resources->storage(), new Direction\Factory());
+        $controller = new Controller(
+            $this->resources->request(),
+            $this->resources->storage(),
+            $this->resources->cache(),
+            new Direction\Factory()
+        );
 
         try {
-            $response = $controller->{strtolower($_SERVER['REQUEST_METHOD'])}();
-            $this->invokeCache($response);
-
-            return $response;
+            return $controller->{strtolower($_SERVER['REQUEST_METHOD'])}();
         } catch (Controller\NotFoundException $e) {
 
             return self::jsonResponse([], HttpFoundation\Response::HTTP_NOT_FOUND);
@@ -45,19 +47,10 @@ class Application
         }
     }
 
-    private function invokeCache(Response $response)
-    {
-        if('GET' == strtoupper($_SERVER['REQUEST_METHOD'])) {
-            $this->resources->cache()->save($response->body, $this->resources->request());
-        } elseif('DELETE' == strtoupper($_SERVER['REQUEST_METHOD'])) {
-            $this->resources->cache()->invalidate($this->resources->request()->id);
-        }
-    }
-
     /**
      * @return Resources
      */
-    public function resources()
+    public function resources(): Resources
     {
         return $this->resources;
     }

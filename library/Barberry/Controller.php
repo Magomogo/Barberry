@@ -20,6 +20,11 @@ class Controller implements Controller\ControllerInterface
     private $storage;
 
     /**
+     * @var Cache
+     */
+    private $cache;
+
+    /**
      * @var Request
      */
     private $request;
@@ -27,12 +32,18 @@ class Controller implements Controller\ControllerInterface
     /**
      * @param Request $request
      * @param Storage\StorageInterface $storage
+     * @param Cache $cache
      * @param Direction\Factory $directionFactory
      */
-    public function __construct(Request $request, Storage\StorageInterface $storage, Direction\Factory $directionFactory)
-    {
+    public function __construct(
+        Request $request,
+        Storage\StorageInterface $storage,
+        Cache $cache,
+        Direction\Factory $directionFactory
+    ) {
         $this->request = $request;
         $this->storage = $storage;
+        $this->cache = $cache;
         $this->directionFactory = $directionFactory;
     }
 
@@ -76,6 +87,7 @@ class Controller implements Controller\ControllerInterface
      * @return HttpFoundation\Response
      * @throws Controller\NotFoundException
      * @throws ContentType\Exception
+     * @throws Cache\Exception
      */
     public function get(): HttpFoundation\Response
     {
@@ -99,6 +111,8 @@ class Controller implements Controller\ControllerInterface
             );
 
             if ($direction instanceof NullPlugin) {
+                $this->cache->save($stream, $this->request);
+
                 return (new HttpFoundation\StreamedResponse(
                     static function() use ($stream) {
                         $stream->rewind();
@@ -114,8 +128,11 @@ class Controller implements Controller\ControllerInterface
                 ))->setProtocolVersion('1.1');
             }
 
+            $content = $direction->convert($stream->getContents());
+            $this->cache->save($content, $this->request);
+
             return (new HttpFoundation\Response(
-                $direction->convert($stream->getContents()),
+                $content,
                 HttpFoundation\Response::HTTP_OK,
                 [
                     'Content-type' => (string) $this->request->contentType
@@ -138,6 +155,7 @@ class Controller implements Controller\ControllerInterface
     {
         try {
             $this->storage->delete($this->request->id);
+            $this->cache->invalidate($this->request->id);
         } catch (Storage\NotFoundException $e) {
             throw new Controller\NotFoundException;
         }

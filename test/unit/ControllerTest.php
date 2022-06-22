@@ -38,7 +38,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         self::assertInstanceOf(ControllerInterface::class, self::controller());
     }
 
-    public function testGETReadsStorage(): void
+    public function testGetReadsStorage(): void
     {
         $storage = $this->createMock('Barberry\\Storage\\StorageInterface');
         $storage
@@ -52,35 +52,54 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
             ->method('getContentTypeById')
             ->willReturn(ContentType::gif());
 
-        self::controller(new Request('/123asd.gif'), $storage)->GET();
+        self::controller(new Request('/123asd.gif'), $storage)->get();
     }
 
-    public function testGETReturnsAResponseObject(): void
+    public function testGetReturnsAResponseObject(): void
     {
-        self::assertInstanceOf(HttpFoundation\Response::class, self::controller()->GET());
+        self::assertInstanceOf(HttpFoundation\Response::class, self::controller()->get());
     }
 
     public function testGETResponseContainsCorrectContentType(): void
     {
-        $response = self::controller()->GET();
+        $response = self::controller()->get();
         self::assertEquals('image/gif', $response->headers->get('Content-type'));
+    }
+
+    public function testSaveIntoCacheOnGetRequest(): void
+    {
+        $request = new Request('/124234');
+
+        $cacheMock = m::mock(Cache::class);
+        $cacheMock
+            ->shouldReceive('save')
+            ->with(
+                m::on(function($stream) {
+                    self::assertEquals('GIF image', (string) $stream);
+                    return true;
+                }),
+                $request
+            )
+            ->once();
+
+        self::controller($request, null, $cacheMock)->get();
     }
 
     public function testPOSTResponseIsJson(): void
     {
         self::assertEquals(
             'application/json',
-            self::controller(self::binaryRequest())->POST()->headers->get('Content-type')
+            self::controller(self::binaryRequest())->post()->headers->get('Content-type')
         );
     }
 
-    public function testDELETEResponseIsJson(): void
+    public function testDeleteResponseIsJson(): void
     {
-        $response = self::controller()->DELETE();
+        $response = self::controller()->delete();
         self::assertEquals('application/json', $response->headers->get('Content-type'));
     }
 
-    public function testPOSTReturnsDocumentInformationAtSavingToStorage(): void
+    public function testPostReturnsDocumentInformationAtSavingToStorage(): void
     {
         $storageMock = m::mock(Storage\StorageInterface::class);
         $storageMock
@@ -100,7 +119,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
                 ],
                 201
             ))->setProtocolVersion('1.1'),
-            self::controller(self::binaryRequest(), $storageMock)->POST()
+            self::controller(self::binaryRequest(), $storageMock)->post()
         );
     }
 
@@ -115,19 +134,19 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
             ->once();
 
         $controller = self::controller(self::binaryRequest(), $storage);
-        $controller->POST();
+        $controller->post();
     }
 
     public function testThrowsNullPostValueWhenNoContentPosted(): void
     {
         $this->expectException(NullPostException::class);
-        self::controller()->POST();
+        self::controller()->post();
     }
 
     public function testThrowsNotFoundExceptionWhenUnknownMethodIsCalled(): void
     {
         $this->expectException(NotFoundException::class);
-        self::controller()->PUT();
+        self::controller()->put();
     }
 
     public function testThrowsNotFoundExceptionWhenStorageHasNoRequestedDocument(): void
@@ -138,14 +157,14 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
             ->andThrow(new Storage\NotFoundException('123'));
 
         $this->expectException(NotFoundException::class);
-        self::controller(null, $storageMock)->GET();
+        self::controller(null, $storageMock)->get();
     }
 
     public function testSuccessfulPOSTReturns201CreatedCode(): void
     {
         self::assertEquals(
             201,
-            self::controller(self::binaryRequest())->POST()->getStatusCode()
+            self::controller(self::binaryRequest())->post()->getStatusCode()
         );
     }
 
@@ -157,7 +176,18 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
             ->with('124234')
             ->once();
 
-        self::controller(new Request('/124234'), $storageMock)->DELETE();
+        self::controller(new Request('/124234'), $storageMock)->delete();
+    }
+
+    public function testDeleteMethodInvalidatesCache(): void
+    {
+        $cacheMock = m::mock(Cache::class);
+        $cacheMock
+            ->shouldReceive('invalidate')
+            ->with('124234')
+            ->once();
+
+        self::controller(new Request('/124234'), null, $cacheMock)->delete();
     }
 
     public function testCanDetectOutputContentTypeByContentsOfStorage(): void
@@ -203,7 +233,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
 
         $directionFactory = m::mock(Factory::class, ['direction' => $plugin]);
 
-        self::controller(null, $storageMock, $directionFactory)->get();
+        self::controller(null, $storageMock, null, $directionFactory)->get();
     }
 
     public function testConversionNotPossibleExceptionCauses404NotFound(): void
@@ -216,12 +246,13 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
         $directionFactory = m::mock(Factory::class, ['direction' => $plugin]);
 
         $this->expectException(NotFoundException::class);
-        self::controller(null, null, $directionFactory)->GET();
+        self::controller(null, null, null, $directionFactory)->get();
     }
 
     private static function controller(
         Request $request = null,
         Storage\StorageInterface $storage = null,
+        Cache $cache = null,
         Direction\Factory $directionFactory = null
     ): Controller
     {
@@ -235,6 +266,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
                     'save' => null,'delete' => null
                 ]
             ),
+            $cache ?: m::mock(Cache::class, ['save' => true, 'invalidate' => true]),
             $directionFactory ?: m::mock(Factory::class, ['direction' => new Plugin\NullPlugin])
         );
     }
