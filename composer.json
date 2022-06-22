@@ -10,7 +10,7 @@
         ]
     },
     "require": {
-        "php": "^7.2",
+        "php": ">=7.3",
         "ext-json": "*",
         "barberry/interfaces": "^2.5",
         "guzzlehttp/psr7": "^2.3",
