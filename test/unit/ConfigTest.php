@@ -6,9 +6,9 @@ use PHPUnit\Framework\TestCase;
 
 class ConfigTest extends TestCase
 {
-    public function testOptionsCanBeOverriden()
+    public function testOptionsCanBeOverriden(): void
     {
         $config = new Config(__DIR__, '/test_config.php');
-        $this->assertEquals('/usr/another/storage', $config->directoryStorage);
+        self::assertEquals('/usr/another/storage', $config->directoryStorage);
     }
 }

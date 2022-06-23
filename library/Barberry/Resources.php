@@ -75,8 +75,6 @@ class Resources
         );
     }
 
-//--------------------------------------------------------------------------------------------------
-
     private function getResource($name, $initCallback)
     {
         if (!array_key_exists($name, $this->initializedResources)) {

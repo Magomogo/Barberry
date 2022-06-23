@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class PostedDataProcessorTest extends TestCase
 {
-    public function testCallsFilterInterfaceSpecifiedInConstructor()
+    public function testCallsFilterInterfaceSpecifiedInConstructor(): void
     {
         $postVars = ['var' => 'test val'];
 
@@ -30,13 +30,13 @@ class PostedDataProcessorTest extends TestCase
             ->once();
 
         $processor = new PostedDataProcessor($filterMock);
-        $this->assertEquals(
+        self::assertEquals(
             'test content',
             $processor->process([], $postVars)->uploadedFile->getStream()->getContents()
         );
     }
 
-    public function testReturnsFirstPostedFileFromCollection()
+    public function testReturnsFirstPostedFileFromCollection(): void
     {
         $mock = $this->getMockBuilder('Barberry\\PostedDataProcessor')
             ->setMethods(['createCollection'])
@@ -46,24 +46,22 @@ class PostedDataProcessorTest extends TestCase
         $mock->expects($this->once())
             ->method('createCollection')
             ->with(array('files'))
-            ->will(
-                $this->returnValue(
-                    new PostedFile\Collection(
-                        array(
-                            'file' => new PostedFile(
-                                new UploadedFile(Utils::streamFor('some'), 10, UPLOAD_ERR_OK, 'Name of a file.txt'),
-                                '/tmp/asD6yhq'
-                            ),
-                            'image' => new PostedFile(
-                                new UploadedFile(Utils::streamFor('GIF binary'), 10, UPLOAD_ERR_OK, 'test.gif'),
-                                '/tmp/zAq8ugi'
-                            )
+            ->willReturn(
+                new PostedFile\Collection(
+                    array(
+                        'file' => new PostedFile(
+                            new UploadedFile(Utils::streamFor('some'), 10, UPLOAD_ERR_OK, 'Name of a file.txt'),
+                            '/tmp/asD6yhq'
+                        ),
+                        'image' => new PostedFile(
+                            new UploadedFile(Utils::streamFor('GIF binary'), 10, UPLOAD_ERR_OK, 'test.gif'),
+                            '/tmp/zAq8ugi'
                         )
                     )
                 )
             );
 
-        $this->assertEquals(
+        self::assertEquals(
             'Name of a file.txt',
             $mock->process(['files'])->uploadedFile->getClientFilename()
         );

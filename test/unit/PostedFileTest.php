@@ -8,15 +8,15 @@ use PHPUnit\Framework\TestCase;
 
 class PostedFileTest extends TestCase
 {
-    public function testProvidesAccessToFileProperties()
+    public function testProvidesAccessToFileProperties(): void
     {
         $postedFile = new PostedFile(
             new UploadedFile(Utils::streamFor('GIF image'), 10, UPLOAD_ERR_OK, 'image.gif'),
             '/tmp/asD6yhq'
         );
 
-        $this->assertEquals('GIF image', $postedFile->uploadedFile->getStream()->getContents());
-        $this->assertEquals('/tmp/asD6yhq', $postedFile->tmpName);
-        $this->assertEquals('image.gif', $postedFile->uploadedFile->getClientFilename());
+        self::assertEquals('GIF image', $postedFile->uploadedFile->getStream()->getContents());
+        self::assertEquals('/tmp/asD6yhq', $postedFile->tmpName);
+        self::assertEquals('image.gif', $postedFile->uploadedFile->getClientFilename());
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Barberry\Filter;
 
+use Barberry\PostedFile;
 use Barberry\PostedFile\Collection;
 use GuzzleHttp\Psr7\UploadedFile;
 use GuzzleHttp\Psr7\Utils;
@@ -10,12 +11,12 @@ use PHPUnit\Framework\TestCase;
 class FilterCompositeTest extends TestCase
 {
 
-    public function testImplementsFilterInterface()
+    public function testImplementsFilterInterface(): void
     {
-        $this->assertInstanceOf(FilterInterface::class, $this->c());
+        self::assertInstanceOf(FilterInterface::class, $this->c());
     }
 
-    public function testCallsAssignedFilter()
+    public function testCallsAssignedFilter(): void
     {
         $files = new Collection();
         $files['file'] = self::postedFile();
@@ -24,9 +25,9 @@ class FilterCompositeTest extends TestCase
         $this->c($filterMock)->filter($files, array('vars'));
     }
 
-    public function testCallsAllFilters()
+    public function testCallsAllFilters(): void
     {
-        $vars = array('vars');
+        $vars = ['vars'];
 
         $files = new Collection();
         $files['file'] = self::postedFile();
@@ -61,18 +62,17 @@ class FilterCompositeTest extends TestCase
         $w = $f->expects($this->once())->method('filter')->with($expectedFiles, $expectedVars);
 
         if (is_callable($callback)) {
-            $w->will($this->returnCallback($callback));
+            $w->willReturnCallback($callback);
         }
 
         return $f;
     }
 
-    private static function postedFile()
+    private static function postedFile(): PostedFile
     {
-        return new \Barberry\PostedFile(
+        return new PostedFile(
             new UploadedFile(Utils::streamFor('some text'), 10, UPLOAD_ERR_OK, 'test_name.txt'),
             '/tmp/asD6yhq'
         );
     }
-
 }

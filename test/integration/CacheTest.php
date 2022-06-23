@@ -21,7 +21,7 @@ class CacheIntegrationTest extends TestCase
         exec('rm -rf ' . $this->cache_path);
     }
 
-    public function testIsContentSavedInFileSystem()
+    public function testIsContentSavedInFileSystem(): void
     {
         $this->cache()->save(
             Test\Data::gif1x1(),
@@ -30,10 +30,10 @@ class CacheIntegrationTest extends TestCase
 
         $expectedPath = $this->cache_path . '/7y/U9/8s/7yU98sd/7yU98sd_1x1.gif';
 
-        $this->assertEquals(file_get_contents($expectedPath), Test\Data::gif1x1());
+        self::assertStringEqualsFile($expectedPath, Test\Data::gif1x1());
     }
 
-    public function testIsContentSavedInFileSystemInGroupDirectory()
+    public function testIsContentSavedInFileSystemInGroupDirectory(): void
     {
         $this->cache()->save(
             Test\Data::gif1x1(),
@@ -42,10 +42,10 @@ class CacheIntegrationTest extends TestCase
 
         $expectedPath = $this->cache_path . '/7y/U9/8s/adm/7yU98sd/7yU98sd_1x1.gif';
 
-        $this->assertEquals(file_get_contents($expectedPath), Test\Data::gif1x1());
+        self::assertStringEqualsFile($expectedPath, Test\Data::gif1x1());
     }
 
-    public function testInvalidateRemovesCachedContent()
+    public function testInvalidateRemovesCachedContent(): void
     {
         $this->cache()->save(
             Test\Data::gif1x1(),
@@ -54,10 +54,10 @@ class CacheIntegrationTest extends TestCase
 
         $this->cache()->invalidate('7yU98sd');
 
-        $this->assertFalse(is_dir($this->cache_path . '/7y/U9/8s/7yU98sd'));
+        self::assertDirectoryDoesNotExist($this->cache_path . '/7y/U9/8s/7yU98sd');
     }
 
-    private function cache()
+    private function cache(): Cache
     {
         return new Cache($this->cache_path);
     }

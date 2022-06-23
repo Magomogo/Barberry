@@ -1,4 +1,5 @@
 <?php
+
 namespace Barberry\Storage;
 
 use Barberry\nonlinear;
@@ -25,70 +26,71 @@ class FileTest extends TestCase
         fs\rmDirRecursive($this->storage_path);
     }
 
-    public function testIsFileSavedInFileSystem()
+    public function testIsFileSavedInFileSystem(): void
     {
         $id = $this->storage()->save(
             new UploadedFile(Utils::tryFopen(__DIR__ . '/../data/1x1.gif', 'r'), 43, UPLOAD_ERR_OK)
         );
         $content = $this->storage()->getById($id);
 
-        $this->assertEquals(Test\Data::gif1x1(), $content);
+        self::assertEquals(Test\Data::gif1x1(), $content);
     }
 
-    public function testIsFileSavedInNonLinearStructure()
+    public function testIsFileSavedInNonLinearStructure(): void
     {
         $id = $this->storage()->save(
             new UploadedFile(Utils::tryFopen(__DIR__ . '/../data/1x1.gif', 'r'), 43, UPLOAD_ERR_OK)
         );
 
         $path = $this->storage_path . nonlinear\generateDestination($id);
-        $this->assertCount(5, array_filter(explode(DIRECTORY_SEPARATOR, $path), function($item) { return !empty($item); }));
+        self::assertCount(5, array_filter(explode(DIRECTORY_SEPARATOR, $path), function($item) { return !empty($item); }));
 
         $content = file_get_contents($path . $id);
-        $this->assertEquals($content, $this->storage()->getById($id));
+        self::assertEquals($content, $this->storage()->getById($id));
 
     }
 
-    public function testReadLinearFile()
+    public function testReadLinearFile(): void
     {
         $file = tempnam($this->storage_path, '');
         file_put_contents($file, Test\Data::gif1x1());
 
         $content = $this->storage()->getById(basename($file));
-        $this->assertEquals(Test\Data::gif1x1(), $content);
+        self::assertEquals(Test\Data::gif1x1(), $content);
     }
 
-    public function testIsFileReturnById()
+    public function testIsFileReturnById(): void
     {
         $id = $this->storage()->save(
             new UploadedFile(Utils::tryFopen(__DIR__ . '/../data/1x1.gif', 'r'), 43, UPLOAD_ERR_OK)
         );
-        $this->assertEquals($this->storage()->getById($id), Test\Data::gif1x1());
+        self::assertEquals($this->storage()->getById($id), Test\Data::gif1x1());
     }
 
-    public function testIsFileDeletedById()
+    public function testIsFileDeletedById(): void
     {
         $id = $this->storage()->save(
             new UploadedFile(Utils::tryFopen(__DIR__ . '/../data/1x1.gif', 'r'), 43, UPLOAD_ERR_OK)
         );
         $expectedPath = $this->storage_path.$id;
         $this->storage()->delete($id);
-        $this->assertFalse(file_exists($expectedPath));
+
+        self::assertFileDoesNotExist($expectedPath);
     }
 
-    public function testNotFoundException()
+    public function testNotFoundException(): void
     {
         $this->expectException(NotFoundException::class);
         $this->storage()->getById('not-existing-id');
     }
 
-    public function testGetByIdTestsForFileExistance()
+    public function testGetByIdTestsForFileExistance(): void
     {
         $this->expectException(NotFoundException::class);
         $this->storage()->getById('/');
     }
 
-    private function storage($path = null)
+    private function storage($path = null): File
     {
         return new File($path ?: $this->storage_path);
     }
