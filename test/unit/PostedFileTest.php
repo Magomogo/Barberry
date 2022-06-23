@@ -4,8 +4,9 @@ namespace Barberry;
 
 use GuzzleHttp\Psr7\UploadedFile;
 use GuzzleHttp\Psr7\Utils;
+use PHPUnit\Framework\TestCase;
 
-class PostedFileTest extends \PHPUnit_Framework_TestCase
+class PostedFileTest extends TestCase
 {
     public function testProvidesAccessToFileProperties()
     {

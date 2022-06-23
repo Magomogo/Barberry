@@ -1,9 +1,12 @@
 <?php
+
 namespace Barberry\Plugin;
+
 use Barberry\Test;
+use PHPUnit\Framework\TestCase;
 
-class NullTest extends \PHPUnit_Framework_TestCase {
-
+class NullTest extends TestCase
+{
     public function testDataType() {
         $this->assertInstanceOf('Barberry\\Plugin\\InterfaceConverter', new NullPlugin());
     }

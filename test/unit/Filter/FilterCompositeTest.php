@@ -5,8 +5,9 @@ namespace Barberry\Filter;
 use Barberry\PostedFile\Collection;
 use GuzzleHttp\Psr7\UploadedFile;
 use GuzzleHttp\Psr7\Utils;
+use PHPUnit\Framework\TestCase;
 
-class FilterCompositeTest extends \PHPUnit_Framework_TestCase
+class FilterCompositeTest extends TestCase
 {
 
     public function testImplementsFilterInterface()

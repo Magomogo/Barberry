@@ -5,8 +5,9 @@ namespace Barberry;
 use GuzzleHttp\Psr7\Utils;
 use Mockery as m;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\TestCase;
 
-class CacheTest extends \PHPUnit_Framework_TestCase
+class CacheTest extends TestCase
 {
     use m\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
@@ -28,18 +29,10 @@ class CacheTest extends \PHPUnit_Framework_TestCase
      */
     public function testConvertsUriToFilePath(string $uri, string $expectedPath): void
     {
-        $cache = $this->getMockBuilder(Cache::class)
-            ->setMethods(['writeToFilesystem'])
-            ->enableOriginalConstructor()
-            ->setConstructorArgs([self::$filesystem->url() . '/cache'])
-            ->getMock();
-
-        $cache
-            ->expects($this->any())
-            ->method('writeToFilesystem')
-            ->with('123', $expectedPath);
-
+        $cache = new Cache(self::$filesystem->url() . '/cache');
         $cache->save('123', new Request($uri));
+
+        self::assertFileExists(self::$filesystem->url() . '/cache' . $expectedPath);
     }
 
     public function testStreamDataCanBeSaved(): void

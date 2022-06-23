@@ -1,21 +1,16 @@
 <phpunit backupGlobals="false"
          backupStaticAttributes="false"
          bootstrap="vendor/autoload.php"
-         cacheTokens="true"
          colors="true"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          forceCoversAnnotation="false"
-         mapTestClassNameToCoveredClassName="false"
-         printerClass="PHPUnit_TextUI_ResultPrinter"
          processIsolation="false"
          stopOnError="true"
          stopOnFailure="true"
          stopOnIncomplete="false"
          stopOnSkipped="false"
-         testSuiteLoaderClass="PHPUnit_Runner_StandardTestSuiteLoader"
-         strict="false"
          verbose="false">
 
     <php>
@@ -23,7 +18,7 @@
     </php>
 
     <testsuites>
-        <testsuite>
+        <testsuite name="Tests">
             <directory>test</directory>
         </testsuite>
     </testsuites>

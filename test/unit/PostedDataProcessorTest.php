@@ -7,8 +7,9 @@ use Barberry\PostedFile\Collection;
 use GuzzleHttp\Psr7\UploadedFile;
 use GuzzleHttp\Psr7\Utils;
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class PostedDataProcessorTest extends \PHPUnit_Framework_TestCase
+class PostedDataProcessorTest extends TestCase
 {
     public function testCallsFilterInterfaceSpecifiedInConstructor()
     {

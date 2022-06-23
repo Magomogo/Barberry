@@ -6,12 +6,13 @@ use Barberry\Test;
 use GuzzleHttp\Psr7\UploadedFile;
 use GuzzleHttp\Psr7\Utils;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\TestCase;
 
-class CollectionTest extends \PHPUnit_Framework_TestCase
+class CollectionTest extends TestCase
 {
     private static $filesystem;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -26,8 +27,8 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     public function testImplementsIteratorAndArrayAccessInterfaces()
     {
         $collection = new Collection([]);
-        $this->assertInstanceOf('\\Iterator', $collection);
-        $this->assertInstanceOf('\\ArrayAccess', $collection);
+        $this->assertInstanceOf(\Iterator::class, $collection);
+        $this->assertInstanceOf(\ArrayAccess::class, $collection);
     }
 
     public function testCanBeIteratedThrowFiles()
@@ -57,7 +58,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testThrowsExceptionOnSetWrongPostedFile()
     {
-        $this->setExpectedException('Barberry\\PostedFile\\CollectionException', 'Wrong type, should be PostedFile');
+        $this->expectException(CollectionException::class);
         $collection = $this->partiallyMockedCollection();
         $collection['file'] = new \stdClass();
     }
@@ -109,6 +110,8 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         foreach ($collection as $v) {
             $this->fail('Should not contain any files');
         }
+
+        self::assertNull($collection[0]);
     }
 
     public function testCanBeCreatedWithPostedFilesInConstructor()

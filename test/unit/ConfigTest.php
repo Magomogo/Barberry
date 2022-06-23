@@ -1,9 +1,13 @@
 <?php
+
 namespace Barberry;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
 
-    public function testOptionsCanBeOverriden() {
+class ConfigTest extends TestCase
+{
+    public function testOptionsCanBeOverriden()
+    {
         $config = new Config(__DIR__, '/test_config.php');
         $this->assertEquals('/usr/another/storage', $config->directoryStorage);
     }

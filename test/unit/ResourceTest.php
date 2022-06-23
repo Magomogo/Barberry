@@ -1,8 +1,10 @@
 <?php
 namespace Barberry;
 use Barberry\Filter;
+use PHPUnit\Framework\TestCase;
 
-class ResourcesTest extends \PHPUnit_Framework_TestCase {
+class ResourcesTest extends TestCase
+{
 
     public function testCache() {
         $this->assertInstanceOf('Barberry\\Cache', self::r()->cache());

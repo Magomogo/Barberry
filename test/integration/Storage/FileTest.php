@@ -6,12 +6,13 @@ use Barberry\Test;
 use Barberry\fs;
 use GuzzleHttp\Psr7\UploadedFile;
 use GuzzleHttp\Psr7\Utils;
+use PHPUnit\Framework\TestCase;
 
-class FileTest extends \PHPUnit_Framework_TestCase
+class FileTest extends TestCase
 {
     private $storage_path;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->storage_path = '/tmp/testStorage/';
         if (!is_dir($this->storage_path)) {
@@ -19,7 +20,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         fs\rmDirRecursive($this->storage_path);
     }
@@ -77,13 +78,13 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     public function testNotFoundException()
     {
-        $this->setExpectedException('Barberry\\Storage\\NotFoundException');
+        $this->expectException(NotFoundException::class);
         $this->storage()->getById('not-existing-id');
     }
 
     public function testGetByIdTestsForFileExistance()
     {
-        $this->setExpectedException('Barberry\\Storage\\NotFoundException');
+        $this->expectException(NotFoundException::class);
         $this->storage()->getById('/');
     }
 

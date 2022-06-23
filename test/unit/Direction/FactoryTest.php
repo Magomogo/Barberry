@@ -1,9 +1,13 @@
 <?php
-namespace Barberry\Direction;
-use Barberry\ContentType;
-use Barberry\Plugin;
 
-class FactoryTest extends \PHPUnit_Framework_TestCase {
+namespace Barberry\Direction;
+
+use Barberry\ContentType;
+use Barberry\Plugin\NotAvailableException;
+use PHPUnit\Framework\TestCase;
+
+class FactoryTest extends TestCase
+{
 
     public function testDetectsDirectionClassName() {
         $this->assertInstanceOf(
@@ -13,7 +17,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testThrowExceptionWhenDirectionIsNotAvailable() {
-        $this->setExpectedException('Barberry\Plugin\NotAvailableException', 'text/x-php to image/jpeg');
+        $this->expectException(NotAvailableException::class);
         self::factory()->direction(ContentType::byExtention('php'), ContentType::byExtention('jpeg'));
     }
 
@@ -25,7 +29,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testSameSourceAndDestinationWithCommandRequiresPlugin() {
-        $this->setExpectedException('Barberry\Plugin\NotAvailableException');
+        $this->expectException(NotAvailableException::class);
         self::factory()->direction(ContentType::byExtention('php'), ContentType::byExtention('php'), '12');
     }
 
