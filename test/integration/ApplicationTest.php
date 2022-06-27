@@ -1,32 +1,39 @@
 <?php
+
 namespace Barberry;
 
-class ApplicationTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation;
+
+class ApplicationTest extends TestCase
 {
+    public function testCanRun(): void
+    {
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/Asd98';
 
-    public function testCanRun()
+        $app = new Application(new Config(__DIR__));
+        $response = $app->run();
+
+        self::assertInstanceOf(HttpFoundation\Response::class, $response);
+        self::assertEquals('application/json', $response->headers->get('Content-type'));
+    }
+
+    public function testCanGetResources(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
 
-        $a = new Application(new Config(__DIR__));
-        $this->assertInstanceOf('Barberry\\Response', $a->run());
+        $app = new Application(new Config(__DIR__));
+        self::assertInstanceOf(Resources::class, $app->resources());
     }
 
-    public function testCanGetResources()
-    {
-        $_SERVER['REQUEST_METHOD'] = 'GET';
-
-        $a = new Application(new Config(__DIR__));
-        $this->assertInstanceOf('Barberry\\Resources', $a->resources());
-    }
-
-    public function testNullPostCaused400BadRequest()
+    public function testNullPostCaused400BadRequest(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $a = new Application(new Config(__DIR__));
+        $app = new Application(new Config(__DIR__));
 
-        $response = $a->run();
+        $response = $app->run();
 
-        $this->assertSame(400, $response->code);
+        self::assertSame(400, $response->getStatusCode());
     }
 }

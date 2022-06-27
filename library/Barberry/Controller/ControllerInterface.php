@@ -1,8 +1,14 @@
 <?php
+
 namespace Barberry\Controller;
 
-interface ControllerInterface {
-    public function GET();
-    public function POST();
-    public function DELETE();
+use Symfony\Component\HttpFoundation;
+
+interface ControllerInterface
+{
+    public function get(): HttpFoundation\Response;
+
+    public function post(): HttpFoundation\Response;
+
+    public function delete(): HttpFoundation\Response;
 }

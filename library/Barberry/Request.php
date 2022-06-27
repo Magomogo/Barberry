@@ -1,120 +1,99 @@
 <?php
+
 namespace Barberry;
-use Barberry\ContentType;
 
 /**
  * @property-read string $originalBasename
  * @property-read string $id
  * @property-read null|ContentType $contentType
  * @property-read null|string $group
- * @property-read null|string $bin
- * @property-read null|string $tmpName
- * @property-read null|string $postedFilename
- * @property-read null|string $postedMd5
  * @property-read null|string $commandString
+ * @property-read PostedFile|null $postedFile
  */
-class Request {
-
-    private $_originalBasename;
+class Request
+{
+    private $originalBasename;
 
     /**
      * @var null|string
      */
-    private $_group;
+    private $group;
 
     /**
      * @var string
      */
-    private $_id;
+    private $id;
 
     /**
      * @var null|ContentType
      */
-    private $_contentType;
+    private $contentType;
 
     /**
      * @var null|string
      */
-    private $_bin;
+    private $commandString;
 
     /**
-     * @var null|string
+     * @var PostedFile|null
      */
-    private $_tmpName;
+    private $postedFile;
 
-    /**
-     * @var null|string
-     */
-    private $_postedFilename;
-
-    /**
-     * @var string
-     */
-    private $_postedMd5;
-
-    /**
-     * @var null|string
-     */
-    private $_commandString;
-
-    public function __construct($uri, PostedFile $postedFile = null) {
+    public function __construct($uri, PostedFile $postedFile = null)
+    {
         $this->parseUri($uri);
-        $this->keepPost($postedFile);
-        $this->_originalBasename =
-            trim($this->_group ? substr($uri, strlen($this->_group) + 1) : $uri, '/');
+        $this->postedFile = $postedFile;
     }
 
-    public function defineContentType(ContentType $c) {
-        $this->_contentType = $c;
+    public function defineContentType(ContentType $c)
+    {
+        $this->contentType = $c;
     }
 
-    public function __get($property) {
-        if (property_exists($this, '_' . $property)) {
-            return $this->{'_' . $property};
+    public function __get($property)
+    {
+        if (property_exists($this, $property)) {
+            return $this->{$property};
         }
         trigger_error('Undefined property via __get(): ' . $property, E_USER_NOTICE);
         return null;
     }
 
-//--------------------------------------------------------------------------------------------------
-
-    private function keepPost(PostedFile $postedFile = null) {
-        if (!is_null($postedFile)) {
-            $this->_bin = $postedFile->bin;
-            $this->_tmpName = $postedFile->tmpName;
-            $this->_postedFilename = $postedFile->filename;
-            $this->_postedMd5 = $postedFile->md5;
-        }
-    }
-
-    private function parseUri($uri) {
+    private function parseUri($uri)
+    {
         $parts = array_values(array_filter(explode('/', $uri)));
         switch (1) {
             case (count($parts) == 2) && preg_match('@^[a-z]{3}$@i', $parts[0]):
-                $this->_group = array_shift($parts);
+                $this->group = array_shift($parts);
             // TRICKY: no break.
             case count($parts) == 1:
-                $this->_id = self::extractId($parts[0]);
-                $this->_commandString = self::extractCommandString($parts[0]);
-                $this->_contentType = self::extractOutputContentType($parts[0]);
+                $this->id = self::extractId($parts[0]);
+                $this->commandString = self::extractCommandString($parts[0]);
+                $this->contentType = self::extractOutputContentType($parts[0]);
         }
+
+        $this->originalBasename =
+            trim($this->group ? substr($uri, strlen($this->group) + 1) : $uri, '/');
     }
 
-    private static function extractId($part) {
+    private static function extractId($part)
+    {
         if (preg_match('@^([0-9a-z]+)[_\.]?@i', $part, $regs)) {
             return $regs[1];
         }
         return null;
     }
 
-    private static function extractCommandString($uri) {
+    private static function extractCommandString($uri)
+    {
         if (preg_match('@^[^_]+_([^.]*)\.?[a-z]*@i', $uri, $regs)) {
             return $regs[1];
         }
         return '';
     }
 
-    private static function extractOutputContentType($uri) {
+    private static function extractOutputContentType($uri)
+    {
         if (preg_match('@\.([a-z0-9]+)$@i', $uri, $regs)) {
             try {
                 return ContentType::byExtention($regs[1]);

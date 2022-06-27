@@ -2,6 +2,8 @@
 
 namespace Barberry;
 
+use Barberry\Plugin\NullPlugin;
+use Symfony\Component\HttpFoundation;
 use Barberry\Storage;
 use Barberry\Direction;
 
@@ -18,6 +20,11 @@ class Controller implements Controller\ControllerInterface
     private $storage;
 
     /**
+     * @var Cache
+     */
+    private $cache;
+
+    /**
      * @var Request
      */
     private $request;
@@ -25,57 +32,67 @@ class Controller implements Controller\ControllerInterface
     /**
      * @param Request $request
      * @param Storage\StorageInterface $storage
+     * @param Cache $cache
      * @param Direction\Factory $directionFactory
      */
-    public function __construct(Request $request, Storage\StorageInterface $storage, Direction\Factory $directionFactory)
-    {
+    public function __construct(
+        Request $request,
+        Storage\StorageInterface $storage,
+        Cache $cache,
+        Direction\Factory $directionFactory
+    ) {
         $this->request = $request;
         $this->storage = $storage;
+        $this->cache = $cache;
         $this->directionFactory = $directionFactory;
     }
 
     /**
-     * @return Response
+     * @return HttpFoundation\Response
      * @throws Controller\NullPostException
      * @throws Controller\NotImplementedException
      */
-    public function POST()
+    public function post(): HttpFoundation\Response
     {
-        if (!strlen($this->request->bin)) {
+        if (
+            is_null($this->request->postedFile) ||
+            $this->request->postedFile->uploadedFile->getStream()->getSize() === 0
+        ) {
             throw new Controller\NullPostException;
         }
 
         try {
-            $contentType = ContentType::byFilename($this->request->tmpName);
+            $contentType = ContentType::byFilename($this->request->postedFile->tmpName);
         } catch (ContentType\Exception $e) {
             throw new Controller\NotImplementedException($e->getMessage());
         }
 
-        return self::response(
-            ContentType::json(),
-            json_encode(
-                array(
-                    'id' => $this->storage->save($this->request->bin),
-                    'contentType' => (string) $contentType,
-                    'ext' => $contentType->standardExtension(),
-                    'length' => strlen($this->request->bin),
-                    'filename' => $this->request->postedFilename,
-                    'md5' => $this->request->postedMd5
-                )
-            ),
-            201
+        $uploadedFile = $this->request->postedFile->uploadedFile;
+        $fileMd5 = md5_file($this->request->postedFile->tmpName);
+
+        return self::jsonResponse(
+            [
+                'id' => $this->storage->save($uploadedFile),
+                'contentType' => (string) $contentType,
+                'ext' => $contentType->standardExtension(),
+                'length' => $uploadedFile->getSize(),
+                'filename' => $uploadedFile->getClientFilename(),
+                'md5' => $fileMd5
+            ],
+            HttpFoundation\Response::HTTP_CREATED
         );
     }
 
     /**
-     * @return Response
+     * @return HttpFoundation\Response
      * @throws Controller\NotFoundException
      * @throws ContentType\Exception
+     * @throws Cache\Exception
      */
-    public function GET()
+    public function get(): HttpFoundation\Response
     {
         try {
-            $bin = $this->storage->getById($this->request->id);
+            $stream = $this->storage->getById($this->request->id);
         } catch (Storage\NotFoundException $e) {
             throw new Controller\NotFoundException;
         }
@@ -87,14 +104,40 @@ class Controller implements Controller\ControllerInterface
         }
 
         try {
-            return self::response(
+            $direction = $this->directionFactory->direction(
+                $contentType,
                 $this->request->contentType,
-                $this->directionFactory->direction(
-                    $contentType,
-                    $this->request->contentType,
-                    $this->request->commandString
-                )->convert($bin)
+                $this->request->commandString
             );
+
+            if ($direction instanceof NullPlugin) {
+                $this->cache->save($stream, $this->request);
+
+                return (new HttpFoundation\StreamedResponse(
+                    static function() use ($stream) {
+                        $stream->rewind();
+                        while (!$stream->eof()) {
+                            echo $stream->read(4096);
+                        }
+                        $stream->close();
+                    },
+                    HttpFoundation\Response::HTTP_OK,
+                    [
+                        'Content-type' => (string) $this->request->contentType
+                    ]
+                ))->setProtocolVersion('1.1');
+            }
+
+            $content = $direction->convert($stream->getContents());
+            $this->cache->save($content, $this->request);
+
+            return (new HttpFoundation\Response(
+                $content,
+                HttpFoundation\Response::HTTP_OK,
+                [
+                    'Content-type' => (string) $this->request->contentType
+                ]
+            ))->setProtocolVersion('1.1');
         } catch (Plugin\NotAvailableException $e) {
             throw new Controller\NotFoundException;
         } catch (Exception\AmbiguousPluginCommand $e) {
@@ -105,17 +148,18 @@ class Controller implements Controller\ControllerInterface
     }
 
     /**
-     * @return Response
+     * @return HttpFoundation\Response
      * @throws Controller\NotFoundException
      */
-    public function DELETE()
+    public function delete(): HttpFoundation\Response
     {
         try {
             $this->storage->delete($this->request->id);
+            $this->cache->invalidate($this->request->id);
         } catch (Storage\NotFoundException $e) {
             throw new Controller\NotFoundException;
         }
-        return self::response(ContentType::json(), '{}');
+        return self::jsonResponse([]);
     }
 
     public function __call($name, $args)
@@ -123,9 +167,13 @@ class Controller implements Controller\ControllerInterface
         throw new Controller\NotFoundException;
     }
 
-    private static function response($contentType, $body, $code = 200)
+    /**
+     * @param $data
+     * @param int $status
+     * @return HttpFoundation\Response
+     */
+    private static function jsonResponse($data, int $status = HttpFoundation\Response::HTTP_OK): HttpFoundation\Response
     {
-        return new Response($contentType, $body, $code);
+        return (new HttpFoundation\JsonResponse($data,$status))->setProtocolVersion('1.1');
     }
-
 }

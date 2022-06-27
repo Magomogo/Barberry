@@ -1,75 +1,90 @@
 <?php
+
 namespace Barberry;
 
-class RequestTest extends \PHPUnit_Framework_TestCase {
+use GuzzleHttp\Psr7\UploadedFile;
+use PHPUnit\Framework\TestCase;
 
-    public function testExtractsId() {
-        $this->assertEquals('12345zx', self::request('/12345zx.jpg')->id);
-        $this->assertEquals('12345zx', self::request('/12345zx')->id);
+class RequestTest extends TestCase
+{
+    public function testExtractsId(): void
+    {
+        self::assertEquals('12345zx', self::request('/12345zx.jpg')->id);
+        self::assertEquals('12345zx', self::request('/12345zx')->id);
     }
 
-    public function testExtractsGroup() {
-        $this->assertEquals(
+    public function testExtractsGroup(): void
+    {
+        self::assertEquals(
             'adm',
             self::request('/adm/12345zx.jpg')->group
         );
     }
 
-    public function testUnderstandsOutputContentTypeByExtension() {
-        $this->assertEquals(
+    public function testUnderstandsOutputContentTypeByExtension(): void
+    {
+        self::assertEquals(
             ContentType::jpeg(),
             self::request('/12345zx.jpg')->contentType
         );
-        $this->assertEquals(
+        self::assertEquals(
             ContentType::mp4(),
             self::request('/test.mp4')->contentType
         );
     }
 
-    public function testExtractsCommandStringFromUri() {
+    public function testExtractsCommandStringFromUri(): void
+    {
         $r = self::request('/123erwe34_175x75_bgFFF_bw.jpg');
-        $this->assertEquals('175x75_bgFFF_bw', $r->commandString);
+        self::assertEquals('175x75_bgFFF_bw', $r->commandString);
     }
 
-    public function testExtractsAll() {
+    public function testExtractsAll(): void
+    {
         $r = self::request('/adm/123erwe34_175x75_bgFFF_bw.jpg');
-        $this->assertEquals('adm', $r->group);
-        $this->assertEquals('123erwe34', $r->id);
-        $this->assertEquals('175x75_bgFFF_bw', $r->commandString);
-        $this->assertEquals(ContentType::jpeg(), $r->contentType);
+        self::assertEquals('adm', $r->group);
+        self::assertEquals('123erwe34', $r->id);
+        self::assertEquals('175x75_bgFFF_bw', $r->commandString);
+        self::assertEquals(ContentType::jpeg(), $r->contentType);
     }
 
-    public function testProvidesAccessToPostedFile() {
-        $request = new Request('', new PostedFile('123', '/tmp/asD6yhq', 'Text.txt'));
-        $this->assertEquals('123', $request->bin);
-        $this->assertEquals('Text.txt', $request->postedFilename);
-        $this->assertEquals('202cb962ac59075b964b07152d234b70', $request->postedMd5);
+    public function testProvidesAccessToPostedFile(): void
+    {
+        $postedFile = new PostedFile(
+            new UploadedFile('123', 1024, UPLOAD_ERR_OK, 'Text.txt', 'text/plain'),
+            '/tmp/xGhoPq'
+        );
+        $request = new Request('', $postedFile);
+
+        self::assertEquals($postedFile, $request->postedFile);
     }
 
-    public function testKeepsOriginalUri() {
+    public function testKeepsOriginalUri(): void
+    {
         $r = self::request('/adm/123erwe34_absrs.jpg');
-        $this->assertEquals('123erwe34_absrs.jpg', $r->originalBasename);
+        self::assertEquals('123erwe34_absrs.jpg', $r->originalBasename);
     }
 
-    public function testKeepsOriginalUriOfGroupRequest() {
+    public function testKeepsOriginalUriOfGroupRequest(): void
+    {
         $r = self::request('/123erwe34_absrs.jpg');
-        $this->assertEquals('123erwe34_absrs.jpg', $r->originalBasename);
+        self::assertEquals('123erwe34_absrs.jpg', $r->originalBasename);
     }
 
-    public function testRecognizesCommandWhenExtensionMissed() {
+    public function testRecognizesCommandWhenExtensionMissed(): void
+    {
         $r = self::request('/123erwe34_absrs');
-        $this->assertEquals('absrs', $r->commandString);
+        self::assertEquals('absrs', $r->commandString);
     }
 
-    public function testEmptyCommandStringAsString()
+    public function testEmptyCommandStringAsString(): void
     {
         $r = self::request('/123erwe34.gif');
-        $this->assertSame('', $r->commandString);
+        self::assertSame('', $r->commandString);
     }
 
-//--------------------------------------------------------------------------------------------------
-
-    private static function request($uri) {
+    private static function request($uri): Request
+    {
         return new Request($uri);
     }
 }

@@ -1,156 +1,180 @@
 <?php
+
 namespace Barberry\PostedFile;
+
+use Barberry\PostedFile;
 use Barberry\Test;
+use GuzzleHttp\Psr7\UploadedFile;
+use GuzzleHttp\Psr7\Utils;
+use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\TestCase;
 
-class CollectionTest extends \PHPUnit_Framework_TestCase {
+class CollectionTest extends TestCase
+{
+    private static $filesystem;
 
-    public function testImplementsIteratorAndArrayAccessInterfaces() {
-        $collection = new Collection(array());
-        $this->assertInstanceOf('\\Iterator', $collection);
-        $this->assertInstanceOf('\\ArrayAccess', $collection);
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        self::$filesystem = vfsStream::setup('root', null, [
+            'tmp' => [
+                '1254432ks3' => "Column1\tColumn2\tColumn3",
+                '1254432ks1' => 'GIF binary'
+            ]
+        ]);
     }
 
-    public function testCanBeIteratedThrowFiles() {
+    public function testImplementsIteratorAndArrayAccessInterfaces(): void
+    {
+        $collection = new Collection([]);
+        self::assertInstanceOf(\Iterator::class, $collection);
+        self::assertInstanceOf(\ArrayAccess::class, $collection);
+    }
+
+    public function testCanBeIteratedThrowFiles(): void
+    {
         $collection = $this->partiallyMockedCollection(
-            array(
+            [
                 'file' => self::goodFileInPhpFilesArray(),
                 'image' => self::additionalFileInPhpFilesArray()
-            )
+            ]
         );
 
-        $result = array();
+        $result = [];
         foreach ($collection as $key => $value) {
             $result[$key] = $value;
         }
 
-        $this->assertEquals(2, count($result));
-        $this->assertEquals('Name of a file.txt', $result['file']->filename);
-        $this->assertEquals('another.gif', $result['image']->filename);
+        self::assertCount(2, $result);
+        self::assertEquals('Name of a file.txt', $result['file']->uploadedFile->getClientFilename());
+        self::assertEquals('another.gif', $result['image']->uploadedFile->getClientFilename());
     }
 
-    public function testReturnsPostedFileCreatedFromUploadedFilesPhpSpec() {
+    public function testReturnsPostedFileCreatedFromUploadedFilesPhpSpec(): void
+    {
         $collection = $this->partiallyMockedCollection();
-        $this->assertInstanceOf('Barberry\\PostedFile', $collection['file']);
+        self::assertInstanceOf(PostedFile::class, $collection['file']);
     }
 
-    public function testThrowsExceptionOnSetWrongPostedFile() {
-        $this->setExpectedException('Barberry\\PostedFile\\CollectionException', 'Wrong type, should be PostedFile');
+    public function testThrowsExceptionOnSetWrongPostedFile(): void
+    {
+        $this->expectException(CollectionException::class);
         $collection = $this->partiallyMockedCollection();
         $collection['file'] = new \stdClass();
     }
 
-    public function testCanSetPostedFile() {
+    public function testCanSetPostedFile(): void
+    {
         $collection = $this->partiallyMockedCollection();
-        $collection['file'] = new \Barberry\PostedFile('ssdgsdfg', '/tmp/asD6yhq', 'test.txt');
-
-        $this->assertEquals('test.txt', $collection['file']->filename);
-    }
-
-    public function testCanAddNewPostedFile() {
-        $collection = $this->partiallyMockedCollection();
-        $collection['image'] = new \Barberry\PostedFile('ssdgsdfg', '/tmp/asD6yhq', 'test.txt');
-
-        $collection->rewind();
-        $collection->next();
-
-        $this->assertEquals('test.txt', $collection->current()->filename);
-    }
-
-    public function testCanUnshiftPostedFileToTheBeginning() {
-        $collection = $this->partiallyMockedCollection();
-        $collection->unshift('image', new \Barberry\PostedFile('ssdgsdfg', '/tmp/asD6yhq', 'test.txt'));
-
-        $collection->rewind();
-        $this->assertEquals('test.txt', $collection->current()->filename);
-
-        $collection->next();
-        $this->assertEquals('Name of a file.txt', $collection->current()->filename);
-    }
-
-    public function testCallsReadTempFileWhenIterating() {
-        $collection = $this->partiallyMockedEmptyCollection();
-        $collection->expects($this->once())
-            ->method('readTempFile')
-            ->with('/tmp/1254432ks3')
-            ->will($this->returnValue(Test\Data::gif1x1()));
-
-        foreach ($collection as $v) {
-            $this->assertEquals(Test\Data::gif1x1(), $v->bin);
-        }
-    }
-
-    public function testCallsReadTempFileOnlyWhenValueIsRetrieved() {
-        $collection = $this->partiallyMockedEmptyCollection(
-            array('file' => self::goodFileInPhpFilesArray(), 'image' => self::additionalFileInPhpFilesArray())
+        $collection['file'] = new PostedFile(
+            new UploadedFile(Utils::streamFor('xxx'), 10, UPLOAD_ERR_OK, 'test.txt'),
+            '/tmp/asD6yhq'
         );
-        $collection->expects($this->once())
-            ->method('readTempFile')
-            ->with('/tmp/1254432ks1')
-            ->will($this->returnValue(Test\Data::gif1x1()));
+
+        self::assertEquals('test.txt', $collection['file']->uploadedFile->getClientFilename());
+    }
+
+    public function testCanAddNewPostedFile(): void
+    {
+        $collection = $this->partiallyMockedCollection();
+        $collection['image'] = new PostedFile(
+            new UploadedFile('ssdgsdfg', 10, UPLOAD_ERR_OK, 'test.txt'),
+            '/tmp/asD6yhq'
+        );
 
         $collection->rewind();
         $collection->next();
 
-        $this->assertEquals(Test\Data::gif1x1(),  $collection->current()->bin);
+        self::assertEquals('test.txt', $collection->current()->uploadedFile->getClientFilename());
     }
 
-    public function testIgnoresBadFiles() {
-        $collection = $this->partiallyMockedCollection(array('file' => self::badFileInPhpFilesArray()));
+    public function testCanUnshiftPostedFileToTheBeginning(): void
+    {
+        $collection = $this->partiallyMockedCollection();
+        $collection->unshift('image', new PostedFile(
+            new UploadedFile('ssdgsdfg', 10, UPLOAD_ERR_OK, 'test.txt'),
+            '/tmp/asD6yhq'
+        ));
+
+        $collection->rewind();
+        self::assertEquals('test.txt', $collection->current()->uploadedFile->getClientFilename());
+
+        $collection->next();
+        self::assertEquals('Name of a file.txt', $collection->current()->uploadedFile->getClientFilename());
+    }
+
+    public function testIgnoresBadFiles(): void
+    {
+        $collection = $this->partiallyMockedCollection(['file' => self::badFileInPhpFilesArray()]);
 
         foreach ($collection as $v) {
-            $this->fail('Should not contain any files');
+            self::fail('Should not contain any files');
         }
+
+        self::assertNull($collection[0]);
     }
 
-    public function testCanBeCreatedWithPostedFilesInConstructor() {
-        $collection = new Collection(array('file' => new \Barberry\PostedFile(Test\Data::gif1x1(), '/tmp/asD6yhq', 'test.gif')));
-        $this->assertEquals(Test\Data::gif1x1(), $collection['file']->bin);
+    public function testCanBeCreatedWithPostedFilesInConstructor(): void
+    {
+        $collection = new Collection([
+            'file' => new PostedFile(
+                new UploadedFile(Utils::streamFor('gif content'), 10, UPLOAD_ERR_OK, 'test.gif'),
+                '/tmp/asD6yhq'
+            )
+        ]);
+        $this->assertEquals('gif content', $collection['file']->uploadedFile->getStream()->getContents());
     }
 
-//--------------------------------------------------------------------------------------------------
-
-    private static function goodFileInPhpFilesArray() {
-        return array(
+    private static function goodFileInPhpFilesArray(): array
+    {
+        return [
             'size' => 1234,
-            'tmp_name' => '/tmp/1254432ks3',
+            'tmp_name' => self::$filesystem->url() . '/tmp/1254432ks3',
             'error' => UPLOAD_ERR_OK,
             'name' => 'Name of a file.txt'
-        );
+        ];
     }
 
-    private static function additionalFileInPhpFilesArray() {
-        return array(
+    private static function additionalFileInPhpFilesArray(): array
+    {
+        return [
             'size' => 123,
-            'tmp_name' => '/tmp/1254432ks1',
+            'tmp_name' => self::$filesystem->url() . '/tmp/1254432ks1',
             'error' => UPLOAD_ERR_OK,
             'name' => 'another.gif'
-        );
+        ];
     }
 
-    private static function badFileInPhpFilesArray() {
-        return array(
+    private static function badFileInPhpFilesArray()
+    {
+        return [
             'size' => 0,
             'error' => UPLOAD_ERR_CANT_WRITE
-        );
+        ];
     }
 
-    private function partiallyMockedEmptyCollection(array $specs = null) {
+    private function partiallyMockedEmptyCollection(array $specs = null)
+    {
         if ($specs === null) {
-            $specs = array('file' => self::goodFileInPhpFilesArray());
+            $specs = ['file' => self::goodFileInPhpFilesArray()];
         }
 
         return $this->getMockBuilder('Barberry\\PostedFile\\Collection')
             ->setMethods(['readTempFile'])
             ->enableOriginalConstructor()
-            ->setConstructorArgs(array($specs))
+            ->setConstructorArgs([$specs])
             ->getMock();
 
     }
 
-    private function partiallyMockedCollection(array $specs = null, $readFile = null) {
+    private function partiallyMockedCollection(array $specs = null, $readFile = null)
+    {
         $partialMock = $this->partiallyMockedEmptyCollection($specs);
-        $partialMock->expects($this->any())->method('readTempFile')
-            ->will($this->returnValue($readFile ?: Test\Data::gif1x1()));
+        $partialMock
+            ->expects($this->any())
+            ->method('readTempFile')
+            ->willReturn($readFile ?: Test\Data::gif1x1());
 
         return $partialMock;
     }

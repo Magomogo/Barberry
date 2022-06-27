@@ -1,28 +1,43 @@
 <?php
+
 namespace Barberry;
 
-class PostedDataProcessorTest extends \PHPUnit_Framework_TestCase {
+use Barberry\Filter\FilterInterface;
+use Barberry\PostedFile\Collection;
+use GuzzleHttp\Psr7\UploadedFile;
+use GuzzleHttp\Psr7\Utils;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-    public function testCallsFilterInterfaceSpecifiedInConstructor() {
-        $postVars = array('var' => 'test val');
+class PostedDataProcessorTest extends TestCase
+{
+    public function testCallsFilterInterfaceSpecifiedInConstructor(): void
+    {
+        $postVars = ['var' => 'test val'];
 
-        $filter = $this->createMock('Barberry\\Filter\\FilterInterface');
-        $filter->expects($this->once())
-            ->method('filter')
-            ->with($this->isInstanceOf('Barberry\\PostedFile\\Collection'), $postVars)
-            ->will(
-                $this->returnCallback(
-                    function (\Barberry\PostedFile\Collection $files, $vars) {
-                        $files['file'] = new PostedFile('test content', '/tmp/asD6yhq', 'test.txt');
-                    }
-                )
-            );
+        $filterMock = m::mock(FilterInterface::class);
+        $filterMock
+            ->shouldReceive('filter')
+            ->with(m::type(Collection::class), $postVars)
+            ->andReturnUsing(
+                function (\Barberry\PostedFile\Collection $files, $vars) {
+                    $files['file'] = new PostedFile(
+                        new UploadedFile(Utils::streamFor('test content'), 10, UPLOAD_ERR_OK, 'test.txt'),
+                        '/tmp/asD6yhq'
+                    );
+                }
+            )
+            ->once();
 
-        $processor = new PostedDataProcessor($filter);
-        $this->assertEquals('test content', $processor->process(array(), $postVars)->bin);
+        $processor = new PostedDataProcessor($filterMock);
+        self::assertEquals(
+            'test content',
+            $processor->process([], $postVars)->uploadedFile->getStream()->getContents()
+        );
     }
 
-    public function testReturnsFirstPostedFileFromCollection() {
+    public function testReturnsFirstPostedFileFromCollection(): void
+    {
         $mock = $this->getMockBuilder('Barberry\\PostedDataProcessor')
             ->setMethods(['createCollection'])
             ->enableOriginalConstructor()
@@ -31,18 +46,25 @@ class PostedDataProcessorTest extends \PHPUnit_Framework_TestCase {
         $mock->expects($this->once())
             ->method('createCollection')
             ->with(array('files'))
-            ->will(
-                $this->returnValue(
-                    new PostedFile\Collection(
-                        array(
-                            'file' => new PostedFile('some', '/tmp/asD6yhq', 'Name of a file.txt'),
-                            'image' => new PostedFile(Test\Data::gif1x1(), '/tmp/zAq8ugi', 'test.gif')
+            ->willReturn(
+                new PostedFile\Collection(
+                    array(
+                        'file' => new PostedFile(
+                            new UploadedFile(Utils::streamFor('some'), 10, UPLOAD_ERR_OK, 'Name of a file.txt'),
+                            '/tmp/asD6yhq'
+                        ),
+                        'image' => new PostedFile(
+                            new UploadedFile(Utils::streamFor('GIF binary'), 10, UPLOAD_ERR_OK, 'test.gif'),
+                            '/tmp/zAq8ugi'
                         )
                     )
                 )
             );
 
-        $this->assertEquals('Name of a file.txt', $mock->process(array('files'))->filename);
+        self::assertEquals(
+            'Name of a file.txt',
+            $mock->process(['files'])->uploadedFile->getClientFilename()
+        );
     }
 
 }

@@ -1,6 +1,9 @@
 <?php
 namespace Barberry\PostedFile;
 
+use GuzzleHttp\Psr7\UploadedFile;
+use GuzzleHttp\Psr7\Utils;
+
 class Collection implements \ArrayAccess, \Iterator
 {
 
@@ -133,14 +136,8 @@ class Collection implements \ArrayAccess, \Iterator
         }
     }
 
-    protected function readTempFile($filepath) {
-        if (is_uploaded_file($filepath)) {
-            return file_get_contents($filepath);
-        }
-        return null;
-    }
-
-    private function getPostedFile($key) {
+    private function getPostedFile($key)
+    {
         if (!$this->specsIterator->offsetExists($key)) {
             return null;
         }
@@ -148,9 +145,14 @@ class Collection implements \ArrayAccess, \Iterator
         $spec = $this->specsIterator[$key];
         if (is_array($spec)) {
             $this->specsIterator[$key] = new \Barberry\PostedFile(
-                $this->readTempFile($spec['tmp_name']),
-                $spec['tmp_name'],
-                $spec['name']
+                new UploadedFile(
+                    Utils::tryFopen($spec['tmp_name'], 'r'),
+                    $spec['size'],
+                    $spec['error'],
+                    $spec['name'],
+                    $spec['type'] ?? null
+                ),
+                $spec['tmp_name']
             );
         }
 
