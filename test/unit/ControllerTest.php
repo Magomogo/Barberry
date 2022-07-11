@@ -161,6 +161,12 @@ class ControllerTest extends TestCase
         self::controller(null, $storageMock)->get();
     }
 
+    public function testThrowsNotFoundExceptionOnGetWithoutDocumentId(): void
+    {
+        $this->expectException(NotFoundException::class);
+        self::controller(new Request(''))->get();
+    }
+
     public function testSuccessfulPOSTReturns201CreatedCode(): void
     {
         self::assertEquals(
