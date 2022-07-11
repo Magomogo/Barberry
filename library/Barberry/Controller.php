@@ -91,6 +91,10 @@ class Controller implements Controller\ControllerInterface
      */
     public function get(): HttpFoundation\Response
     {
+        if ($this->request->id === null) {
+            throw new Controller\NotFoundException;
+        }
+
         try {
             $stream = $this->storage->getById($this->request->id);
         } catch (Storage\NotFoundException $e) {
