@@ -35,5 +35,19 @@ class ApplicationTest extends TestCase
         $response = $app->run();
 
         self::assertSame(400, $response->getStatusCode());
+        self::assertEquals('{}', $response->getContent());
+    }
+
+    public function testOnEmptyGetRespond404NotFound(): void
+    {
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '';
+
+        $app = new Application(new Config(__DIR__));
+
+        $response = $app->run();
+
+        self::assertSame(404, $response->getStatusCode());
+        self::assertEquals('{}', $response->getContent());
     }
 }
