@@ -3,7 +3,6 @@ namespace Barberry;
 
 class Config
 {
-    public $directoryTemp;
     public $directoryStorage;
     public $directoryCache;
     public $directoryMonitors;
@@ -28,7 +27,6 @@ class Config
     private function setDefaultValues()
     {
         $this->directoryCache = $this->applicationPath . '/public/cache/';
-        $this->directoryTemp = $this->applicationPath . '/var/';
         $this->directoryStorage = $this->applicationPath . '/usr/storage/';
         $this->directoryMonitors = $this->applicationPath . '/barberry-monitors/';
     }
