@@ -14,7 +14,7 @@
         "ext-json": "*",
         "barberry/interfaces": "dev-master as 2.7.x-dev",
         "guzzlehttp/psr7": "^2.3",
-        "symfony/http-foundation": "^5.4"
+        "symfony/http-foundation": ">=5.4"
     },
     "suggest": {
         "ext-openssl": "*"
