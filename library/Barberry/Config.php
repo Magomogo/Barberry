@@ -5,7 +5,6 @@ class Config
 {
     public $directoryStorage;
     public $directoryCache;
-    public $directoryMonitors;
 
     public $applicationPath;
 
@@ -28,6 +27,5 @@ class Config
     {
         $this->directoryCache = $this->applicationPath . '/public/cache/';
         $this->directoryStorage = $this->applicationPath . '/usr/storage/';
-        $this->directoryMonitors = $this->applicationPath . '/barberry-monitors/';
     }
 }
