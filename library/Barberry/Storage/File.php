@@ -6,17 +6,16 @@ use Barberry\fs;
 use Barberry\nonlinear;
 use GuzzleHttp\Psr7\UploadedFile;
 use GuzzleHttp\Psr7\Utils;
+use League\Flysystem\Filesystem;
 use Psr\Http\Message\StreamInterface;
 
 class File implements StorageInterface
 {
-    private $permanentStoragePath;
+    private Filesystem $filesystem;
 
-    private $baseLen = 10;
-
-    public function __construct($path)
+    public function __construct(Filesystem $filesystem)
     {
-        $this->permanentStoragePath = fs\als($path);
+        $this->filesystem = $filesystem;
     }
 
     /**
@@ -26,15 +25,12 @@ class File implements StorageInterface
      */
     public function getById(string $id): StreamInterface
     {
-        $filePath = $this->filePathById($id);
-
-        if (is_file($filePath)) {
-            return Utils::streamFor(
-                Utils::tryFopen($filePath, 'rb')
-            );
+        $path = $this->filePathById($id);
+        if ($this->filesystem->fileExists($path)){
+            return Utils::streamFor($this->filesystem->readStream($path));
         }
 
-        throw new NotFoundException($filePath);
+        throw new NotFoundException($id);
     }
 
     /**
@@ -44,9 +40,11 @@ class File implements StorageInterface
      */
     public function getContentTypeById(string $id): ContentType
     {
-        return ContentType::byFilename(
-            $this->filePathById($id)
-        );
+        $path = $this->filePathById($id);
+
+        $content = $this->filesystem->read($path);
+
+        return ContentType::byString($content);
     }
 
     /**
@@ -57,15 +55,14 @@ class File implements StorageInterface
     {
         do {
             $id = $this->generateUniqueId();
-        } while (file_exists($filePath = $this->filePathById($id)));
+            $path = $this->filePathById($id);
+        } while ($this->filesystem->fileExists($path));
 
-        if (!is_dir(dirname($filePath))) {
-            if (!mkdir($directory = dirname($filePath), 0777, true) && !is_dir($directory)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $directory));
-            }
-        }
+        $this->filesystem->createDirectory(dirname($path));
 
-        $uploadedFile->moveTo($filePath);
+        $stream = $uploadedFile->getStream();
+
+        $this->filesystem->writeStream($path, $stream->detach());
 
         return $id;
     }
@@ -78,11 +75,12 @@ class File implements StorageInterface
     {
         $filePath = $this->filePathById($id);
 
-        if (is_file($filePath)) {
-            unlink($filePath);
-        } else {
-            throw new NotFoundException($filePath);
+        if ($this->filesystem->fileExists($filePath)) {
+            $this->filesystem->delete($filePath);
+            return;
         }
+
+        throw new NotFoundException($filePath);
     }
 
     /**
@@ -91,19 +89,19 @@ class File implements StorageInterface
      */
     private function filePathById($id)
     {
-        if (is_file($f = $this->permanentStoragePath . $id)) {
-            return $f;
+        if ($this->filesystem->fileExists($id)) {
+            return $id;
         }
 
-        return $this->permanentStoragePath . nonlinear\generateDestination($id) . $id;
+        return nonlinear\generateDestination($id) . $id;
     }
 
-    private function generateUniqueId()
+    private function generateUniqueId(): string
     {
         if (extension_loaded('openssl')) {
-            $bytes = openssl_random_pseudo_bytes($this->baseLen);
+            $bytes = openssl_random_pseudo_bytes(10);
             return bin2hex($bytes);
         }
-        return $this->baseLen > 10 ? md5(uniqid('', true)) : uniqid('');
+        return uniqid('', true);
     }
 }

@@ -3,23 +3,22 @@
 namespace Barberry;
 
 use GuzzleHttp\Psr7\Utils;
+use League\Flysystem\Filesystem;
+use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use Mockery as m;
-use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 
 class CacheTest extends TestCase
 {
     use m\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-    private static $filesystem;
+    private static Filesystem $filesystem;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        self::$filesystem = vfsStream::setup('root', null, [
-            'cache' => []
-        ]);
+        self::$filesystem = new Filesystem(new InMemoryFilesystemAdapter());
     }
 
     /**
@@ -29,20 +28,18 @@ class CacheTest extends TestCase
      */
     public function testConvertsUriToFilePath(string $uri, string $expectedPath): void
     {
-        $cache = new Cache(self::$filesystem->url() . '/cache');
+        $cache = new Cache(self::$filesystem);
         $cache->save('123', new Request($uri));
 
-        self::assertFileExists(self::$filesystem->url() . '/cache' . $expectedPath);
+        self::assertTrue(self::$filesystem->fileExists($expectedPath));
     }
 
     public function testStreamDataCanBeSaved(): void
     {
-        $cache = new Cache(self::$filesystem->url() . '/cache');
+        $cache = new Cache(self::$filesystem);
         $cache->save(Utils::streamFor('Cached content'), new Request('/a1b2c3d4.gif'));
 
-        self::assertEquals('Cached content', file_get_contents(
-            self::$filesystem->url() . '/cache/a1/b2/c3/a1b2c3d4/a1b2c3d4.gif'
-        ));
+        self::assertEquals('Cached content', self::$filesystem->read('a1/b2/c3/a1b2c3d4/a1b2c3d4.gif'));
     }
 
     public static function uriCacheDataProvider(): array

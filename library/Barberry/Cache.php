@@ -1,17 +1,15 @@
 <?php
 namespace Barberry;
 
-use Barberry\nonlinear;
-use Barberry\fs;
-use GuzzleHttp\Psr7\Utils;
+use League\Flysystem\Filesystem;
 use Psr\Http\Message\StreamInterface;
 
 class Cache {
 
-    private $path;
+    private Filesystem $filesystem;
 
-    public function __construct($path) {
-        $this->path = fs\als($path);
+    public function __construct(Filesystem $filesystem) {
+        $this->filesystem = $filesystem;
     }
 
     /**
@@ -29,33 +27,23 @@ class Cache {
 
     public function invalidate($id): void
     {
-        $dir = $this->path . nonlinear\generateDestination($id);
-        if (is_dir($dir)) {
-            fs\rmDirRecursive($dir);
+        $path  = nonlinear\generateDestination($id);
+        if ($this->directoryExists($path)) {
+            $this->filesystem->deleteDirectory($path);
         }
     }
 
     private function writeToFilesystem($streamOrContent, $filePath): void
     {
-        if (!is_dir($d = dirname($filePath))) {
-            if (!mkdir($d, 0777, true) && !is_dir($d)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $d));
-            }
+        $dir = dirname($filePath);
+        if (!$this->directoryExists($dir)) {
+            $this->filesystem->createDirectory($dir);
         }
 
         if ($streamOrContent instanceof StreamInterface) {
-            Utils::copyToStream(
-                $streamOrContent,
-                Utils::streamFor(
-                    Utils::tryFopen($filePath, 'w+')
-                )
-            );
+            $this->filesystem->writeStream($filePath, $streamOrContent->detach());
         } else {
-            $bytes = @file_put_contents($filePath, $streamOrContent);
-            if ($bytes === false) {
-                $msg = error_get_last();
-                throw new Cache\Exception($filePath, isset($msg['message']) ? $msg['message'] : '');
-            }
+            $this->filesystem->write($filePath, $streamOrContent);
         }
     }
 
@@ -63,11 +51,11 @@ class Cache {
     {
         $file = self::directoryByRequest($request);
 
-        if (is_file($f = $this->path . $file)) {
-            return $f;
+        if ($this->filesystem->fileExists($file)) {
+            return $file;
         }
 
-        return $this->path . nonlinear\generateDestination($request->id) . $file;
+        return nonlinear\generateDestination($request->id) . $file;
     }
 
     private static function directoryByRequest(Request $request): string
@@ -77,10 +65,22 @@ class Cache {
             array_filter(
                 array(
                     $request->group,
-                    $request->id . '/' . $request->originalBasename
-                )
-            )
+                    $request->id . '/' . $request->originalBasename,
+                ),
+            ),
         );
+    }
+
+    private function directoryExists(string $path): bool
+    {
+        if (method_exists($this->filesystem, 'directoryExists')) {
+            return $this->filesystem->directoryExists($path);
+        }
+        if (method_exists($this->filesystem, 'listContents')) {
+            $content = $this->filesystem->listContents($path, false)->toArray();
+            return !empty($content);
+        }
+        return false;
     }
 
 }

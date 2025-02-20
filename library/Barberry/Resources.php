@@ -1,6 +1,6 @@
 <?php
 namespace Barberry;
-use Barberry\Filter;
+use League\Flysystem\Filesystem;
 
 class Resources
 {
@@ -38,7 +38,7 @@ class Resources
         return $this->getResource(
             __FUNCTION__,
             function () use ($config) {
-                return new Cache($config->directoryCache);
+                return new Cache(new Filesystem($config->cacheAdapter));
             }
         );
     }
@@ -52,7 +52,7 @@ class Resources
         return $this->getResource(
             __FUNCTION__,
             function () use ($config) {
-                return new Storage\File($config->directoryStorage);
+                return new Storage\File(new Filesystem($config->storageAdapter));
             }
         );
     }

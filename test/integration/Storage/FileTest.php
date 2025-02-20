@@ -7,7 +7,11 @@ use Barberry\Test;
 use Barberry\fs;
 use GuzzleHttp\Psr7\UploadedFile;
 use GuzzleHttp\Psr7\Utils;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
+
+use function PHPUnit\Framework\assertEquals;
 
 class FileTest extends TestCase
 {
@@ -15,7 +19,7 @@ class FileTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->storage_path = '/tmp/testStorage/';
+        $this->storage_path = '/tmp/testStorage-'.random_int(1000, 9999).'/';
         if (!is_dir($this->storage_path)) {
             mkdir($this->storage_path);
         }
@@ -23,7 +27,7 @@ class FileTest extends TestCase
 
     protected function tearDown(): void
     {
-        fs\rmDirRecursive($this->storage_path);
+        self::rmDirRecursive($this->storage_path);
     }
 
     public function testIsFileSavedInFileSystem(): void
@@ -90,8 +94,34 @@ class FileTest extends TestCase
         $this->storage()->getById('/');
     }
 
-    private function storage($path = null): File
+    public function testCanDefineContentType(): void{
+        $id = $this->storage()->save(
+            new UploadedFile(Utils::tryFopen(__DIR__ . '/../data/1x1.gif', 'r'), 43, UPLOAD_ERR_OK)
+        );
+
+        assertEquals('image/gif', $this->storage()->getContentTypeById($id)->__toString());
+    }
+
+    private function storage(): File
     {
-        return new File($path ?: $this->storage_path);
+        return new File(new Filesystem(new LocalFilesystemAdapter($this->storage_path)));
+    }
+
+    private static function rmDirRecursive(string $dir): void {
+        if (!is_dir($dir)) {
+            throw new \InvalidArgumentException("$dir is not a valid directory.");
+        }
+
+        $items = array_diff(scandir($dir), ['.', '..']);
+
+        foreach ($items as $item) {
+            $path = $dir . DIRECTORY_SEPARATOR . $item;
+            if (is_dir($path)) {
+                self::rmDirRecursive($path);
+                rmdir($path);
+            } else {
+                unlink($path);
+            }
+        }
     }
 }

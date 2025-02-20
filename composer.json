@@ -10,18 +10,20 @@
         ]
     },
     "require": {
-        "php": ">=7.3",
+        "php": ">=7.4",
         "ext-json": "*",
         "barberry/interfaces": "dev-master as 2.7.x-dev",
         "guzzlehttp/psr7": "^2.3",
+        "league/flysystem": "*",
         "symfony/http-foundation": ">=5.4"
     },
     "suggest": {
         "ext-openssl": "*"
     },
     "require-dev": {
+        "league/flysystem-memory": "*",
+        "mikey179/vfsstream": "^1.6",
         "mockery/mockery": "^1.0",
-        "phpunit/phpunit": "^9.4",
-        "mikey179/vfsstream": "^1.6"
+        "phpunit/phpunit": "^9.4"
     }
 }
