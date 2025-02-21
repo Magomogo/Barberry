@@ -1,2 +1,2 @@
 <?php
-return array('directoryStorage' => '/usr/another/storage');
+return array('directoryStorage' => '/tmp/another/storage');
