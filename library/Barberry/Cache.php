@@ -41,7 +41,17 @@ class Cache {
         }
 
         if ($streamOrContent instanceof StreamInterface) {
-            $this->filesystem->writeStream($filePath, $streamOrContent->detach());
+            $resource = tmpfile();
+            if ($resource === false) {
+                throw new Cache\Exception('Unable to create temporary file');
+            }
+            $streamOrContent->rewind();
+            while (!$streamOrContent->eof()) {
+                $chunk = $streamOrContent->read(8192);
+                fwrite($resource, $chunk);
+            }
+            $this->filesystem->writeStream($filePath, $resource);
+            fclose($resource);
         } else {
             $this->filesystem->write($filePath, $streamOrContent);
         }
