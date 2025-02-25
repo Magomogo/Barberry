@@ -1,0 +1,34 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - master
+      - "[0-9]+.[0-9]+"
+  pull_request:
+    branches:
+      - master
+      - "[0-9]+.[0-9]+"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ["7.4", "8.0", "8.1", "8.2", "8.3"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "${{ matrix.php-version }}"
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --dev
+
+      - name: Run tests
+        run: ./vendor/bin/phpunit

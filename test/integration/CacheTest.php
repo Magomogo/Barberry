@@ -2,7 +2,8 @@
 
 namespace Barberry;
 
-use Barberry\Test;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
 
 class CacheIntegrationTest extends TestCase
@@ -59,6 +60,6 @@ class CacheIntegrationTest extends TestCase
 
     private function cache(): Cache
     {
-        return new Cache($this->cache_path);
+        return new Cache(new Filesystem(new LocalFilesystemAdapter($this->cache_path)));
     }
 }

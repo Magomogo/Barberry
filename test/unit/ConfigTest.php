@@ -9,6 +9,12 @@ class ConfigTest extends TestCase
     public function testOptionsCanBeOverriden(): void
     {
         $config = new Config(__DIR__, '/test_config.php');
-        self::assertEquals('/usr/another/storage', $config->directoryStorage);
+        self::assertEquals('/tmp/another/storage', $config->directoryStorage);
+    }
+
+    public function testWorksWithNullAppPath(): void
+    {
+        $config = new Config();
+        $this->expectNotToPerformAssertions();
     }
 }

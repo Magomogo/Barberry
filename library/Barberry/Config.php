@@ -1,17 +1,30 @@
 <?php
 namespace Barberry;
 
+use Composer\InstalledVersions;
+use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\Local\LocalFilesystemAdapter;
+
 class Config
 {
-    public $directoryTemp;
     public $directoryStorage;
-    public $directoryCache;
-    public $directoryMonitors;
+    private $directoryCache;
 
-    public $applicationPath;
+    private $applicationPath;
+    public FilesystemAdapter $storageAdapter;
+    public FilesystemAdapter $cacheAdapter;
 
-    public function __construct($applicationPath, $configToInclude = null)
+    public function __construct(
+        $applicationPath = null,
+        $configToInclude = null,
+        ?FilesystemAdapter $storageAdapter = null,
+        ?FilesystemAdapter $cacheAdapter = null
+    )
     {
+        if (is_null($applicationPath)) {
+            $installedPath = InstalledVersions::getRootPackage()['install_path'];
+            $applicationPath = $installedPath ?? dirname(__DIR__);
+        }
         $this->applicationPath = rtrim($applicationPath, '/');
         $this->setDefaultValues();
 
@@ -23,13 +36,20 @@ class Config
                 $this->$key = $value;
             }
         }
+
+        if (is_null($storageAdapter)) {
+            $storageAdapter = new LocalFilesystemAdapter($this->directoryStorage);
+        }
+        if (is_null($cacheAdapter)) {
+            $cacheAdapter = new LocalFilesystemAdapter($this->directoryCache);
+        }
+        $this->storageAdapter = $storageAdapter;
+        $this->cacheAdapter = $cacheAdapter;
     }
 
-    private function setDefaultValues()
+    private function setDefaultValues(): void
     {
         $this->directoryCache = $this->applicationPath . '/public/cache/';
-        $this->directoryTemp = $this->applicationPath . '/var/';
         $this->directoryStorage = $this->applicationPath . '/usr/storage/';
-        $this->directoryMonitors = $this->applicationPath . '/barberry-monitors/';
     }
 }
