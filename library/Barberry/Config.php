@@ -36,8 +36,15 @@ class Config
                 $this->$key = $value;
             }
         }
-        $this->cacheAdapter = new LocalFilesystemAdapter($this->directoryCache);
-        $this->storageAdapter = new LocalFilesystemAdapter($this->directoryStorage);
+
+        if (is_null($storageAdapter)) {
+            $storageAdapter = new LocalFilesystemAdapter($this->directoryStorage);
+        }
+        if (is_null($cacheAdapter)) {
+            $cacheAdapter = new LocalFilesystemAdapter($this->directoryCache);
+        }
+        $this->storageAdapter = $storageAdapter;
+        $this->cacheAdapter = $cacheAdapter;
     }
 
     private function setDefaultValues(): void
