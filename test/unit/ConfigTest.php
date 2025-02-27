@@ -2,14 +2,16 @@
 
 namespace Barberry;
 
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
 
 class ConfigTest extends TestCase
 {
     public function testOptionsCanBeOverriden(): void
     {
-        $config = new Config(__DIR__, '/test_config.php');
-        self::assertEquals('/tmp/another/storage', $config->directoryStorage);
+        $adapter = new LocalFilesystemAdapter('/tmp/another/storage');
+        $config = new Config($adapter);
+        self::assertEquals($adapter, $config->storageAdapter);
     }
 
     public function testWorksWithNullAppPath(): void
