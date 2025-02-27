@@ -39,6 +39,6 @@ class ResourcesTest extends TestCase
 
     private static function r(Filter\FilterInterface $filter = null): Resources
     {
-        return new Resources(new Config(__DIR__), $filter);
+        return new Resources(new Config(), $filter);
     }
 }
