@@ -13,6 +13,7 @@ class Config
     private string $applicationPath;
     public FilesystemAdapter $storageAdapter;
     public FilesystemAdapter $cacheAdapter;
+    private int $depth = 3;
 
     /**
      * When you pass null, by default will be used ../public/cache/ and ../usr/storage/ locations
@@ -45,5 +46,15 @@ class Config
 
         $this->directoryCache = $this->applicationPath . '/public/cache/';
         $this->directoryStorage = $this->applicationPath . '/usr/storage/';
+    }
+
+    public function setDepth(int $depth): void
+    {
+        $this->depth = $depth;
+    }
+
+    public function getDepth(): int
+    {
+        return $this->depth;
     }
 }

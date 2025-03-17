@@ -2,8 +2,7 @@
 namespace Barberry\Storage;
 
 use Barberry\ContentType;
-use Barberry\fs;
-use Barberry\nonlinear;
+use Barberry\Destination;
 use GuzzleHttp\Psr7\UploadedFile;
 use GuzzleHttp\Psr7\Utils;
 use League\Flysystem\Filesystem;
@@ -12,10 +11,12 @@ use Psr\Http\Message\StreamInterface;
 class File implements StorageInterface
 {
     private Filesystem $filesystem;
+    private Destination $destination;
 
-    public function __construct(Filesystem $filesystem)
+    public function __construct(Filesystem $filesystem, Destination $destination)
     {
         $this->filesystem = $filesystem;
+        $this->destination = $destination;
     }
 
     /**
@@ -93,7 +94,7 @@ class File implements StorageInterface
             return $id;
         }
 
-        return nonlinear\generateDestination($id) . $id;
+        return $this->destination->generate($id) . $id;
     }
 
     private function generateUniqueId(): string

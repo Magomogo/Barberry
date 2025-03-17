@@ -60,6 +60,6 @@ class CacheIntegrationTest extends TestCase
 
     private function cache(): Cache
     {
-        return new Cache(new Filesystem(new LocalFilesystemAdapter($this->cache_path)));
+        return new Cache(new Filesystem(new LocalFilesystemAdapter($this->cache_path)), new Destination());
     }
 }
