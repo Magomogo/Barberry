@@ -2,9 +2,8 @@
 
 namespace Barberry\Storage;
 
-use Barberry\nonlinear;
+use Barberry\Destination;
 use Barberry\Test;
-use Barberry\fs;
 use GuzzleHttp\Psr7\UploadedFile;
 use GuzzleHttp\Psr7\Utils;
 use League\Flysystem\Filesystem;
@@ -46,7 +45,9 @@ class FileTest extends TestCase
             new UploadedFile(Utils::tryFopen(__DIR__ . '/../data/1x1.gif', 'r'), 43, UPLOAD_ERR_OK)
         );
 
-        $path = $this->storage_path . nonlinear\generateDestination($id);
+        $destination = new Destination();
+
+        $path = $this->storage_path . $destination->generate($id);
         self::assertCount(5, array_filter(explode(DIRECTORY_SEPARATOR, $path), function($item) { return !empty($item); }));
 
         $content = file_get_contents($path . $id);
@@ -104,7 +105,7 @@ class FileTest extends TestCase
 
     private function storage(): File
     {
-        return new File(new Filesystem(new LocalFilesystemAdapter($this->storage_path)));
+        return new File(new Filesystem(new LocalFilesystemAdapter($this->storage_path)), new Destination());
     }
 
     private static function rmDirRecursive(string $dir): void {

@@ -28,7 +28,7 @@ class CacheTest extends TestCase
      */
     public function testConvertsUriToFilePath(string $uri, string $expectedPath): void
     {
-        $cache = new Cache(self::$filesystem);
+        $cache = new Cache(self::$filesystem, new Destination());
         $cache->save('123', new Request($uri));
 
         self::assertTrue(self::$filesystem->fileExists($expectedPath));
@@ -36,7 +36,7 @@ class CacheTest extends TestCase
 
     public function testStreamDataCanBeSaved(): void
     {
-        $cache = new Cache(self::$filesystem);
+        $cache = new Cache(self::$filesystem, new Destination());
         $cache->save(Utils::streamFor('Cached content'), new Request('/a1b2c3d4.gif'));
 
         self::assertEquals('Cached content', self::$filesystem->read('a1/b2/c3/a1b2c3d4/a1b2c3d4.gif'));

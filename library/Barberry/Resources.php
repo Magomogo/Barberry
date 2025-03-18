@@ -18,6 +18,7 @@ class Resources
      * @var Filter\FilterInterface
      */
     private $filter;
+    private Destination $destination;
 
     /**
      * @param Config $config
@@ -27,6 +28,7 @@ class Resources
     {
         $this->config = $config;
         $this->filter = $filter;
+        $this->destination = new Destination($config->getDepth());
     }
 
     /**
@@ -38,7 +40,7 @@ class Resources
         return $this->getResource(
             __FUNCTION__,
             function () use ($config) {
-                return new Cache(new Filesystem($config->cacheAdapter));
+                return new Cache(new Filesystem($config->cacheAdapter), $this->destination);
             }
         );
     }
@@ -52,7 +54,7 @@ class Resources
         return $this->getResource(
             __FUNCTION__,
             function () use ($config) {
-                return new Storage\File(new Filesystem($config->storageAdapter));
+                return new Storage\File(new Filesystem($config->storageAdapter), $this->destination);
             }
         );
     }

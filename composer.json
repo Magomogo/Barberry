@@ -4,10 +4,7 @@
     "autoload": {
         "psr-0": {
             "Barberry": "library/"
-        },
-        "files": [
-            "library/Barberry/functions.php"
-        ]
+        }
     },
     "require": {
         "php": ">=7.4",

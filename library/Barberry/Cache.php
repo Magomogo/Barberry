@@ -7,9 +7,11 @@ use Psr\Http\Message\StreamInterface;
 class Cache {
 
     private Filesystem $filesystem;
+    private Destination $destination;
 
-    public function __construct(Filesystem $filesystem) {
+    public function __construct(Filesystem $filesystem, Destination $destination) {
         $this->filesystem = $filesystem;
+        $this->destination = $destination;
     }
 
     /**
@@ -27,7 +29,7 @@ class Cache {
 
     public function invalidate($id): void
     {
-        $path  = nonlinear\generateDestination($id);
+        $path  = $this->destination->generate($id);
         if ($this->directoryExists($path)) {
             $this->filesystem->deleteDirectory($path);
         }
@@ -65,7 +67,7 @@ class Cache {
             return $file;
         }
 
-        return nonlinear\generateDestination($request->id) . $file;
+        return $this->destination->generate($request->id) . $file;
     }
 
     private static function directoryByRequest(Request $request): string
