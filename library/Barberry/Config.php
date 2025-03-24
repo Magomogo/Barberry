@@ -4,6 +4,8 @@ namespace Barberry;
 use Composer\InstalledVersions;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
+use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
+use League\Flysystem\Visibility;
 
 class Config
 {
@@ -29,10 +31,10 @@ class Config
         $this->setDefaultValues();
 
         if (is_null($storageAdapter)) {
-            $storageAdapter = new LocalFilesystemAdapter($this->directoryStorage);
+            $storageAdapter = new LocalFilesystemAdapter($this->directoryStorage, new PortableVisibilityConverter(0664, 0600, 0775, 0700, Visibility::PUBLIC));
         }
         if (is_null($cacheAdapter)) {
-            $cacheAdapter = new LocalFilesystemAdapter($this->directoryCache);
+            $cacheAdapter = new LocalFilesystemAdapter($this->directoryCache, new PortableVisibilityConverter(0664, 0600, 0775, 0700, Visibility::PUBLIC));
         }
         $this->storageAdapter = $storageAdapter;
         $this->cacheAdapter = $cacheAdapter;

@@ -4,6 +4,8 @@ namespace Barberry;
 
 use League\Flysystem\Filesystem;
 use League\Flysystem\Local\LocalFilesystemAdapter;
+use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
+use League\Flysystem\Visibility;
 use PHPUnit\Framework\TestCase;
 
 class CacheIntegrationTest extends TestCase
@@ -26,7 +28,7 @@ class CacheIntegrationTest extends TestCase
     {
         $this->cache()->save(
             Test\Data::gif1x1(),
-            new Request('/7yU98sd_1x1.gif')
+            new Request('/7yU98sd_1x1.gif'),
         );
 
         $expectedPath = $this->cache_path . '/7y/U9/8s/7yU98sd/7yU98sd_1x1.gif';
@@ -38,7 +40,7 @@ class CacheIntegrationTest extends TestCase
     {
         $this->cache()->save(
             Test\Data::gif1x1(),
-            new Request('/adm/7yU98sd_1x1.gif')
+            new Request('/adm/7yU98sd_1x1.gif'),
         );
 
         $expectedPath = $this->cache_path . '/7y/U9/8s/adm/7yU98sd/7yU98sd_1x1.gif';
@@ -50,7 +52,7 @@ class CacheIntegrationTest extends TestCase
     {
         $this->cache()->save(
             Test\Data::gif1x1(),
-            new Request('/7yU98sd_1x1.gif')
+            new Request('/7yU98sd_1x1.gif'),
         );
 
         $this->cache()->invalidate('7yU98sd');
@@ -58,8 +60,29 @@ class CacheIntegrationTest extends TestCase
         self::assertDirectoryDoesNotExist($this->cache_path . '/7y/U9/8s/7yU98sd');
     }
 
+    public function testDirectoryHas775Permissions(): void
+    {
+        $currentUmask = umask();
+        umask(0);
+
+        $this->cache()->save(
+            Test\Data::gif1x1(),
+            new Request('QWERTY_1x1.gif'),
+        );
+
+        $this->assertFileExists($this->cache_path . 'QW/ER/TY/QWERTY/QWERTY_1x1.gif');
+
+        $dirPermissions = fileperms($this->cache_path . 'QW/ER/TY/QWERTY');
+        self::assertEquals('775',  decoct( $dirPermissions & 0777 ));
+
+        $permissions = fileperms($this->cache_path . 'QW/ER/TY/QWERTY/QWERTY_1x1.gif');
+        self::assertEquals('664',  decoct( $permissions & 0777 ));
+
+        umask($currentUmask);
+    }
+
     private function cache(): Cache
     {
-        return new Cache(new Filesystem(new LocalFilesystemAdapter($this->cache_path)), new Destination());
+        return new Cache(new Filesystem(new LocalFilesystemAdapter($this->cache_path, new PortableVisibilityConverter(0664, 0600, 0775, 0700, Visibility::PUBLIC))), new Destination());
     }
 }

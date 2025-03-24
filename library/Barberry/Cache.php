@@ -39,7 +39,7 @@ class Cache {
     {
         $dir = dirname($filePath);
         if (!$this->directoryExists($dir)) {
-            $this->filesystem->createDirectory($dir);
+            $this->filesystem->createDirectory($dir, ['visibility' => 'public']);
         }
 
         if ($streamOrContent instanceof StreamInterface) {
@@ -52,10 +52,10 @@ class Cache {
                 $chunk = $streamOrContent->read(8192);
                 fwrite($resource, $chunk);
             }
-            $this->filesystem->writeStream($filePath, $resource);
+            $this->filesystem->writeStream($filePath, $resource, ['visibility' => 'public']);
             fclose($resource);
         } else {
-            $this->filesystem->write($filePath, $streamOrContent);
+            $this->filesystem->write($filePath, $streamOrContent, ['visibility' => 'public']);
         }
     }
 
