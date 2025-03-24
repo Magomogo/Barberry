@@ -59,11 +59,11 @@ class File implements StorageInterface
             $path = $this->filePathById($id);
         } while ($this->filesystem->fileExists($path));
 
-        $this->filesystem->createDirectory(dirname($path));
+        $this->filesystem->createDirectory(dirname($path), ['visibility' => 'public']);
 
         $stream = $uploadedFile->getStream();
 
-        $this->filesystem->writeStream($path, $stream->detach());
+        $this->filesystem->writeStream($path, $stream->detach(), ['visibility' => 'public']);
 
         return $id;
     }
