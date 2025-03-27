@@ -2,6 +2,7 @@
 
 namespace Barberry;
 
+use League\Flysystem\FilesystemException;
 use Symfony\Component\HttpFoundation;
 use Barberry\Direction;
 
@@ -40,6 +41,9 @@ class Application
         } catch (Controller\NotImplementedException $e) {
 
             return self::jsonResponse(['msg' => $e->getMessage()], HttpFoundation\Response::HTTP_NOT_IMPLEMENTED);
+        } catch (FilesystemException $e) {
+            error_log((string) $e);
+            return self::jsonResponse(['msg' => $e->getMessage()], HttpFoundation\Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch (\Exception $e) {
             error_log((string) $e);
 
