@@ -37,11 +37,6 @@ class Cache {
 
     private function writeToFilesystem($streamOrContent, $filePath): void
     {
-        $dir = dirname($filePath);
-        if (!$this->directoryExists($dir)) {
-            $this->filesystem->createDirectory($dir, ['visibility' => 'public']);
-        }
-
         if ($streamOrContent instanceof StreamInterface) {
             $resource = tmpfile();
             if ($resource === false) {
