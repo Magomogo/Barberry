@@ -32,6 +32,17 @@ class FactoryTest extends TestCase
         );
     }
 
+    public function testSameExtensionWithDifferentMimesDoesNotActivatePlugin(): void
+    {
+        self::assertInstanceOf(
+            NullPlugin::class,
+            self::factory()->direction(
+                ContentType::xls('application/vnd.ms-excel'),
+                ContentType::xls('application/CDFV2')
+            )
+        );
+    }
+
     public function testSameSourceAndDestinationWithCommandRequiresPlugin(): void
     {
         $this->expectException(NotAvailableException::class);

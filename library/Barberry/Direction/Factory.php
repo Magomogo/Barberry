@@ -13,15 +13,17 @@ class Factory {
      * @return \Barberry\Plugin\InterfaceConverter
      */
     public function direction(ContentType $sourceContentType, ContentType $destinationContentType, $commandPart = null) {
+        $sourceExtension = $sourceContentType->standardExtension();
+        $destinationExtension = $destinationContentType->standardExtension();
 
         $directionClassName =
             'Barberry\\Direction\\'
                 . 'Direction'
-                . ucfirst($sourceContentType->standardExtension())
+                . ucfirst($sourceExtension)
                 . 'To'
-                . ucfirst($destinationContentType->standardExtension());
+                . ucfirst($destinationExtension);
 
-        if (($destinationContentType == $sourceContentType) && !$commandPart) {
+        if (($destinationExtension === $sourceExtension) && !$commandPart) {
             return new Plugin\NullPlugin;
         }
 
