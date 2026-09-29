@@ -274,7 +274,8 @@ class ControllerTest extends TestCase
                 ]
             ),
             $cache ?: m::mock(Cache::class, ['save' => true, 'invalidate' => true]),
-            $directionFactory ?: m::mock(Factory::class, ['direction' => new Plugin\NullPlugin])
+            $directionFactory ?: m::mock(Factory::class, ['direction' => new Plugin\NullPlugin]),
+            new ContentTypeDetector()
         );
     }
 

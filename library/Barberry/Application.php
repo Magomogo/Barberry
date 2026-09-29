@@ -27,7 +27,8 @@ class Application
             $this->resources->request(),
             $this->resources->storage(),
             $this->resources->cache(),
-            new Direction\Factory()
+            new Direction\Factory(),
+            new ContentTypeDetector()
         );
 
         try {

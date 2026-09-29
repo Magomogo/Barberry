@@ -30,21 +30,29 @@ class Controller implements Controller\ControllerInterface
     private $request;
 
     /**
+     * @var ContentTypeDetector
+     */
+    private $contentTypeDetector;
+
+    /**
      * @param Request $request
      * @param Storage\StorageInterface $storage
      * @param Cache $cache
      * @param Direction\Factory $directionFactory
+     * @param ContentTypeDetector $contentTypeDetector
      */
     public function __construct(
         Request $request,
         Storage\StorageInterface $storage,
         Cache $cache,
-        Direction\Factory $directionFactory
+        Direction\Factory $directionFactory,
+        ContentTypeDetector $contentTypeDetector
     ) {
         $this->request = $request;
         $this->storage = $storage;
         $this->cache = $cache;
         $this->directionFactory = $directionFactory;
+        $this->contentTypeDetector = $contentTypeDetector;
     }
 
     /**
@@ -63,6 +71,7 @@ class Controller implements Controller\ControllerInterface
 
         try {
             $contentType = ContentType::byFilename($this->request->postedFile->tmpName);
+            $contentType = $this->detectGenericContentType($contentType, $this->request->postedFile->tmpName);
         } catch (ContentType\Exception $e) {
             throw new Controller\NotImplementedException($e->getMessage());
         }
@@ -102,6 +111,8 @@ class Controller implements Controller\ControllerInterface
         }
 
         $contentType = $this->storage->getContentTypeById($this->request->id);
+        $contentType = $this->detectGenericStreamContentType($contentType, $stream);
+        $stream->rewind();
 
         if (is_null($this->request->contentType)) {
             $this->request->defineContentType($contentType);
@@ -169,6 +180,24 @@ class Controller implements Controller\ControllerInterface
     public function __call($name, $args)
     {
         throw new Controller\NotFoundException;
+    }
+
+    private function detectGenericContentType(ContentType $contentType, string $path): ContentType
+    {
+        if ((string) $contentType !== 'application/octet-stream') {
+            return $contentType;
+        }
+
+        return $this->contentTypeDetector->detectFile($path);
+    }
+
+    private function detectGenericStreamContentType(ContentType $contentType, $stream): ContentType
+    {
+        if ((string) $contentType !== 'application/octet-stream') {
+            return $contentType;
+        }
+
+        return $this->contentTypeDetector->detect($stream->read(ContentTypeDetector::SAMPLE_SIZE));
     }
 
     /**
