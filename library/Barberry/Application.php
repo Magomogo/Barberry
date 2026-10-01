@@ -27,7 +27,10 @@ class Application
             $this->resources->request(),
             $this->resources->storage(),
             $this->resources->cache(),
-            new Direction\Factory()
+            new Direction\Factory(),
+            new ContentType\Factory(new ContentTypeDetector([
+                new ContentType\Utf16CsvGuesser(new ContentType\FileReader()),
+            ]))
         );
 
         try {

@@ -30,21 +30,29 @@ class Controller implements Controller\ControllerInterface
     private $request;
 
     /**
+     * @var ContentType\Factory
+     */
+    private $contentTypeFactory;
+
+    /**
      * @param Request $request
      * @param Storage\StorageInterface $storage
      * @param Cache $cache
      * @param Direction\Factory $directionFactory
+     * @param ContentType\Factory $contentTypeFactory
      */
     public function __construct(
         Request $request,
         Storage\StorageInterface $storage,
         Cache $cache,
-        Direction\Factory $directionFactory
+        Direction\Factory $directionFactory,
+        ContentType\Factory $contentTypeFactory
     ) {
         $this->request = $request;
         $this->storage = $storage;
         $this->cache = $cache;
         $this->directionFactory = $directionFactory;
+        $this->contentTypeFactory = $contentTypeFactory;
     }
 
     /**
@@ -62,7 +70,7 @@ class Controller implements Controller\ControllerInterface
         }
 
         try {
-            $contentType = ContentType::byFilename($this->request->postedFile->tmpName);
+            $contentType = $this->contentTypeFactory->byFilename($this->request->postedFile->tmpName);
         } catch (ContentType\Exception $e) {
             throw new Controller\NotImplementedException($e->getMessage());
         }
@@ -102,6 +110,7 @@ class Controller implements Controller\ControllerInterface
         }
 
         $contentType = $this->storage->getContentTypeById($this->request->id);
+        $stream->rewind();
 
         if (is_null($this->request->contentType)) {
             $this->request->defineContentType($contentType);
