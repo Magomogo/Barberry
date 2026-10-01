@@ -28,9 +28,9 @@ class Application
             $this->resources->storage(),
             $this->resources->cache(),
             new Direction\Factory(),
-            new ContentTypeDetector([
-                new ContentType\Utf16CsvLocator(new ContentType\FileReader()),
-            ])
+            new ContentType\Factory(new ContentTypeDetector([
+                new ContentType\Utf16CsvGuesser(new ContentType\FileReader()),
+            ]))
         );
 
         try {
