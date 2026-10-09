@@ -7,7 +7,7 @@
         }
     },
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.0.2",
         "ext-json": "*",
         "barberry/interfaces": "dev-master as 2.7.x-dev",
         "guzzlehttp/psr7": "^2.3",
