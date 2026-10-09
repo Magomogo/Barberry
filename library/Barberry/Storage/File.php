@@ -50,8 +50,8 @@ class File implements StorageInterface
 
         $stream = $this->filesystem->readStream($path);
 
-        // Read only the first 4KB of the file. This is more than enough to determine the content type accurately.
-        $fileBeginning = fread($stream, 4096);
+        // Inspect up to 12KB so OOXML entries after metadata can be recognized.
+        $fileBeginning = fread($stream, 12288);
         fclose($stream);
 
         return ContentType::byString($fileBeginning);
